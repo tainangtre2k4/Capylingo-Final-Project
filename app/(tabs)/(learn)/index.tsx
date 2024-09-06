@@ -24,7 +24,7 @@ const Learn = () => {
                         </View>
                     </View>
                     <Image
-                        source={require('@/assets/images/learn/learn-greeter.png')}
+                        source={require('../../../assets/images/learn/learn-greeter.png')}
                         style={styles.image}
                     />
                 </View>

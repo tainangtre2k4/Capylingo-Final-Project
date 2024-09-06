@@ -1,16 +1,16 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, ImageSourcePropType, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import Vocabulary from "@/app/(auth)/learn/vocabulary";
+//import Vocabulary from "@/app/(tabs)/learn/vocabulary";
 
 // Define the allowed types
 type SubjectType = 'vocabulary' | 'grammar' | 'skillcheck';
 
 // Define an object to map types to their corresponding illustrations
 const illustrationMap: Record<SubjectType, ImageSourcePropType> = {
-  vocabulary: require('../../assets/images/learn/vocabulary-illustration.png'),
-  grammar: require('../../assets/images/learn/grammar-illustration.png'),
-  skillcheck: require('../../assets/images/learn/skillcheck-illustration.png'),
+  vocabulary: require('@/assets/images/learn/vocabulary-illustration.png'),
+  grammar: require('@/assets/images/learn/grammar-illustration.png'),
+  skillcheck: require('@/assets/images/learn/skillcheck-illustration.png'),
 };
 
 const link = {
