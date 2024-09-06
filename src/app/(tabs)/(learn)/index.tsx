@@ -1,7 +1,7 @@
 import {Dimensions, Image, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import {Ionicons} from '@expo/vector-icons'
-import WOTDCard from '@/components/learn/WOTDCard';
-import SubjectCard from '@/components/learn/SubjectCard';
+import WOTDCard from '@/src/components/learn/WOTDCard';
+import SubjectCard from '@/src/components/learn/SubjectCard';
 import {StatusBar} from 'expo-status-bar';
 
 const { width, height } = Dimensions.get('window');
