@@ -1,5 +1,6 @@
 import { useAuth } from "@/src/providers/AuthProvider";
-import { Redirect, Tabs } from "expo-router";
+import { Redirect, Tabs, useSegments } from "expo-router";
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function TabsLayout(){
     const { isAuthenticated } = useAuth();
@@ -7,5 +8,35 @@ export default function TabsLayout(){
     if (!isAuthenticated) {
         return <Redirect href="/(auth)" />;
     }
-    return <Tabs/>
+    const segment = useSegments();
+
+    const page = segment.join('/')
+    const pagesToHideTabBar = ['vocabulary/type1', 'skillcheck/reading', "skillcheck/listening"]
+
+    const checkPageToHideTabBar = (): boolean => {
+        for (const s of pagesToHideTabBar)
+          if (page.includes(s))
+            return true;
+        return false;
+      };
+    return( <Tabs>
+        <Tabs.Screen 
+        name="(learn)"
+        options={{
+            headerTransparent: true,
+            headerTitle: '',
+            tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="book-open-page-variant-outline" size={size} color={color} />,
+            tabBarLabel: 'Learn',
+            headerShown: false,
+            tabBarStyle: { display: checkPageToHideTabBar() ? 'none' : 'flex' }
+        }}/>
+        <Tabs.Screen 
+        name="(profile)"
+        options={{
+            headerShown: false,
+            tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
+            tabBarLabel: 'My Profile',
+        }}/>
+    </Tabs>
+    )
 }

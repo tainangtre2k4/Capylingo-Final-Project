@@ -1,93 +1,87 @@
-import React, { useState } from 'react'
-import { Alert, StyleSheet, View, AppState, TextInput } from 'react-native'
-import { supabase } from '@/src/lib/supabase'
-import Button from '@/src/components/community/Button'
+import { Link } from 'expo-router';
+import React, { useState } from 'react';
+import { View, StyleSheet, TextInput, Button, Pressable, Text, Alert,Image, TouchableOpacity } from 'react-native';
+import Spinner from 'react-native-loading-spinner-overlay';
+import colors from '@/constants/Colors';
+import { supabase } from '@/src/lib/supabase';
+const Login = () => {
 
-// Tells Supabase Auth to continuously refresh the session automatically if
-// the app is in the foreground. When this is added, you will continue to receive
-// `onAuthStateChange` events with the `TOKEN_REFRESHED` or `SIGNED_OUT` event
-// if the user's session is terminated. This should only be registered once.
-AppState.addEventListener('change', (state) => {
-  if (state === 'active') {
-    supabase.auth.startAutoRefresh()
-  } else {
-    supabase.auth.stopAutoRefresh()
-  }
-})
-
-export default function Auth() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [emailAddress, setEmailAddress] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   async function signInWithEmail() {
     setLoading(true)
     const { error } = await supabase.auth.signInWithPassword({
-      email: email,
+      email: emailAddress,
       password: password,
     })
 
     if (error) Alert.alert(error.message)
-    setLoading(false)
-  }
-
-  async function signUpWithEmail() {
-    setLoading(true)
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    })
-
-    if (error) Alert.alert(error.message)
-    if (!session) Alert.alert('Please check your inbox for email verification!')
     setLoading(false)
   }
 
   return (
     <View style={styles.container}>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <TextInput
-          onChangeText={(text) => setEmail(text)}
-          value={email}
-          placeholder="email@address.com"
-          autoCapitalize={'none'}
-          className="border border-gray-300 p-3 rounded-md"
-        />
+      <Spinner visible={loading} />
+      <View style={{alignItems:'center'}}>
+      <Image source={require('@/assets/images/login/1.png')} style={{width: 281, height: 285}} />
       </View>
-      <View style={styles.verticallySpaced}>
-        <TextInput
-          onChangeText={(text) => setPassword(text)}
-          value={password}
-          secureTextEntry={true}
-          placeholder="Password"
-          autoCapitalize={'none'}
-          className="border border-gray-300 p-3 rounded-md"
-        />
+      <View>
+        <Text style={styles.titleInput}>Email</Text>
+        <TextInput autoCapitalize="none" placeholder="Enter your email" value={emailAddress} onChangeText={setEmailAddress} style={styles.inputField} />
       </View>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Button title="Sign in"  onPress={() => signInWithEmail()} />
+      <View>
+        <Text style={styles.titleInput}>Password</Text>
+        <TextInput placeholder="Enter your password" value={password} onChangeText={setPassword} secureTextEntry style={styles.inputField} />
       </View>
-      <View style={styles.verticallySpaced}>
-        <Button title="Sign up" onPress={() => signUpWithEmail()} />
+      {/* <View style={styles.button}>
+        <Button onPress={onSignInPress} title="Login" color={'#FFFFFF'}/>
+      </View> */}
+      <TouchableOpacity onPress={signInWithEmail} style={styles.button}>
+        <Text style={{color: '#FFF', fontSize: 20, fontWeight: '500'}}> Login </Text>
+      </TouchableOpacity>
+
+      <View style={{flexDirection:'row',justifyContent: 'center'}}>
+      <Text>Doesn't have account?    </Text>
+      <Link href="/register" asChild>
+        <Pressable>
+          <Text style={{color: '#3DB2FF'}}>Create Account</Text>
+        </Pressable>
+      </Link>
       </View>
+
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 40,
-    padding: 12,
+    flex: 1,
+    justifyContent: 'center',
+    padding: 20,
   },
-  verticallySpaced: {
-    paddingTop: 4,
-    paddingBottom: 4,
-    alignSelf: 'stretch',
+  titleInput:{
+    color:'#0074CE',
+    fontSize:16,
   },
-  mt20: {
-    marginTop: 20,
+  inputField: {
+    marginVertical: 4,
+    height: 58,
+    borderWidth: 1,
+    borderColor: '#0074CE',
+    borderRadius: 40,
+    padding: 16,
+    backgroundColor: '#fff',
   },
-})
+  button: {
+    marginVertical: 4,
+    alignItems: 'center',
+    backgroundColor: colors.primary.primary80,
+    padding: 20,
+    marginTop: 16,
+    borderRadius: 40,
+  },
+});
+
+export default Login;
