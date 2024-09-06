@@ -30,6 +30,16 @@ export default function TabsLayout(){
             headerShown: false,
             tabBarStyle: { display: checkPageToHideTabBar() ? 'none' : 'flex' }
         }}/>
+
+        <Tabs.Screen
+          name="(dictionary)"
+          options={{
+              tabBarIcon: ({ color, size }) => <Ionicons name="file-tray-full" size={size} color={color} />,
+              tabBarLabel: 'Dictionary',
+              headerShown: false,
+          }}
+        />
+
         <Tabs.Screen 
         name="(profile)"
         options={{
