@@ -85,7 +85,7 @@ const VocabExercises = () => {
       const totalAnswered = numberCorrectAnswers + numberIncorrectAnswers;
       if (totalAnswered === exerciseLength) {
         router.push({
-          pathname: 'resultScreen',
+          pathname: './resultScreen',
           params: {
             correctAnswers: numberCorrectAnswers,
             wrongAnswers: numberIncorrectAnswers,
@@ -101,7 +101,7 @@ const VocabExercises = () => {
   const handleModalSubmit = () => {
     setModalVisible(false);
     router.push({
-      pathname: './exercises/resultScreen',
+      pathname: './resultScreen',
       params: {
         correctAnswers: numberCorrectAnswers,
         wrongAnswers: numberIncorrectAnswers,
