@@ -23,8 +23,14 @@ const VocabularyLesson = () => {
 
     return (
         <View style={styles.container}>
-            <Link href='/(learn)/vocabulary/exercises'>exercises</Link>
-            <Link href='/(learn)/vocabulary/learnVocab'>learn vocabs</Link>
+            <Link href='/vocabulary/exercises'>exercises</Link>
+            <Link href='/vocabulary/learnVocab'>learn vocabs</Link>
+            <Link href={{
+                pathname: '/resultScreen',
+                params: {correct: 12, all: 40}
+            }}>
+                result demo
+            </Link>
         </View>
     )
 }

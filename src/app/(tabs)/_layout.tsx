@@ -11,7 +11,7 @@ export default function TabsLayout(){
     const segment = useSegments();
 
     const page = segment.join('/')
-    const pagesToHideTabBar = ['vocabulary/type1', 'skillcheck/reading', "skillcheck/listening"]
+    const pagesToHideTabBar = ['vocabulary/type1', 'skillcheck/reading', 'skillcheck/listening', 'resultScreen']
 
     const checkPageToHideTabBar = (): boolean => {
         for (const s of pagesToHideTabBar)
