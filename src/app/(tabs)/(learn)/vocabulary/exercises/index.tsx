@@ -4,7 +4,7 @@ import { useNavigation } from "expo-router";
 import ProgressTracker from '@/src/components/ProgressTracker';
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from 'expo-router';
-import { getVocabExType1List, getVocabExType2List, getVocabExType3List} from '@/src/fetchData/fetchLearn'
+import { getVocabExType1List, getVocabExType2List, getVocabExType3List } from '@/src/fetchData/fetchLearn'
 import BackButton from "@/src/components/BackButton";
 import ExVocabType1 from '@/src/components/exercise/VocabType1/VocabType1';
 import ExVocabType2 from '@/src/components/exercise/VocabType2/VocabType2';
@@ -63,6 +63,12 @@ const VocabExercises = () => {
           <View style={styles.headerFillerContainer} />
         </View>
       ),
+      ...Platform.select({
+        android: {
+          statusBarColor: 'white',
+          statusBarStyle: 'dark',
+        }
+      })
     });
   }, [navigation, currentIndex, exerciseLength]);
 
@@ -114,7 +120,7 @@ const VocabExercises = () => {
   };
 
   return (
-    
+
     <>
       <StatusBar style="dark" backgroundColor="white" />
       <View style={styles.container}>
@@ -137,7 +143,7 @@ const VocabExercises = () => {
                 key={index}
                 onNext={goToNextExercise}
                 questionImageUrl={exercise.questionImage}
-                correctAnswerIndex={exercise.correctAnswerIndex-1}
+                correctAnswerIndex={exercise.correctAnswerIndex - 1}
                 answers={exercise.answers}
                 onCorrectAnswer={() => setNumberCorrectAnswers(prev => prev + 1)}
                 onIncorrectAnswer={() => setNumberIncorrectAnswers(prev => prev + 1)}
@@ -151,7 +157,7 @@ const VocabExercises = () => {
                 key={index}
                 onNext={goToNextExercise}
                 question={exercise.question}
-                correctAnswerIndex={exercise.correctAnswerIndex-1}
+                correctAnswerIndex={exercise.correctAnswerIndex - 1}
                 answers={exercise.answers}
                 onCorrectAnswer={() => setNumberCorrectAnswers(prev => prev + 1)}
                 onIncorrectAnswer={() => setNumberIncorrectAnswers(prev => prev + 1)}
@@ -204,7 +210,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: Platform.OS === 'android' ? RNStatusBar.currentHeight || 20 : 0,
     paddingVertical: 12,
     backgroundColor: 'white',
     paddingHorizontal: 20,
@@ -226,23 +231,23 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   capyModal: {
-    width: width*0.14,
-    height: width*0.14,
+    width: width * 0.14,
+    height: width * 0.14,
     resizeMode: 'contain',
     position: 'absolute',
-    top: -0.08*width,
+    top: -0.08 * width,
     right: -2,
   },
   modalContent: {
     width: '82%',
-    padding: 0.066*width,
+    padding: 0.066 * width,
     backgroundColor: 'white',
-    borderRadius: 0.04*width,
+    borderRadius: 0.04 * width,
     alignItems: 'center',
   },
   modalText: {
     fontSize: 20,
-    marginBottom: height*0.025,
+    marginBottom: height * 0.025,
     textAlign: 'center',
   },
   modalButtons: {
@@ -252,18 +257,18 @@ const styles = StyleSheet.create({
   },
   modalButtonCancel: {
     backgroundColor: '#A9A9A9',
-    padding: 0.026*width,
-    borderRadius: 0.026*width,
+    padding: 0.026 * width,
+    borderRadius: 0.026 * width,
     flex: 1,
-    marginRight: 0.026*width,
+    marginRight: 0.026 * width,
     alignItems: 'center',
   },
   modalButtonSubmit: {
     backgroundColor: '#4095F1',
-    padding: 0.026*width,
-    borderRadius: 0.026*width,
+    padding: 0.026 * width,
+    borderRadius: 0.026 * width,
     flex: 1,
-    marginLeft: 0.026*width,
+    marginLeft: 0.026 * width,
     alignItems: 'center',
   },
   modalButtonText: {
