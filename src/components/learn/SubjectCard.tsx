@@ -30,13 +30,13 @@ const SubjectCard: React.FC<SubjectCardProps> = ({ type }) => {
   const pressHandler = () => {
     switch (type) {
       case 'vocabulary':
-        router.push('/(auth)/learn/vocabulary');
+        router.push('/(tabs)/(learn)/vocabulary');
         break;
       case 'grammar':
-        router.push('/(auth)/learn/grammar');
+        router.push('/(tabs)/(learn)/grammar');
         break;
       case 'skillcheck':
-        router.push('/(auth)/learn/skillcheck');
+        router.push('/(tabs)/(learn)/skillcheck');
     }
   }
 
