@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useState, Dispatch, SetStateAction } from 'react';
 import { Stack } from 'expo-router';
-import {SafeAreaView} from "react-native";
+import { SafeAreaView, StyleSheet, StatusBar as RNStatusBar, Platform } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface WordData {
@@ -78,12 +78,27 @@ const DictionaryStack = () => {
     }, [history, favorite, cache]);
 
     return (
-        <SafeAreaView style={{flex: 1, backgroundColor: '#3DB2FF'}}>
+        <SafeAreaView style={styles.container}>
             <DictionaryContext.Provider value={{ history, favorite, cache, setHistory, setFavorite, setCache }}>
-                <Stack screenOptions={{ animation: 'none' }} />
+                <Stack screenOptions={{
+                    animation: 'none',
+                    ...Platform.select({
+                        android: {
+                            statusBarColor: '#3DB2FF',
+                            statusBarStyle: 'light',
+                        }
+                    })
+                }} initialRouteName='dictionary' />
             </DictionaryContext.Provider>
         </SafeAreaView>
     );
 };
 
 export default DictionaryStack;
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#3DB2FF',
+    }
+})
