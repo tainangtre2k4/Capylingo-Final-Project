@@ -19,34 +19,45 @@ export default function TabsLayout(){
             return true;
         return false;
       };
-    return( <Tabs>
-        <Tabs.Screen 
-        name="(learn)"
-        options={{
-            headerTransparent: true,
-            headerTitle: '',
-            tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="book-open-page-variant-outline" size={size} color={color} />,
-            tabBarLabel: 'Learn',
-            headerShown: false,
-            tabBarStyle: { display: checkPageToHideTabBar() ? 'none' : 'flex' }
-        }}/>
+    return(
+        <Tabs initialRouteName="(learn)">
+            <Tabs.Screen
+                name="(learn)"
+                options={{
+                    headerTransparent: true,
+                    headerTitle: '',
+                    tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="book-open-page-variant-outline" size={size} color={color} />,
+                    tabBarLabel: 'Learn',
+                    headerShown: false,
+                    tabBarStyle: { display: checkPageToHideTabBar() ? 'none' : 'flex' }
+                }}
+            />
+            <Tabs.Screen
+                name="(dictionary)"
+                options={{
+                    tabBarIcon: ({ color, size }) => <Ionicons name="file-tray-full" size={size} color={color} />,
+                    tabBarLabel: 'Dictionary',
+                    headerShown: false,
+                }}
+            />
+            <Tabs.Screen
+                name="(resources)"
+                options={{
+                    headerTransparent: true,
+                    headerTitle: '',
+                    tabBarIcon: ({ color, size }) => <Ionicons name="folder-open-outline" size={size} color={color} />,
+                    tabBarLabel: 'Resources',
+                }}
+            />
 
-        <Tabs.Screen
-          name="(dictionary)"
-          options={{
-              tabBarIcon: ({ color, size }) => <Ionicons name="file-tray-full" size={size} color={color} />,
-              tabBarLabel: 'Dictionary',
-              headerShown: false,
-          }}
-        />
-
-        <Tabs.Screen 
-        name="(profile)"
-        options={{
-            headerShown: false,
-            tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
-            tabBarLabel: 'My Profile',
-        }}/>
+            <Tabs.Screen
+                name="(profile)"
+                options={{
+                    headerShown: false,
+                    tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
+                    tabBarLabel: 'My Profile',
+                }}
+            />
     </Tabs>
     )
 }
