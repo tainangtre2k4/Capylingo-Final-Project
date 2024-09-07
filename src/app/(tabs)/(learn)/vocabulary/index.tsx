@@ -1,52 +1,117 @@
-import {StatusBar as RNStatusBar, StyleSheet, Text, View} from 'react-native'
-import React, {useEffect} from 'react'
-import {Link, useNavigation} from 'expo-router'
-import BackButton from '@/src/components/BackButton';
+import React, { useEffect, useState } from 'react';
+import { useNavigation } from "expo-router";
+import { View, Text, FlatList, StyleSheet, SafeAreaView, Image, Dimensions, Platform, StatusBar as RNStatusBar } from 'react-native';
+import { getVocabTopicList } from '@/src/fetchData/fetchLearn';
+import CloudHeader from '@/src/components/CloudHeader';
 
-const VocabularyLesson = () => {
-    const navigation = useNavigation();
+const level = 2;
+const { width, height } = Dimensions.get('screen');
+const cardColors = ['#9BD2FC', '#F1C40F', '#16A085', '#2980B9'];
+const topicList = () => {
+  const navigation = useNavigation();
+  const [topics, setTopics] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const topicList = await getVocabTopicList(level);
+        setTopics(topicList);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   useEffect(() => {
     navigation.setOptions({
       headerShown: true,
       header: () => (
-        <View style={styles.header}>
-          <BackButton/>
-          <Text style={styles.title}>Vocabulary</Text>
+        <View style={styles.headerContainer}>
+          <CloudHeader title='Vocabulary'/>
         </View>
       ),
-      headerTitleStyle: {
-        color: 'white'
-      },
     });
   }, [navigation]);
 
-    return (
-        <View style={styles.container}>
-            <Link href='/(learn)/vocabulary/exercises'>exercises</Link>
-            <Link href='/(learn)/vocabulary/learnVocab'>learn vocabs</Link>
-        </View>
-    )
-}
+  if (loading) {
+    return <Text>Loading...</Text>;
+  }
 
-export default VocabularyLesson
+  if (error) {
+    return <Text>Sorry! Failed to load Vocabulary</Text>;
+  }
+
+
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={topics}
+        renderItem={({ item, index }) => (
+          <View style={[styles.card, { backgroundColor: cardColors[index % cardColors.length] }]}>
+            <View style={styles.iconBackground}>
+              <Image
+                source={item.ImageUrl ? { uri: item.ImageUrl } : require('@/assets/images/learn/learn-greeter.png')}
+                style={styles.image}
+              />
+            </View>
+            <Text style={styles.cardText}>{item.title}</Text>
+          </View>
+        )}
+        keyExtractor={(item, index) => index.toString()}
+      />
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-    container: {
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    header: {
-        paddingVertical: 6,
-        paddingHorizontal: 10,
-        backgroundColor: '#3DB2FF',
-        alignItems: 'center',
-        flexDirection: 'row'
-    },
-    title: {
-        marginHorizontal: 10,
-        color: 'white',
-        fontSize: 22,
-        fontWeight: '500'
-    }
-})
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    marginTop: Platform.OS === 'android' ? RNStatusBar.currentHeight || 20 : 0,
+  },
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: width*0.85,
+    height: height*0.105,
+    padding: 16,
+    marginVertical: 8,
+    marginHorizontal: 16,
+    borderRadius: 8,
+  },
+  iconBackground: {
+    backgroundColor: 'orange',
+    borderRadius: 33,
+    width: 66,
+    height: 66,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  image: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+  },
+  cardText: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: 'white',
+    flexShrink: 1,
+  },
+});
+
+export default topicList;
