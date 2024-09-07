@@ -47,6 +47,14 @@ export default function TabsLayout(){
             tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
             tabBarLabel: 'My Profile',
         }}/>
+        <Tabs.Screen 
+        name="(resources)"
+        options={{
+            headerTransparent: true,
+            headerTitle: '',
+            tabBarIcon: ({ color, size }) => <Ionicons name="folder-open-outline" size={size} color={color} />,
+            tabBarLabel: 'Resources',
+        }}/>
     </Tabs>
     )
 }
