@@ -24,6 +24,7 @@ const VocabularyLesson = () => {
     return (
         <View style={styles.container}>
             <Link href='/(learn)/vocabulary/exercises'>exercises</Link>
+            <Link href='/(learn)/vocabulary/learnVocab'>learn vocabs</Link>
         </View>
     )
 }

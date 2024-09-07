@@ -85,7 +85,7 @@ const VocabExercises = () => {
       const totalAnswered = numberCorrectAnswers + numberIncorrectAnswers;
       if (totalAnswered === exerciseLength) {
         router.push({
-          pathname: '@/src/(tabs)/(learn)/vocabulary/exercises/resultScreen',
+          pathname: 'resultScreen',
           params: {
             correctAnswers: numberCorrectAnswers,
             wrongAnswers: numberIncorrectAnswers,
