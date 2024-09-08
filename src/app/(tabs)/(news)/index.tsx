@@ -65,12 +65,22 @@ const News = (props: Props) => {
   return (
     <ScrollView style = {[styles.container, {paddingTop: 10}]}>
       <Header />
-      <TouchableOpacity
-        style={styles.discoverButton}
-        onPress={() => router.push('/discover')}  // Navigate to Discover screen
-      >
-        <Text style={styles.discoverButtonText}>Discover</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.discoverButton}
+          onPress={() => router.push('/discover')}
+        >
+          <Text style={styles.discoverButtonText}>Discover</Text>
+        </TouchableOpacity>
+
+        {/* Saved Button */}
+        <TouchableOpacity
+          style={styles.savedButton}
+          onPress={() => router.push('/saved')}  
+        >
+          <Text style={styles.savedButtonText}>Saved</Text>
+        </TouchableOpacity>
+      </View>
       {isLoading ? (
         <Loading size = {'large'} />
       ) : (
@@ -89,14 +99,28 @@ const styles = StyleSheet.create(
     container: {
       //flex:1,
     },
+    buttonContainer: {
+      flexDirection: 'row', // Aligns buttons in a row
+      justifyContent: 'center',
+      marginVertical: 10,
+    },
     discoverButton: {
       backgroundColor: '#007BFF',
       padding: 10,
       borderRadius: 20,
-      alignSelf: 'center',
-      marginVertical: 10,
+      marginRight: 10, // Space between buttons
     },
     discoverButtonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    savedButton: {
+      backgroundColor: '#FF6347',
+      padding: 10,
+      borderRadius: 20,
+    },
+    savedButtonText: {
       color: '#fff',
       fontSize: 16,
       fontWeight: 'bold',
