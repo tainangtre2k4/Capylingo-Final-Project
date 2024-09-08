@@ -110,8 +110,8 @@ const styles = StyleSheet.create({
     },
     bodyContainer: {
         flex: 1,
-        borderTopRightRadius: width * .04,
-        borderTopLeftRadius: width * .04,
+        borderTopRightRadius: width * .08,
+        borderTopLeftRadius: width * .08,
         backgroundColor: 'white',
         paddingHorizontal: 20,
         paddingVertical: 10,

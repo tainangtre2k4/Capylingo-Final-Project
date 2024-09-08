@@ -29,7 +29,7 @@ const ProgressCard: React.FC<ProgressCardProps> = ({ level, percentage }) => {
                 <Text style={styles.levelText}>Level {currentLevel}</Text>
             </View>
             <AnimatedCircularProgress
-                size={56}
+                size={48}
                 width={6}
                 backgroundWidth={2}
                 fill={currentPercentage}
@@ -37,8 +37,10 @@ const ProgressCard: React.FC<ProgressCardProps> = ({ level, percentage }) => {
                 backgroundColor="#F3F3F3"
                 rotation={0}
                 lineCap="round"
+                style={styles.progressCircle}
+                childrenContainerStyle={styles.progressCircleInnerContainer}
             >
-                {() => <Text style={styles.percentageText}>{currentPercentage}%</Text>}
+                {() => <Text style={styles.percentageText}> {currentPercentage}%</Text>}
             </AnimatedCircularProgress>
         </View>
     );
@@ -70,8 +72,19 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     percentageText: {
-        color: 'white',
-        fontSize: 14,
+        color: '#0693F1',
+        fontSize: 12,
         fontWeight: '700',
     },
+    progressCircle: {
+        backgroundColor: 'white',
+        padding: 4,
+        borderRadius: 30
+    },
+    progressCircleInnerContainer: {
+        justifyContent: 'center',
+        alignContent: 'center',
+        marginTop: 3,
+        marginLeft: 3
+    }
 });
