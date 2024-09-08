@@ -212,7 +212,7 @@ export default WOTDCard;
 const styles = StyleSheet.create({
     container: {
         backgroundColor: '#27AE60',
-        width: width * 0.4,
+        width: width * 0.42,
         height: 100,
         padding: 12,
         borderRadius: 12,
