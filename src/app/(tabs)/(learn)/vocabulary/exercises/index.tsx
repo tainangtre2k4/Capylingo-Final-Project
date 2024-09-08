@@ -1,6 +1,6 @@
 import { Platform, Image, Modal, TouchableOpacity, Text, StyleSheet, Dimensions, ScrollView, View, StatusBar as RNStatusBar } from 'react-native';
 import React, { useEffect, useState, useRef } from 'react';
-import { useNavigation } from "expo-router";
+import { useNavigation, useLocalSearchParams } from "expo-router";
 import ProgressTracker from '@/src/components/ProgressTracker';
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from 'expo-router';
@@ -12,8 +12,6 @@ import ExVocabType3 from '@/src/components/exercise/VocabType3/VocabType3';
 
 
 const { width, height } = Dimensions.get('screen');
-
-const topicID = 1;
 
 const VocabExercises = () => {
   const navigation = useNavigation();
@@ -28,6 +26,8 @@ const VocabExercises = () => {
   const [error, setError] = useState<string | null>(null);
   const scrollViewRef = useRef<ScrollView>(null);
   const router = useRouter();
+
+  const { topicID } = useLocalSearchParams();
 
   useEffect(() => {
     const fetchData = async () => {

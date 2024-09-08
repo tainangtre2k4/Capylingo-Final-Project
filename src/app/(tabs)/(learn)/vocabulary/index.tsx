@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigation } from "expo-router";
-import { View, Text, FlatList, StyleSheet, SafeAreaView, Image, Dimensions, Platform, StatusBar as RNStatusBar } from 'react-native';
+import { useNavigation, router } from "expo-router";
+import { View, Text, FlatList, StyleSheet, SafeAreaView, Image, Dimensions, Platform, StatusBar as RNStatusBar, TouchableOpacity } from 'react-native';
 import { getVocabTopicList } from '@/src/fetchData/fetchLearn';
 import CloudHeader from '@/src/components/CloudHeader';
 
-const level = 2;
+const level = 1;
 const { width, height } = Dimensions.get('screen');
 const cardColors = ['#9BD2FC', '#F1C40F', '#16A085', '#2980B9'];
-const topicList = () => {
+
+const TopicList = () => {
   const navigation = useNavigation();
   const [topics, setTopics] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,13 +50,18 @@ const topicList = () => {
     return <Text>Sorry! Failed to load Vocabulary</Text>;
   }
 
-
   return (
     <View style={styles.container}>
       <FlatList
         data={topics}
         renderItem={({ item, index }) => (
-          <View style={[styles.card, { backgroundColor: cardColors[index % cardColors.length] }]}>
+          <TouchableOpacity
+            style={[styles.card, { backgroundColor: cardColors[index % cardColors.length] }]}
+            onPress={() => router.push({
+              pathname: './learnTopic',
+              params: { title: item.title, topicID: item.id }
+            })}
+          >
             <View style={styles.iconBackground}>
               <Image
                 source={item.ImageUrl ? { uri: item.ImageUrl } : require('@/assets/images/learn/learn-greeter.png')}
@@ -63,7 +69,7 @@ const topicList = () => {
               />
             </View>
             <Text style={styles.cardText}>{item.title}</Text>
-          </View>
+          </TouchableOpacity>
         )}
         keyExtractor={(item, index) => index.toString()}
       />
@@ -85,8 +91,8 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: width*0.85,
-    height: height*0.105,
+    width: width * 0.85,
+    height: height * 0.105,
     padding: 16,
     marginVertical: 8,
     marginHorizontal: 16,
@@ -114,4 +120,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default topicList;
+export default TopicList;
