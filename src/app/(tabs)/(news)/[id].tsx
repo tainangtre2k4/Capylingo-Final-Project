@@ -68,10 +68,11 @@
 // WebViewScreen.tsx
 import React, { useState } from 'react';
 import { WebView } from 'react-native-webview';
-import { View, ActivityIndicator, StyleSheet, Text, Button, SafeAreaView } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { View, ActivityIndicator, StyleSheet, Text, Button, SafeAreaView, TouchableOpacity } from 'react-native';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
 import * as Linking from 'expo-linking';
 import Constants from 'expo-constants';
+import { Ionicons } from '@expo/vector-icons';
 
 const WebViewScreen = () => {
   // Use useLocalSearchParams to access the URL
@@ -79,25 +80,23 @@ const WebViewScreen = () => {
   const [favourite, setFavourite] = useState('');
 
   return (
-    // <View style={styles.container}>
-    //   <Button
-    //     title="Open URL with the system browser"
-    //     onPress={() => Linking.openURL(url)}
-    //   />
-    //   <Button
-    //     title="Open URL with an in-app browser"
-    //     onPress={() => WebBrowser.openBrowserAsync('https://expo.dev')}
-    //   />
-    // </View>
-    //<SafeAreaView style = {styles.container}>
+    <>
+    <Stack.Screen options = {{
+        headerLeft: () => (
+            <TouchableOpacity onPress={() => router.back()}>
+                <Ionicons name= "arrow-back" size = {22} />
+            </TouchableOpacity>
+    ),
+    title: "News Detail"
+}
+    } />
     <View style={styles.container}>
     <WebView
-    //style={styles.container}
     style = {{marginTop: 0}}
     source={{ uri: url }}
   />
   </View>
-  //</SafeAreaView>
+  </>
   );
 };
 
@@ -112,8 +111,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    //alignItems: 'center',
-    //justifyContent: 'center',
     padding: 0,
     margin: 0
   },

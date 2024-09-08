@@ -3,6 +3,8 @@ import React from 'react'
 import { NewsDataType } from '@/constants/types'
 import { colors } from 'react-native-elements'
 import Loading from './Loading'
+import { Link } from 'expo-router'
+import { TouchableOpacity } from 'react-native'
 
 type Props = {
     newsList: Array<NewsDataType>
@@ -15,7 +17,20 @@ const NewsList = ({newsList}: Props) => {
             <Loading size = {"large"}/>
         ) : (
         newsList.map((item, index)=> (
-        <View key= {index} style={styles.itemContainer}>
+        <Link href={`/(news)/${item.article_id}?url=${encodeURIComponent(item.link)}`} asChild key = {index}> 
+        <TouchableOpacity>
+            <NewsItem item = {item} />
+        </TouchableOpacity>
+        </Link>
+        ))
+        )}
+    </View>
+  )
+}
+
+export const NewsItem =({item}: {item: NewsDataType}) => {
+    return (
+        <View style={styles.itemContainer}>
             <Image source={{uri:item.image_url}} style={styles.itemImg} />
             <View style = {styles.itemInfo}>
             <Text style={styles.itemCategory}>{item.category}</Text>
@@ -28,10 +43,7 @@ const NewsList = ({newsList}: Props) => {
                 </View>
             </View>
         </View>
-        ))
-        )}
-    </View>
-  )
+    )
 }
 
 export default NewsList

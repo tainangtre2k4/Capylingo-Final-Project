@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native'
 import React, {useEffect, useState} from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Header from '@/src/components/(news)/Header'
@@ -9,10 +9,11 @@ import BreakingNews from '@/src/components/(news)/BreakingNews'
 import Categories from '@/src/components/(news)/Categories'
 import NewsList from '@/src/components/(news)/NewsList'
 import Loading from '@/src/components/(news)/Loading'
+import { router } from 'expo-router'
 
 type Props = {}
 
-const index = (props: Props) => {
+const News = (props: Props) => {
   const {top: safeTop} = useSafeAreaInsets();
   const [breakingNews, setBreakingNews] = useState<NewsDataType[]>([]);
   const [news, setNews] = useState<NewsDataType[]>([]);
@@ -64,7 +65,12 @@ const index = (props: Props) => {
   return (
     <ScrollView style = {[styles.container, {paddingTop: 10}]}>
       <Header />
-      <SearchBar />
+      <TouchableOpacity
+        style={styles.discoverButton}
+        onPress={() => router.push('/discover')}  // Navigate to Discover screen
+      >
+        <Text style={styles.discoverButtonText}>Discover</Text>
+      </TouchableOpacity>
       {isLoading ? (
         <Loading size = {'large'} />
       ) : (
@@ -76,12 +82,24 @@ const index = (props: Props) => {
   )
 }
 
-export default index
+export default News
 
 const styles = StyleSheet.create(
   {
     container: {
       //flex:1,
+    },
+    discoverButton: {
+      backgroundColor: '#007BFF',
+      padding: 10,
+      borderRadius: 20,
+      alignSelf: 'center',
+      marginVertical: 10,
+    },
+    discoverButtonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: 'bold',
     },
   }
 )
