@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigation, router } from "expo-router";
-import { View, Text, FlatList, StyleSheet, SafeAreaView, Image, Dimensions, Platform, StatusBar as RNStatusBar, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Dimensions, Platform, StatusBar as RNStatusBar, TouchableOpacity, Image } from 'react-native';
 import { getVocabTopicList } from '@/src/fetchData/fetchLearn';
+import { AdvancedImage } from "cloudinary-react-native";
+import { cld } from "@/src/lib/cloudinary";
+import { fit } from "@cloudinary/url-gen/actions/resize";
 import CloudHeader from '@/src/components/CloudHeader';
 
 const level = 1;
@@ -54,23 +57,43 @@ const TopicList = () => {
     <View style={styles.container}>
       <FlatList
         data={topics}
-        renderItem={({ item, index }) => (
-          <TouchableOpacity
-            style={[styles.card, { backgroundColor: cardColors[index % cardColors.length] }]}
-            onPress={() => router.push({
-              pathname: './learnTopic',
-              params: { title: item.title, topicID: item.id }
-            })}
-          >
-            <View style={styles.iconBackground}>
+        renderItem={({ item, index }) => {
+          let imageContent;
+
+          if (item.ImageUrl) {
+            const image = cld.image(item.ImageUrl);
+            image.resize(fit().width(100).height(100)); // Resize ảnh Cloudinary
+            imageContent = (
+              <AdvancedImage
+                cldImg={image}
+                style={styles.image}
+                accessibilityLabel={item.title}
+              />
+            );
+          } else {
+            imageContent = (
               <Image
-                source={item.ImageUrl ? { uri: item.ImageUrl } : require('@/assets/images/learn/learn-greeter.png')}
+                source={require('@/assets/images/learn/learnVocab/topicDefault.png')}
                 style={styles.image}
               />
-            </View>
-            <Text style={styles.cardText}>{item.title}</Text>
-          </TouchableOpacity>
-        )}
+            );
+          }
+
+          return (
+            <TouchableOpacity
+              style={[styles.card, { backgroundColor: cardColors[index % cardColors.length] }]}
+              onPress={() => router.push(`/(learn)/vocabulary/learnTopic?title=${item.title}&topicID=${item.id}&imageUrl=${item.ImageUrl}`)}
+            >
+              <View style={styles.textBox}>
+                <Text style={styles.cardText}>{item.title}</Text>
+              </View>
+
+              {imageContent}
+           
+              
+            </TouchableOpacity>
+          );
+        }}
         keyExtractor={(item, index) => index.toString()}
       />
     </View>
@@ -82,7 +105,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    paddingVertical: 20,
+    paddingVertical: height*0.0246,
   },
   headerContainer: {
     flexDirection: 'row',
@@ -91,32 +114,28 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     width: width * 0.85,
-    height: height * 0.105,
-    padding: 16,
+    height: height * 0.113,
+    padding: height * 0.01,
     marginVertical: 8,
-    marginHorizontal: 16,
-    borderRadius: 8,
-  },
-  iconBackground: {
-    backgroundColor: 'orange',
-    borderRadius: 33,
-    width: 66,
-    height: 66,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
+    borderRadius: 16,
   },
   image: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: height * 0.095,
+    height: height * 0.095,
+    resizeMode: 'contain',
+    borderRadius: 12,
+  },
+  textBox: {
+    marginLeft: width*0.064,
+    width: width*0.53,
+    justifyContent: 'center',
   },
   cardText: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '600',
     color: 'white',
-    flexShrink: 1,
   },
 });
 
