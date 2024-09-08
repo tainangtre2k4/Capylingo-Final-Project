@@ -1,6 +1,7 @@
 import { useAuth } from "@/src/providers/AuthProvider";
 import { Redirect, Tabs, useSegments } from "expo-router";
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import React from 'react';
 
 export default function TabsLayout(){
     const { isAuthenticated } = useAuth();
@@ -11,7 +12,7 @@ export default function TabsLayout(){
     const segment = useSegments();
 
     const page = segment.join('/')
-    const pagesToHideTabBar = ['vocabulary/type1', 'skillcheck/reading', "skillcheck/listening"]
+    const pagesToHideTabBar = ['vocabulary/type1', 'skillcheck/reading', 'skillcheck/listening', 'resultScreen', 'vocabulary/learnVocab', 'vocabulary/exercises']
 
     const checkPageToHideTabBar = (): boolean => {
         for (const s of pagesToHideTabBar)
