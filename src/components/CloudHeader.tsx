@@ -21,7 +21,9 @@ const CloudHeader: React.FC<CloudHeaderProps> = ({ title }) => {
       <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
         <Ionicons name="chevron-back" size={20} color="#0693F1" />
       </TouchableOpacity>
-      <Text style={styles.title}>{title}</Text>
+      <View style={{marginLeft: 12, width: '60%'}}>
+        <Text style={styles.title}>{title}</Text>
+      </View>
       <Image source={require('@/assets/images/cloud.png')} style={styles.cloud}/>
     </LinearGradient>
 
@@ -56,7 +58,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '600',
     color: '#fff',
   },

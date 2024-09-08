@@ -1,5 +1,5 @@
-import { StatusBar as RNStatusBar, StyleSheet, Text, View, Platform, Dimensions, TouchableOpacity, Image } from 'react-native';
-import React, { useEffect } from 'react';
+import { ActivityIndicator, StatusBar as RNStatusBar, StyleSheet, Text, View, Platform, Dimensions, TouchableOpacity, Image } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'expo-router';
 import { useNavigation, useLocalSearchParams } from 'expo-router';
 import CloudHeader from '@/src/components/CloudHeader';
@@ -10,79 +10,104 @@ import { fit } from "@cloudinary/url-gen/actions/resize";
 const { width, height } = Dimensions.get('screen');
 
 const LearnTopic: React.FC = () => {
-    const navigation = useNavigation();
-    const params = useLocalSearchParams();
-    const router = useRouter();
+  const navigation = useNavigation();
+  const params = useLocalSearchParams();
+  const router = useRouter();
 
-    // Type casting to ensure correct types
-    const title = params.title as string;
-    const topicID = Number(params.topicID);
-    const imageUrl = params.imageUrl as string;
+  const title = params.title as string;
+  const topicID = Number(params.topicID);
+  const imageUrl = params.imageUrl as string;
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        navigation.setOptions({
-          headerShown: true,
-          header: () => (
-            <View style={styles.headerContainer}>
-              <CloudHeader title={title}/>
-            </View>
-          ),
-        });
-    }, [navigation]);
+  useEffect(() => {
+      navigation.setOptions({
+        headerShown: true,
+        header: () => (
+          <View style={styles.headerContainer}>
+            <CloudHeader title={title}/>
+          </View>
+        ),
+      });
+  }, [navigation]);
 
-    let imageContent;
-    if (imageUrl!=='null') {
-        const image = cld.image(imageUrl);
-        image.resize(fit().width(160).height(160)); // Resize ảnh Cloudinary
-        imageContent = (
-          <AdvancedImage
-            cldImg={image}
-            style={styles.image}
-          />
-        );
-      } else {
-        imageContent = (
-          <Image
-            source={require('@/assets/images/learn/learnVocab/topicDefault.png')}
-            style={styles.image}
-          />
-        );
-      }
+  let imageContent;
+  if (imageUrl !== 'null') {
+      const image = cld.image(imageUrl);
+      image.resize(fit().width(160).height(160)); // Resize ảnh Cloudinary
+      imageContent = (
+        <AdvancedImage
+          cldImg={image}
+          style={styles.image}
+          onLoad={() => setLoading(false)}
+        />
+      );
+  } else {
+      imageContent = (
+        <Image
+          source={require('@/assets/images/learn/learnVocab/topicDefault.png')}
+          style={styles.image}
+          onLoad={() => setLoading(false)}
+        />
+      );
+  }
 
-    return (
-        <View style={styles.container}>
+  return (
+      <View style={styles.container}>
+          {loading && (
+              <View style={styles.loadingOverlay}>
+                  <ActivityIndicator size="large" color="#2980B9" />
+                  <Text style={styles.loadingText}>Loading...</Text>
+              </View>
+          )}
 
-            {imageContent}
+          {imageContent}
 
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                    style={[styles.button, {backgroundColor: '#9BD2FC'}]}
-                    onPress={() => router.push(`/(learn)/vocabulary/learnVocab?topicID=${topicID}`)}
-                >
-                   
-                    <Image source={require('@/assets/images/learn/learnVocab/learnVocabulary.png')}  style={styles.imageBox}/>
-                    <View style={styles.underline}>
-                        <Text style={styles.buttonText}>Learn Vocabulary</Text>
-                    </View>
-                </TouchableOpacity>
+          <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                  style={[styles.button, {backgroundColor: '#9BD2FC'}]}
+                  onPress={() => router.push(`/(learn)/vocabulary/learnVocab?topicID=${topicID}`)}
+              >
+                  <Image source={require('@/assets/images/learn/learnVocab/learnVocabulary.png')} style={styles.imageBox}/>
+                  <View style={styles.underline}>
+                      <Text style={styles.buttonText}>Learn Vocabulary</Text>
+                  </View>
+              </TouchableOpacity>
 
-                <TouchableOpacity
-                    style={[styles.button, {backgroundColor: '#2980B9'}]}
-                    onPress={() => router.push(`/(learn)/vocabulary/exercises?topicID=${topicID}`)}
-                >
-                     <Image source={require('@/assets/images/learn/learnVocab/practiceExercises.png')}  style={styles.imageBox}/>
-                    <View style={styles.underline}>
-                        <Text style={styles.buttonText}>Practice Exercises</Text>
-                    </View>
-                </TouchableOpacity>
-            </View>
-        </View>
-    );
+              <TouchableOpacity
+                  style={[styles.button, {backgroundColor: '#2980B9'}]}
+                  onPress={() => router.push(`/(learn)/vocabulary/exercises?topicID=${topicID}`)}
+              >
+                  <Image source={require('@/assets/images/learn/learnVocab/practiceExercises.png')} style={styles.imageBox}/>
+                  <View style={styles.underline}>
+                      <Text style={styles.buttonText}>Practice Exercises</Text>
+                  </View>
+              </TouchableOpacity>
+          </View>
+      </View>
+  );
 };
+
 
 export default LearnTopic;
 
 const styles = StyleSheet.create({
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+},
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+      marginTop: 10,
+      fontSize: 18,
+      color: '#2980B9',
+  },
     container: {
         flex: 1,
         backgroundColor: '#fff',
@@ -126,7 +151,7 @@ const styles = StyleSheet.create({
         height: height * 0.1,
         borderRadius: height * 0.05,
         resizeMode: 'contain',
-        
+
         marginLeft: 16,
         borderWidth: 3,
         borderColor: '#FF8504',
@@ -135,12 +160,12 @@ const styles = StyleSheet.create({
         padding: 8,
         marginLeft: 30,
         borderBottomWidth: 2,
+        marginTop: -10,
         borderColor: '#fff',
     },
     buttonText: {
         fontSize: 23,
         fontWeight: '600',
         color: '#fff',
-        
     },
 });
