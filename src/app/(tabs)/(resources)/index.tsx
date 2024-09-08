@@ -34,7 +34,7 @@ const DATA: DataItem[] = [
         title: "AI Chatbot",
         description: "Chat with our quirky digital buddy, Cabybot! He will be a great company for your journey. Our beloved Cabybot sometimes turns into Dumdumbara though...",
         image: require('@/assets/images/resources/capyAI.png'),
-        navigate: '/(resources)/community',
+        navigate: '/(resources)/chatbot',
     },
     {
         key: "4",

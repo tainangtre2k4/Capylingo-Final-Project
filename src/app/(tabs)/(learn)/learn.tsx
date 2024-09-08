@@ -3,6 +3,8 @@ import {Ionicons} from '@expo/vector-icons'
 import WOTDCard from '@/src/components/learn/WOTDCard';
 import SubjectCard from '@/src/components/learn/SubjectCard';
 import {StatusBar} from 'expo-status-bar';
+import ProgressCard from '@/src/components/learn/ProgressCard'
+import React from 'react';
 
 const { width, height } = Dimensions.get('window');
 
@@ -33,6 +35,7 @@ const Learn = () => {
                     <Text style={styles.bodyTitle}>Your Learning Progress</Text>
                     <View style={styles.trackingCardsContainer}>
                         <WOTDCard />
+                        <ProgressCard level={3} percentage={75} />
                     </View>
                     <View style={styles.SubjectCardsContainer}>
                         <SubjectCard type='vocabulary' />
@@ -107,8 +110,8 @@ const styles = StyleSheet.create({
     },
     bodyContainer: {
         flex: 1,
-        borderTopRightRadius: width * .04,
-        borderTopLeftRadius: width * .04,
+        borderTopRightRadius: width * .08,
+        borderTopLeftRadius: width * .08,
         backgroundColor: 'white',
         paddingHorizontal: 20,
         paddingVertical: 10,

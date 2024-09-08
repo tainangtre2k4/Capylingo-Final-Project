@@ -81,16 +81,15 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioSource }) => {
     return (
         <View style={styles.container}>
             <View style={styles.controls}>
-                <TouchableOpacity onPress={handlePlayPause}>
+                <TouchableOpacity onPress={handlePlayPause} style={styles.playerButton}>
                     <Ionicons
                         name={isPlaying ? 'pause' : 'play'}
-                        size={24}
+                        size={20}
                         color="white"
                     />
                 </TouchableOpacity>
-                <View style={{ marginHorizontal: 6 }} />
-                <TouchableOpacity onPress={handleReset}>
-                    <Ionicons name="refresh" size={24} color="white" />
+                <TouchableOpacity onPress={handleReset} style={styles.playerButton}>
+                    <Ionicons name="refresh" size={20} color="white" />
                 </TouchableOpacity>
             </View>
             <Slider
@@ -132,13 +131,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     slider: {
-        width: '70%',
+        width: '60%',
         height: 20,
     },
     progressText: {
-        fontSize: 16,
+        fontSize: 14,
         color: 'white',
     },
+    playerButton: {
+        marginHorizontal: 2
+    }
 });
 
 export default AudioPlayer;
