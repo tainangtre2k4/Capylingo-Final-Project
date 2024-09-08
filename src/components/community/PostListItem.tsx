@@ -119,8 +119,8 @@ export default function PostListItem({ post, commentHandler, show = true, onRemo
   const avatarUrl = post.user.avatar_url;
   const avatar = cld.image(
     avatarUrl 
-      ? 'user_ynfjc7'
-      : avatarUrl || 'user_ynfjc7'
+      ? avatarUrl
+      : 'user_ynfjc7'
   );
   avatar.resize(thumbnail().width(48).height(48).gravity(focusOn(FocusOn.face())));
 

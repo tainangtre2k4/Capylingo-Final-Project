@@ -1,5 +1,18 @@
 import { supabase } from '@/src/lib/supabase';
 
+export const getVocabTopicList = async (level) => {
+  const {data, error} = await supabase
+    .from('TopicVocab')
+    .select('*')
+    .eq('level', level);
+  if (error) {
+
+    throw new Error(error.message);
+  }
+
+  return data; 
+};
+
 // Hàm lấy danh sách từ vựng theo TopicID
 export const getVocabList = async (topicID) => {
   const { data, error } = await supabase

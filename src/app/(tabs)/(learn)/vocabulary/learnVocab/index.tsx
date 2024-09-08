@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigation } from "expo-router";
+import { useNavigation, useLocalSearchParams } from "expo-router";
 import BackButton from "@/src/components/BackButton";
 import { StatusBar } from "expo-status-bar";
 import { ScrollView, Platform, View, Text, StyleSheet, Dimensions, StatusBar as RNStatusBar } from 'react-native';
@@ -8,7 +8,6 @@ import RewriteVocab from '@/src/components/learnVocab/rewriteVocab';
 import { getVocabList } from '@/src/fetchData/fetchLearn';
 import ProgressTracker from '@/src/components/ProgressTracker';
 
-const topicID = 1;
 const { width, height } = Dimensions.get('screen');
 
 const LearnVocab = () => {
@@ -19,6 +18,8 @@ const LearnVocab = () => {
   const scrollViewRef = useRef<ScrollView>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [incorrectVocabs, setIncorrectVocabs] = useState<any[]>([]);
+
+  const { topicID } = useLocalSearchParams();
 
   useEffect(() => {
     const fetchData = async () => {
