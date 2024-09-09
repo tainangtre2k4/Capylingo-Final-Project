@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigation, router } from "expo-router";
+import { useNavigation, router, useLocalSearchParams } from "expo-router";
 import { View, Text, FlatList, StyleSheet, Dimensions, Platform, StatusBar as RNStatusBar, TouchableOpacity, Image } from 'react-native';
 import { getVocabTopicList } from '@/src/fetchData/fetchLearn';
 import { AdvancedImage } from "cloudinary-react-native";
@@ -7,7 +7,6 @@ import { cld } from "@/src/lib/cloudinary";
 import { fit } from "@cloudinary/url-gen/actions/resize";
 import CloudHeader from '@/src/components/CloudHeader';
 
-const level = 1;
 const { width, height } = Dimensions.get('screen');
 const cardColors = ['#9BD2FC', '#F1C40F', '#16A085', '#2980B9'];
 
@@ -16,6 +15,8 @@ const TopicList = () => {
   const [topics, setTopics] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const params = useLocalSearchParams();
+  const level = Number(params.level);
 
   useEffect(() => {
     const fetchData = async () => {

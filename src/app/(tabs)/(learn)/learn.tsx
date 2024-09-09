@@ -3,13 +3,36 @@ import {Ionicons} from '@expo/vector-icons'
 import WOTDCard from '@/src/components/learn/WOTDCard';
 import SubjectCard from '@/src/components/learn/SubjectCard';
 import {StatusBar} from 'expo-status-bar';
+import { useRouter } from 'expo-router';
+import { useAuth } from '@/src/providers/AuthProvider';
+import { fetchUserLevel } from '@/src/fetchData/fetchLearn';
 import ProgressCard from '@/src/components/learn/ProgressCard'
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 
 const { width, height } = Dimensions.get('window');
 
 const Learn = () => {
+    const router = useRouter();
+    const user = useAuth();
+    const [level, setLevel] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
+    useEffect(() => {
+        const fetchData = async () => {
+          setLoading(true);
+          setError(null);
+          try {
+            const userLevel = await fetchUserLevel(user.user?.id);
+            setLevel(userLevel.level);
+          } catch (err: any) {
+            setError(err.message);
+          } finally {
+            setLoading(false);
+          }
+        };
+        fetchData();
+    }, []);
     return (
         <>
             <StatusBar style='light' backgroundColor='#3DB2FF' />
@@ -33,14 +56,16 @@ const Learn = () => {
                 <View style={styles.bodyContainer}>
                     {/*<View style={styles.indicator} />*/}
                     <Text style={styles.bodyTitle}>Your Learning Progress</Text>
-                    <View style={styles.trackingCardsContainer}>
+                    <View style={styles.trackingCardsContainer}>      
                         <WOTDCard />
-                        <ProgressCard level={3} percentage={75} />
+                        <TouchableOpacity onPress={()=>router.push('/level')}>
+                            <ProgressCard level={3} percentage={75} />
+                        </TouchableOpacity>
                     </View>
                     <View style={styles.SubjectCardsContainer}>
-                        <SubjectCard type='vocabulary' />
-                        <SubjectCard type='grammar' />
-                        <SubjectCard type='skillcheck' />
+                        <SubjectCard type='vocabulary' level={level}/>
+                        <SubjectCard type='grammar' level={level}/>
+                        <SubjectCard type='skillcheck'/>
                     </View>
                 </View>
             </View>

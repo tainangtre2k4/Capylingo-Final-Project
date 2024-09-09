@@ -1,5 +1,18 @@
 import { supabase } from '@/src/lib/supabase';
 
+export const fetchUserLevel = async (userId) => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('level')
+    .eq('id', userId)
+    .single();
+
+  if (error) {
+    throw error;
+  }
+  return data;
+};
+
 export const getVocabTopicList = async (level) => {
   const {data, error} = await supabase
     .from('TopicVocab')
