@@ -7,10 +7,15 @@ import Flashcard from '@/src/components/learnVocab/flashcard';
 import RewriteVocab from '@/src/components/learnVocab/rewriteVocab';
 import { getVocabList } from '@/src/fetchData/fetchLearn';
 import ProgressTracker from '@/src/components/ProgressTracker';
+import { useRouter } from 'expo-router';
+import { useAuth } from '@/src/providers/AuthProvider';
+import { completeLearning } from '@/src/updateData/updateLearningProgress';
 
 const { width, height } = Dimensions.get('screen');
 
 const LearnVocab = () => {
+  const router = useRouter();
+  const user = useAuth();
   const navigation = useNavigation();
   const [vocabs, setVocabs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,6 +73,10 @@ const LearnVocab = () => {
         x: nextIndex * width,
         animated: true,
       });
+    }
+    else {
+      completeLearning(user.user?.id, topicID);
+      router.push(`/(tabs)/(learn)/resultScreen?correct=${vocabs.length}&all=${vocabs.length}`);
     }
   };
 

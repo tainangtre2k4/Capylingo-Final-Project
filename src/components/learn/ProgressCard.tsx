@@ -16,7 +16,7 @@ const ProgressCard: React.FC<ProgressCardProps> = ({ level, percentage }) => {
     const [currentPercentage, setCurrentPercentage] = useState<number>(percentage);
 
     useEffect(() => {
-        setCurrentLevel(level - 1);
+        setCurrentLevel(level + 1);
         setCurrentPercentage(percentage);
     }, [level, percentage]);
 

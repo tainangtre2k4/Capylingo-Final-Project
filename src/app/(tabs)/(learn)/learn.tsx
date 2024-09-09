@@ -59,12 +59,12 @@ const Learn = () => {
                     <View style={styles.trackingCardsContainer}>      
                         <WOTDCard />
                         <TouchableOpacity onPress={()=>router.push('/level')}>
-                            <ProgressCard level={3} percentage={75} />
+                            <ProgressCard level={level} percentage={75} />
                         </TouchableOpacity>
                     </View>
                     <View style={styles.SubjectCardsContainer}>
-                        <SubjectCard type='vocabulary' level={level}/>
-                        <SubjectCard type='grammar' level={level}/>
+                        <SubjectCard type='vocabulary' level={level+1}/>
+                        <SubjectCard type='grammar' level={level+1}/>
                         <SubjectCard type='skillcheck'/>
                     </View>
                 </View>
