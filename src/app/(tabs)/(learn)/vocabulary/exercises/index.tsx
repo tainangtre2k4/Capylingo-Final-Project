@@ -113,14 +113,7 @@ const VocabExercises = () => {
 
   const handleModalSubmit = () => {
     setModalVisible(false);
-    router.push({
-      pathname: './resultScreen',
-      params: {
-        correctAnswers: numberCorrectAnswers,
-        wrongAnswers: numberIncorrectAnswers,
-        totalQuestions: exerciseLength,
-      },
-    });
+    router.push(`/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}`);
   };
   const handleModalCancel = () => {
     setModalVisible(false);

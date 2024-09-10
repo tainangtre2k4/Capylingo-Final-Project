@@ -6,6 +6,7 @@ import {StatusBar} from 'expo-status-bar';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/src/providers/AuthProvider';
 import { fetchUserLevel } from '@/src/fetchData/fetchLearn';
+import { fetchVocabLevelPercent, fetchGrammarLevelPercent } from '@/src/fetchData/fetchProgress';
 import ProgressCard from '@/src/components/learn/ProgressCard'
 import React, {useState, useEffect} from 'react';
 
@@ -15,6 +16,7 @@ const Learn = () => {
     const router = useRouter();
     const user = useAuth();
     const [level, setLevel] = useState<any>(null);
+    const [percent, setPercent] = useState<number | 0>(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -24,7 +26,11 @@ const Learn = () => {
           setError(null);
           try {
             const userLevel = await fetchUserLevel(user.user?.id);
+            const percentV = await fetchVocabLevelPercent(user.user?.id, userLevel.level+1);
+            const percentG = await fetchGrammarLevelPercent(user.user?.id, userLevel.level+1);
+            const totalPercent = Math.round((percentV + percentG) / 2);
             setLevel(userLevel.level);
+            setPercent(totalPercent);
           } catch (err: any) {
             setError(err.message);
           } finally {
@@ -68,7 +74,7 @@ const Learn = () => {
                     <View style={styles.trackingCardsContainer}>      
                         <WOTDCard />
                         <TouchableOpacity onPress={()=>router.push('/level')}>
-                            <ProgressCard level={level} percentage={75} />
+                            <ProgressCard level={level} percentage={percent} />
                         </TouchableOpacity>
                     </View>
                     <View style={styles.SubjectCardsContainer}>

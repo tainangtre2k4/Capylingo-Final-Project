@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
     },
     percentageText: {
-        marginLeft: 4,
+        //marginLeft: 1.5,
         color: '#0693F1',
         fontSize: 12,
         fontWeight: '700',

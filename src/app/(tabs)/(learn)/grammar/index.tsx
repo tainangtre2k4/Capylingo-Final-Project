@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   },
   textBox: {
     marginTop: width*0.02,
-    marginLeft: width*0.064,
+    marginLeft: width*0.025,
     width: width*0.53,
     justifyContent: 'center',
   },

@@ -5,6 +5,7 @@ import { useNavigation } from 'expo-router';
 import { useAuth } from '@/src/providers/AuthProvider';
 import BackButton from "@/src/components/BackButton";
 import { fetchUserLevel } from '@/src/fetchData/fetchLearn';
+import { fetchVocabLevelPercent, fetchGrammarLevelPercent } from '@/src/fetchData/fetchProgress';
 import CircularProgress from '@/src/components/learn/CircularProgress';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
@@ -42,6 +43,9 @@ const Level: React.FC = () => {
   const router = useRouter();
   const user = useAuth();
   const [level, setLevel] = useState<any>(null);
+  const [percentVocab, setPercentVocab] = useState<number | 0>(0);
+  const [percentGrammar, setPercentGrammar] = useState<number | 0>(0);
+  const [percent, setPercent] = useState<number | 0>(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -52,6 +56,12 @@ const Level: React.FC = () => {
       try {
         const userLevel = await fetchUserLevel(user.user?.id);
         setLevel(userLevel.level);
+        const percentV = await fetchVocabLevelPercent(user.user?.id, userLevel.level+1);
+        const percentG = await fetchGrammarLevelPercent(user.user?.id, userLevel.level+1);
+        const totalPercent = Math.round((percentV + percentG) / 2);
+        setPercentVocab(percentV);
+        setPercentGrammar(percentG);
+        setPercent(totalPercent);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -85,11 +95,22 @@ const Level: React.FC = () => {
   return (
       <View style={styles.container}>
           <View style={styles.buttonContainer}>
-              {levels.map((levelItem, index) => (
+              {levels.map((levelItem, index) => {
+                let vocabPercent = 0;
+                let grammarPercent = 0;
+            
+                if (levelItem.levelNumber === level + 1) {
+                  vocabPercent = percentVocab;
+                  grammarPercent = percentGrammar;
+                } else if (levelItem.levelNumber < level + 1) {
+                  vocabPercent = 100;
+                  grammarPercent = 100;
+                } 
+                return (
                   <TouchableOpacity
                       key={index}
                       style={[styles.button, { backgroundColor: (levelItem.levelNumber <= level+1) ?  levelItem.backgroundColor : '#A0A0A0' }]}
-                      onPress={() => router.push(`/learnLevel?level=${levelItem.levelNumber}`)}
+                      onPress={() => router.push(`/learnLevel?level=${levelItem.levelNumber}&vocabPercent=${vocabPercent}&grammarPercent=${grammarPercent}`)}
                       disabled={levelItem.levelNumber > level + 1}
                   >
                       {
@@ -99,7 +120,7 @@ const Level: React.FC = () => {
                       {
                         (levelItem.levelNumber === level+1) &&
                           <View style={styles.imageBox}>
-                            <CircularProgress size={65} percentage={70}/>
+                            <CircularProgress size={65} percentage={percent}/>
                           </View>
                       }
                      {
@@ -113,7 +134,7 @@ const Level: React.FC = () => {
                       </View>
                       
                   </TouchableOpacity>
-              ))}
+              )})}
           </View>
           <Image
             source={require('@/assets/images/level/bottomDecore.png')}

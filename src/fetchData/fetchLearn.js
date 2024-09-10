@@ -178,8 +178,8 @@ export const getGrammarExType2List = async (topicID) => {
     const randomSentence = shuffleArray([...correctSentence]); // Đảo ngẫu nhiên
 
     return {
-      words: correctSentence,
-      correctAnswer: randomSentence,
+      words: randomSentence,
+      correctAnswer: correctSentence,
     };
   });
 };

@@ -13,6 +13,8 @@ const LearnTopic: React.FC = () => {
   const router = useRouter();
 
   const level = Number(params.level);
+  const vocabPercent = Number(params.vocabPercent);
+  const grammarPercent = Number(params.grammarPercent);
 
   useEffect(() => {
     navigation.setOptions({
@@ -41,20 +43,20 @@ const LearnTopic: React.FC = () => {
                       <Text style={styles.buttonText}>Vocabulary</Text>
                   </View>
                   <View style={styles.circularProgress}>
-                    <CircularProgress size={52} percentage={70}/>
+                    <CircularProgress size={52} percentage={vocabPercent}/>
                   </View>
               </TouchableOpacity>
 
               <TouchableOpacity
                   style={[styles.button, {backgroundColor: '#2980B9'}]}
-                  onPress={() => router.push(`/vocabulary?level=${level}`)}
+                  onPress={() => router.push(`/grammar?level=${level}`)}
               >
                   <Image source={require('@/assets/images/level/grammar.png')} style={styles.imageBox}/>
                   <View style={styles.underline}>
                       <Text style={styles.buttonText}>Grammar</Text>
                   </View>
                   <View style={styles.circularProgress}>
-                    <CircularProgress size={52} percentage={70}/>
+                    <CircularProgress size={52} percentage={grammarPercent}/>
                   </View>
               </TouchableOpacity>
           </View>
