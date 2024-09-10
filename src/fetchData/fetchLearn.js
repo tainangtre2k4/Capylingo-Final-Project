@@ -13,17 +13,29 @@ export const fetchUserLevel = async (userId) => {
   return data;
 };
 
-export const getVocabTopicList = async (level) => {
-  const {data, error} = await supabase
+export const getVocabTopicList = async (userId, level) => {
+  const { data, error } = await supabase
     .from('TopicVocab')
-    .select('*')
-    .eq('level', level);
-  if (error) {
+    .select(`
+      id,
+      title,
+      ImageUrl,
+      level,
+      CompletedTopicVocab(
+        completedLearning,
+        completedPracticing,
+        time
+      )
+    `)
+    .eq('level', level)
+    .eq('CompletedTopicVocab.user_id', userId);
 
+  if (error) {
+    console.error('Error fetching record:', error);
     throw new Error(error.message);
   }
 
-  return data; 
+  return data;
 };
 
 // Hàm lấy danh sách từ vựng theo TopicID

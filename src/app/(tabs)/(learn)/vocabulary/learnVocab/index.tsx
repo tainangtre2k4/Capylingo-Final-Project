@@ -33,15 +33,17 @@ const LearnVocab = () => {
       try {
         const vocabList = await getVocabList(topicID);
         setVocabs(vocabList);
+
       } catch (err: any) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
+
+  const vocabsLength = vocabs.length;
 
   useEffect(() => {
     navigation.setOptions({
@@ -57,6 +59,14 @@ const LearnVocab = () => {
     });
   }, [navigation, currentIndex, incorrectVocabs.length]);
 
+  useEffect(() => {
+    if (vocabsLength === 0 && !loading && !error) {
+      completeLearning(user.user?.id, topicID);
+      router.push(`/(tabs)/(learn)/resultScreen?correct=${0}&all=${0}`);
+    }
+  }, [vocabsLength, loading, error]);
+
+
   if (loading) {
     return <Text>Loading...</Text>;
   }
@@ -64,6 +74,10 @@ const LearnVocab = () => {
   if (error) {
     return <Text>Sorry! Failed to load Vocabulary</Text>;
   }
+
+
+
+
 
   const goToNextVocab = () => {
     if (currentIndex < vocabs.length*2 + incorrectVocabs.length - 1) {

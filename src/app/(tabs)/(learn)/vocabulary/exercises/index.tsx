@@ -9,12 +9,14 @@ import BackButton from "@/src/components/BackButton";
 import ExVocabType1 from '@/src/components/exercise/VocabType1/VocabType1';
 import ExVocabType2 from '@/src/components/exercise/VocabType2/VocabType2';
 import ExVocabType3 from '@/src/components/exercise/VocabType3/VocabType3';
-
+import { completedPracticing } from '@/src/updateData/updateLearningProgress';
+import { useAuth } from '@/src/providers/AuthProvider';
 
 const { width, height } = Dimensions.get('screen');
 
 const VocabExercises = () => {
   const navigation = useNavigation();
+  const user = useAuth();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [numberCorrectAnswers, setNumberCorrectAnswers] = useState(0);
   const [numberIncorrectAnswers, setNumberIncorrectAnswers] = useState(0);
@@ -72,6 +74,13 @@ const VocabExercises = () => {
     });
   }, [navigation, currentIndex, exerciseLength]);
 
+  useEffect(() => {
+    if (exerciseLength === 0 && !loading && !error) {
+      completedPracticing(user.user?.id, topicID);
+      router.push(`/(tabs)/(learn)/resultScreen?correct=${0}&all=${0}`);
+    }
+  }, [exerciseLength, loading, error]);
+
   if (loading) {
     return <Text>Loading...</Text>;
   }
@@ -90,14 +99,12 @@ const VocabExercises = () => {
     } else {
       const totalAnswered = numberCorrectAnswers + numberIncorrectAnswers;
       if (totalAnswered === exerciseLength) {
-        router.push({
-          pathname: './resultScreen',
-          params: {
-            correctAnswers: numberCorrectAnswers,
-            wrongAnswers: numberIncorrectAnswers,
-            totalQuestions: exerciseLength,
-          },
-        });
+
+        if (numberCorrectAnswers/exerciseLength >= 0.8){
+          completedPracticing(user.user?.id, topicID);
+        }
+
+        router.push(`/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}`);
       } else {
         setModalVisible(true);
       }

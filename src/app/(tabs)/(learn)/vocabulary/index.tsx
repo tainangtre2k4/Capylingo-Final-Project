@@ -6,7 +6,13 @@ import { AdvancedImage } from "cloudinary-react-native";
 import { cld } from "@/src/lib/cloudinary";
 import { fit } from "@cloudinary/url-gen/actions/resize";
 import CloudHeader from '@/src/components/CloudHeader';
+import { useAuth } from '@/src/providers/AuthProvider';
+import Icon from 'react-native-vector-icons/Ionicons';
 
+type CompletedTopic = {
+  completedLearning: number;
+  completedPracticing: number;
+};
 const { width, height } = Dimensions.get('screen');
 const cardColors = ['#9BD2FC', '#F1C40F', '#16A085', '#2980B9'];
 
@@ -17,13 +23,14 @@ const TopicList = () => {
   const [error, setError] = useState<string | null>(null);
   const params = useLocalSearchParams();
   const level = Number(params.level);
+  const user = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
       try {
-        const topicList = await getVocabTopicList(level);
+        const topicList = await getVocabTopicList(user.user?.id, level);
         setTopics(topicList);
       } catch (err: any) {
         setError(err.message);
@@ -34,6 +41,7 @@ const TopicList = () => {
 
     fetchData();
   }, []);
+  
 
   useEffect(() => {
     navigation.setOptions({
@@ -53,6 +61,11 @@ const TopicList = () => {
   if (error) {
     return <Text>Sorry! Failed to load Vocabulary</Text>;
   }
+  console.log(topics);
+  topics.forEach((topic) => {
+    console.log('Topic:', topic.title);
+    console.log('CompletedTopicVocab:', topic.CompletedTopicVocab);
+  });
 
   return (
     <View style={styles.container}>
@@ -79,7 +92,10 @@ const TopicList = () => {
               />
             );
           }
-
+          // Kiểm tra completedLearning và completedPracticing
+          const isCompleted = item.CompletedTopicVocab?.some((completed: CompletedTopic) =>
+            completed.completedLearning && completed.completedPracticing
+          );
           return (
             <TouchableOpacity
               style={[styles.card, { backgroundColor: cardColors[index % cardColors.length] }]}
@@ -90,6 +106,18 @@ const TopicList = () => {
               </View>
 
               {imageContent}
+
+              {isCompleted && (
+                <>
+                <Text>{item.topic}</Text>
+                <Icon 
+                  name="checkmark-circle" 
+                  size={32} 
+                  color="white" 
+                  style={styles.checkIcon} 
+                />
+                </>
+              )}
            
               
             </TouchableOpacity>
@@ -130,6 +158,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   textBox: {
+    marginTop: width*0.02,
     marginLeft: width*0.064,
     width: width*0.53,
     justifyContent: 'center',
@@ -138,6 +167,11 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '600',
     color: 'white',
+  },
+  checkIcon: {
+    position: 'absolute',
+    top: width*0.015,
+    left: width*0.03,
   },
 });
 
