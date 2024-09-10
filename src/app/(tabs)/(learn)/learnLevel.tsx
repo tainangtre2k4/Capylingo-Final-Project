@@ -3,7 +3,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'expo-router';
 import { useNavigation, useLocalSearchParams } from 'expo-router';
 import BackButton from "@/src/components/BackButton";
-
+import CircularProgress from '@/src/components/learn/CircularProgress';
 
 const { width, height } = Dimensions.get('screen');
 
@@ -40,6 +40,9 @@ const LearnTopic: React.FC = () => {
                   <View style={styles.underline}>
                       <Text style={styles.buttonText}>Vocabulary</Text>
                   </View>
+                  <View style={styles.circularProgress}>
+                    <CircularProgress size={52} percentage={70}/>
+                  </View>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -49,6 +52,9 @@ const LearnTopic: React.FC = () => {
                   <Image source={require('@/assets/images/level/grammar.png')} style={styles.imageBox}/>
                   <View style={styles.underline}>
                       <Text style={styles.buttonText}>Grammar</Text>
+                  </View>
+                  <View style={styles.circularProgress}>
+                    <CircularProgress size={52} percentage={70}/>
                   </View>
               </TouchableOpacity>
           </View>
@@ -134,5 +140,10 @@ const styles = StyleSheet.create({
         fontSize: 27,
         fontWeight: 'bold',
         color: '#fff',
+    },
+    circularProgress: {
+        position: 'absolute',
+        top: -13,
+        right: -13,
     },
 });

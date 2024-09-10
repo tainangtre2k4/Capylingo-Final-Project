@@ -48,7 +48,7 @@ const TopicList = () => {
       headerShown: true,
       header: () => (
         <View style={styles.headerContainer}>
-          <CloudHeader title='Vocabulary'/>
+           <CloudHeader title={`Vocabulary Lv${level}`} />
         </View>
       ),
     });
@@ -61,11 +61,6 @@ const TopicList = () => {
   if (error) {
     return <Text>Sorry! Failed to load Vocabulary</Text>;
   }
-  console.log(topics);
-  topics.forEach((topic) => {
-    console.log('Topic:', topic.title);
-    console.log('CompletedTopicVocab:', topic.CompletedTopicVocab);
-  });
 
   return (
     <View style={styles.container}>
@@ -92,14 +87,19 @@ const TopicList = () => {
               />
             );
           }
-          // Kiểm tra completedLearning và completedPracticing
+        
           const isCompleted = item.CompletedTopicVocab?.some((completed: CompletedTopic) =>
             completed.completedLearning && completed.completedPracticing
           );
           return (
             <TouchableOpacity
               style={[styles.card, { backgroundColor: cardColors[index % cardColors.length] }]}
-              onPress={() => router.push(`/(learn)/vocabulary/learnTopic?title=${item.title}&topicID=${item.id}&imageUrl=${item.ImageUrl}`)}
+              onPress={() => {
+                const isCompletedLearning = item.CompletedTopicVocab?.some((completed: CompletedTopic) => completed.completedLearning) ?? false;
+                const isCompletedPracticing = item.CompletedTopicVocab?.some((completed: CompletedTopic) => completed.completedPracticing) ?? false;
+            
+                router.push(`/(learn)/vocabulary/learnTopic?title=${item.title}&topicID=${item.id}&imageUrl=${item.ImageUrl}&completedLearning=${isCompletedLearning}&completedPracticing=${isCompletedPracticing}`);
+              }}
             >
               <View style={styles.textBox}>
                 <Text style={styles.cardText}>{item.title}</Text>
@@ -108,15 +108,12 @@ const TopicList = () => {
               {imageContent}
 
               {isCompleted && (
-                <>
-                <Text>{item.topic}</Text>
                 <Icon 
                   name="checkmark-circle" 
-                  size={32} 
+                  size={30} 
                   color="white" 
                   style={styles.checkIcon} 
                 />
-                </>
               )}
            
               
@@ -170,8 +167,8 @@ const styles = StyleSheet.create({
   },
   checkIcon: {
     position: 'absolute',
-    top: width*0.015,
-    left: width*0.03,
+    top: width*0.02,
+    left: width*0.028,
   },
 });
 

@@ -1,8 +1,12 @@
 import { StatusBar as RNStatusBar, StyleSheet, Text, View, Platform, Dimensions, TouchableOpacity, Image } from 'react-native';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useNavigation } from 'expo-router';
+import { useAuth } from '@/src/providers/AuthProvider';
 import BackButton from "@/src/components/BackButton";
+import { fetchUserLevel } from '@/src/fetchData/fetchLearn';
+import CircularProgress from '@/src/components/learn/CircularProgress';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const { width, height } = Dimensions.get('screen');
 
@@ -36,6 +40,26 @@ const levels = [
 const Level: React.FC = () => {
   const navigation = useNavigation();
   const router = useRouter();
+  const user = useAuth();
+  const [level, setLevel] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const userLevel = await fetchUserLevel(user.user?.id);
+        setLevel(userLevel.level);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   useEffect(() => {
     navigation.setOptions({
@@ -50,19 +74,44 @@ const Level: React.FC = () => {
     });
   }, [navigation]);
 
+  if (loading) {
+    return <Text>Loading...</Text>;
+  }
+
+  if (error) {
+  return <Text>Failed to load user's level {error}</Text>;
+  }
+
   return (
       <View style={styles.container}>
           <View style={styles.buttonContainer}>
-              {levels.map((level, index) => (
+              {levels.map((levelItem, index) => (
                   <TouchableOpacity
                       key={index}
-                      style={[styles.button, { backgroundColor: level.backgroundColor }]}
-                      onPress={() => router.push(`/learnLevel?level=${level.levelNumber}`)}
+                      style={[styles.button, { backgroundColor: (levelItem.levelNumber <= level+1) ?  levelItem.backgroundColor : '#A0A0A0' }]}
+                      onPress={() => router.push(`/learnLevel?level=${levelItem.levelNumber}`)}
+                      disabled={levelItem.levelNumber > level + 1}
                   >
-                      <Image source={level.image} style={styles.imageBox} />
+                      {
+                        (levelItem.levelNumber < level+1) &&
+                          <Image source={levelItem.image} style={styles.imageBox} />
+                      }
+                      {
+                        (levelItem.levelNumber === level+1) &&
+                          <View style={styles.imageBox}>
+                            <CircularProgress size={65} percentage={70}/>
+                          </View>
+                      }
+                     {
+                        (levelItem.levelNumber > level+1) &&
+                          <View style={[styles.imageBox, {backgroundColor: 'transparent', borderWidth: 0}]}>
+                            <Ionicons name="lock-closed" size={40} color="#F6D344" />
+                          </View>
+                      }
                       <View style={styles.underline}>
-                          <Text style={styles.buttonText}>{level.title}</Text>
+                          <Text style={styles.buttonText}>{levelItem.title}</Text>
                       </View>
+                      
                   </TouchableOpacity>
               ))}
           </View>
@@ -94,14 +143,6 @@ const styles = StyleSheet.create({
     fontSize: 27,
     fontWeight: '600',
     color: '#fff',
-    shadowColor: '#000',
-    // shadowOffset: {
-    //   width: -2,
-    //   height: 4,
-    // },
-    // shadowOpacity: 0.5,
-    // shadowRadius: 2,
-    // elevation: 3,
   },
   headerFillerContainer: {
     height: 42,
@@ -131,6 +172,7 @@ const styles = StyleSheet.create({
     borderColor: '#EBEBEB',
   },
   imageBox: {
+    backgroundColor: '#fff',
     width: height * 0.088,
     height: height * 0.088,
     borderRadius: height * 0.044,
@@ -138,6 +180,8 @@ const styles = StyleSheet.create({
     marginLeft: width*0.045,
     borderWidth: 3.5,
     borderColor: '#FF8504',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   underline: {
     padding: 8,
@@ -147,5 +191,10 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     color: '#fff',
+  },
+  circularProgress: {
+    position: 'absolute',
+    top: -13,
+    right: -13,
   },
 });

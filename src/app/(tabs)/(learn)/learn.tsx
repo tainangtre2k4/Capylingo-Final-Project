@@ -33,6 +33,15 @@ const Learn = () => {
         };
         fetchData();
     }, []);
+
+    if (loading) {
+        return <Text>Loading...</Text>;
+      }
+    
+    if (error) {
+    return <Text>Failed to load user's level {error}</Text>;
+    }
+    
     return (
         <>
             <StatusBar style='light' backgroundColor='#3DB2FF' />

@@ -2,6 +2,7 @@ import { ActivityIndicator, StatusBar as RNStatusBar, StyleSheet, Text, View, Pl
 import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'expo-router';
 import { useNavigation, useLocalSearchParams } from 'expo-router';
+import Icon from 'react-native-vector-icons/Ionicons';
 import CloudHeader from '@/src/components/CloudHeader';
 import { AdvancedImage } from "cloudinary-react-native";
 import { cld } from "@/src/lib/cloudinary";
@@ -17,6 +18,9 @@ const LearnTopic: React.FC = () => {
   const title = params.title as string;
   const topicID = Number(params.topicID);
   const imageUrl = params.imageUrl as string;
+  const completedLearning = params.completedLearning === 'true';
+  const completedPracticing = params.completedPracticing === 'true';
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -67,6 +71,14 @@ const LearnTopic: React.FC = () => {
                   style={[styles.button, {backgroundColor: '#9BD2FC'}]}
                   onPress={() => router.push(`/(learn)/vocabulary/learnVocab?topicID=${topicID}`)}
               >
+                  {completedLearning && (
+                    <Icon 
+                      name="checkmark-circle" 
+                      size={32} 
+                      color="white" 
+                      style={styles.checkIcon} 
+                    />
+                  )}
                   <Image source={require('@/assets/images/learn/learnVocab/learnVocabulary.png')} style={styles.imageBox}/>
                   <View style={styles.underline}>
                       <Text style={styles.buttonText}>Learn Vocabulary</Text>
@@ -77,6 +89,14 @@ const LearnTopic: React.FC = () => {
                   style={[styles.button, {backgroundColor: '#2980B9'}]}
                   onPress={() => router.push(`/(learn)/vocabulary/exercises?topicID=${topicID}`)}
               >
+                   {completedPracticing && (
+                    <Icon 
+                      name="checkmark-circle" 
+                      size={32} 
+                      color="white" 
+                      style={styles.checkIcon} 
+                    />
+                  )}
                   <Image source={require('@/assets/images/learn/learnVocab/practiceExercises.png')} style={styles.imageBox}/>
                   <View style={styles.underline}>
                       <Text style={styles.buttonText}>Practice Exercises</Text>
@@ -121,8 +141,8 @@ const styles = StyleSheet.create({
         height: height * 0.11,
         resizeMode: 'contain',
         position: 'absolute',
-        top: 16,
-        right: 16,
+        top: 0.019*height,
+        right: 0.019*height,
     },
     buttonContainer: {
         marginTop: height * 0.12,
@@ -152,20 +172,24 @@ const styles = StyleSheet.create({
         borderRadius: height * 0.05,
         resizeMode: 'contain',
 
-        marginLeft: 16,
+        marginLeft: width*0.042,
         borderWidth: 3,
         borderColor: '#FF8504',
     },
     underline: {
         padding: 8,
-        marginLeft: 30,
+        marginLeft: 0.052*width,
         borderBottomWidth: 2,
-        marginTop: -10,
         borderColor: '#fff',
     },
     buttonText: {
         fontSize: 23,
         fontWeight: '600',
         color: '#fff',
+    },
+    checkIcon: {
+      position: 'absolute',
+      top: width*0.022,
+      right: width*0.028,
     },
 });
