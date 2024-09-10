@@ -4,26 +4,26 @@ import { useNavigation, useLocalSearchParams } from "expo-router";
 import ProgressTracker from '@/src/components/ProgressTracker';
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from 'expo-router';
-import { getVocabExType1List, getVocabExType2List, getVocabExType3List } from '@/src/fetchData/fetchLearn'
+import { getGrammarExType1List, getGrammarExType2List, getGrammarExType3List } from '@/src/fetchData/fetchLearn'
 import BackButton from "@/src/components/BackButton";
-import ExVocabType1 from '@/src/components/exercise/VocabType1/VocabType1';
-import ExVocabType2 from '@/src/components/exercise/VocabType2/VocabType2';
-import ExVocabType3 from '@/src/components/exercise/VocabType3/VocabType3';
-import { completedPracticingVocab } from '@/src/updateData/updateLearningProgress';
+import ExGrammarType1 from '@/src/components/exercise/GrammarType1/GrammarType1';
+import ExGrammarType2 from '@/src/components/exercise/GrammarType2/GrammarType2';
+import ExGrammarType3 from '@/src/components/exercise/VocabType2/VocabType2';
+import { completedPracticingGrammar } from '@/src/updateData/updateLearningProgress';
 import { useAuth } from '@/src/providers/AuthProvider';
 
 const { width, height } = Dimensions.get('screen');
 
-const VocabExercises = () => {
+const GrammarExercises = () => {
   const navigation = useNavigation();
   const user = useAuth();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [numberCorrectAnswers, setNumberCorrectAnswers] = useState(0);
   const [numberIncorrectAnswers, setNumberIncorrectAnswers] = useState(0);
   const [isModalVisible, setModalVisible] = useState(false);
-  const [vocabType1Exercises, setVocabType1Exercises] = useState<any[]>([]);
-  const [vocabType2Exercises, setVocabType2Exercises] = useState<any[]>([]);
-  const [vocabType3Exercises, setVocabType3Exercises] = useState<any[]>([]);
+  const [grammarType1Exercises, setGrammarType1Exercises] = useState<any[]>([]);
+  const [grammarType2Exercises, setGrammarType2Exercises] = useState<any[]>([]);
+  const [grammarType3Exercises, setGrammarType3Exercises] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -36,13 +36,13 @@ const VocabExercises = () => {
       setLoading(true);
       setError(null);
       try {
-        const type1Data = await getVocabExType1List(topicID);
-        const type2Data = await getVocabExType2List(topicID);
-        const type3Data = await getVocabExType3List(topicID);
+        const type1Data = await getGrammarExType1List(topicID);
+        const type2Data = await getGrammarExType2List(topicID);
+        const type3Data = await getGrammarExType3List(topicID);
 
-        setVocabType1Exercises(type1Data);
-        setVocabType2Exercises(type2Data);
-        setVocabType3Exercises(type3Data);
+        setGrammarType1Exercises(type1Data);
+        setGrammarType2Exercises(type2Data);
+        setGrammarType3Exercises(type3Data);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -53,7 +53,7 @@ const VocabExercises = () => {
     fetchData();
   }, []);
 
-  const exerciseLength = vocabType1Exercises.length + vocabType2Exercises.length + vocabType3Exercises.length;
+  const exerciseLength = grammarType1Exercises.length + grammarType2Exercises.length + grammarType3Exercises.length;
 
   useEffect(() => {
     navigation.setOptions({
@@ -76,7 +76,7 @@ const VocabExercises = () => {
 
   useEffect(() => {
     if (exerciseLength === 0 && !loading && !error) {
-      completedPracticingVocab(user.user?.id, topicID);
+      completedPracticingGrammar(user.user?.id, topicID);
       router.push(`/(tabs)/(learn)/resultScreen?correct=${0}&all=${0}`);
     }
   }, [exerciseLength, loading, error]);
@@ -101,7 +101,7 @@ const VocabExercises = () => {
       if (totalAnswered === exerciseLength) {
 
         if (numberCorrectAnswers/exerciseLength >= 0.8){
-          completedPracticingVocab(user.user?.id, topicID);
+          completedPracticingGrammar(user.user?.id, topicID);
         }
 
         router.push(`/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}`);
@@ -144,40 +144,39 @@ const VocabExercises = () => {
           scrollEventThrottle={32}
           showsHorizontalScrollIndicator={false}
         >
-          {vocabType1Exercises.map((exercise, index) => (
+          {grammarType1Exercises.map((exercise, index) => (
             <View style={{ width }} key={`type1-${index}`}>
-              <ExVocabType1
+              <ExGrammarType1
                 key={index}
                 onNext={goToNextExercise}
-                questionImageUrl={exercise.questionImage}
-                correctAnswerIndex={exercise.correctAnswerIndex - 1}
-                answers={exercise.answers}
+                question={exercise.question}
+                answer={exercise.answer}
                 onCorrectAnswer={() => setNumberCorrectAnswers(prev => prev + 1)}
                 onIncorrectAnswer={() => setNumberIncorrectAnswers(prev => prev + 1)}
               />
             </View>
           ))}
 
-          {vocabType2Exercises.map((exercise, index) => (
+          {grammarType2Exercises.map((exercise, index) => (
             <View style={{ width }} key={`type2-${index}`}>
-              <ExVocabType2
+              <ExGrammarType2
                 key={index}
                 onNext={goToNextExercise}
-                question={exercise.question}
-                correctAnswerIndex={exercise.correctAnswerIndex - 1}
-                answers={exercise.answers}
+                words={exercise.words}
+                correctAnswer={exercise.correctAnswer}
                 onCorrectAnswer={() => setNumberCorrectAnswers(prev => prev + 1)}
                 onIncorrectAnswer={() => setNumberIncorrectAnswers(prev => prev + 1)}
               />
             </View>
           ))}
-          {vocabType3Exercises.map((exercise, index) => (
+          {grammarType3Exercises.map((exercise, index) => (
             <View style={{ width }} key={`type3-${index}`}>
-              <ExVocabType3
+              <ExGrammarType3
                 key={index}
                 onNext={goToNextExercise}
                 question={exercise.question}
-                synonyms={exercise.synonyms}
+                correctAnswerIndex={exercise.correctAnswerIndex - 1}
+                answers={exercise.answers}
                 onCorrectAnswer={() => setNumberCorrectAnswers(prev => prev + 1)}
                 onIncorrectAnswer={() => setNumberIncorrectAnswers(prev => prev + 1)}
               />
@@ -285,4 +284,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default VocabExercises;
+export default GrammarExercises;

@@ -9,7 +9,7 @@ import { getVocabList } from '@/src/fetchData/fetchLearn';
 import ProgressTracker from '@/src/components/ProgressTracker';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/src/providers/AuthProvider';
-import { completeLearning } from '@/src/updateData/updateLearningProgress';
+import { completeLearningVocab } from '@/src/updateData/updateLearningProgress';
 
 const { width, height } = Dimensions.get('screen');
 
@@ -61,7 +61,7 @@ const LearnVocab = () => {
 
   useEffect(() => {
     if (vocabsLength === 0 && !loading && !error) {
-      completeLearning(user.user?.id, topicID);
+      completeLearningVocab(user.user?.id, topicID);
       router.push(`/(tabs)/(learn)/resultScreen?correct=${0}&all=${0}`);
     }
   }, [vocabsLength, loading, error]);
@@ -89,7 +89,7 @@ const LearnVocab = () => {
       });
     }
     else {
-      completeLearning(user.user?.id, topicID);
+      completeLearningVocab(user.user?.id, topicID);
       router.push(`/(tabs)/(learn)/resultScreen?correct=${vocabs.length}&all=${vocabs.length}`);
     }
   };
