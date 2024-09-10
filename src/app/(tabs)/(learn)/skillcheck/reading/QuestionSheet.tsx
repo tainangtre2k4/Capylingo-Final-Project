@@ -1,9 +1,7 @@
 import {
     View,
-    Image,
     TouchableOpacity,
     StyleSheet,
-    StatusBar as RNStatusBar,
     Dimensions,
     ScrollView,
     Text,
@@ -18,13 +16,12 @@ import { RenderHTML } from "react-native-render-html";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {MaterialCommunityIcons} from '@expo/vector-icons';
-import {solutions} from './Resources';
 
 const { width, height } = Dimensions.get('window');
 
 const ReadingQuestionSheet = () => {
     const navigation = useNavigation();
-    const { curIndex, maxIndex, answers, questionSheet, timeRemaining, setAnswers, setTimeRemaining } = useContext(ReadingContext);
+    const { curIndex, maxIndex, answers, solutions, questionSheet, timeRemaining, setAnswers, setTimeRemaining } = useContext(ReadingContext);
     const fontSize = 14;
 
     const formatTime = (seconds: number) => {
@@ -52,7 +49,6 @@ const ReadingQuestionSheet = () => {
         });
     }, [navigation, curIndex, maxIndex]);
 
-    // hooks
     const sheetRef = useRef<BottomSheet>(null);
 
     const snapPoints = useMemo(() => ["25%", "50%", "100%"], []);
@@ -201,7 +197,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white'
     },
     headerRightIconContainer: {
-        padding: 8,
+        padding: 9.5,
         borderRadius: 12,
         backgroundColor: '#0693F1',
         alignItems: 'center',
@@ -258,7 +254,7 @@ const styles = StyleSheet.create({
     },
     answerInput: {
         flex: 1,
-        fontSize: 28,
+        fontSize: 20,
     },
     submitText: {
         fontSize: 18,

@@ -17,7 +17,7 @@ export default BackButton
 
 const styles = StyleSheet.create({
   backButton: {
-    padding: 8,
+    padding: 9,
     borderRadius: 10,
     backgroundColor: 'white',
     alignItems: 'center',

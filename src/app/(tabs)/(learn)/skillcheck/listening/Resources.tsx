@@ -1,6 +1,6 @@
 export const questionSheets = [
-    {
-        html: `<div id="content">
+  {
+    html: `<div id="content">
             <h1> IELTS Listening. Section 1</h1>
             <p>QUESTIONS 1-10</p>
             <div id="exam-text">
@@ -68,10 +68,10 @@ export const questionSheets = [
                 </ol>
             </div>
             <br>
-        </div>`
-    },
-    {
-        html: `<div id="content">
+        </div>`,
+  },
+  {
+    html: `<div id="content">
             <h1> IELTS Listening. Section 2</h1>
             <p>QUESTIONS 11-20</p>
             <div id="exam-text">
@@ -123,10 +123,10 @@ export const questionSheets = [
             </div>
         
             <p><br></p>
-        </div>`
-    },
-    {
-        html: `<div id="content">
+        </div>`,
+  },
+  {
+    html: `<div id="content">
             <h1> IELTS Listening. Section 3</h1>
             <p><strong>QUESTIONS 21-30</strong></p>
             <div id="exam-text">
@@ -157,10 +157,10 @@ export const questionSheets = [
                 <p><strong>30.</strong> Students need to take their last week __________.</p>
                 <br>
             </div>
-        </div>`
-    },
-    {
-        html: `<div id="content">
+        </div>`,
+  },
+  {
+    html: `<div id="content">
             <h1> IELTS Listening. Section 4</h1>
             <p><strong>SECTION 4. QUESTIONS 31-40</strong></p>
             <div id="exam-text">
@@ -211,56 +211,56 @@ export const questionSheets = [
                 <p><strong>39.</strong> To see the wall from the Moon would require superhuman __________.</p>
                 <p><strong>40.</strong> The Great Wall is generally recognized as one of the most impressive __________ in history.</p>
             </div>
-        </div>`
-    }
+        </div>`,
+  },
 ];
 
 export const audioSources = [
-    'https://ielts-up.com/listening/5.1.mp3',
-    'https://ielts-up.com/listening/5.2.mp3',
-    'https://ielts-up.com/listening/5.3.mp3',
-    'https://ielts-up.com/listening/5.4.mp3',
-]
+  "https://ielts-up.com/listening/5.1.mp3",
+  "https://ielts-up.com/listening/5.2.mp3",
+  "https://ielts-up.com/listening/5.3.mp3",
+  "https://ielts-up.com/listening/5.4.mp3",
+];
 
 export const solutions = [
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-    "apcs",
-]
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+  "apcs",
+];

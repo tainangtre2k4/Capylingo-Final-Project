@@ -21,7 +21,7 @@ export default function TabsLayout(){
         return false;
       };
     return(
-        <Tabs initialRouteName="(learn)">
+        <Tabs initialRouteName="(learn)" screenOptions={{tabBarHideOnKeyboard: true}}>
             <Tabs.Screen
                 name="(learn)"
                 options={{

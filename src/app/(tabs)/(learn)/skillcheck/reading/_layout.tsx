@@ -1,83 +1,125 @@
-import React, { createContext, useState, SetStateAction, Dispatch, useEffect } from 'react'
-import { Stack } from 'expo-router'
-import { StatusBar } from 'expo-status-bar';
-import { passages, questionSheets } from "./Resources";
-import { SafeAreaView, Platform } from 'react-native';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  SetStateAction,
+  Dispatch,
+  useEffect,
+} from "react";
+import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaView, Platform } from "react-native";
+import { SkillcheckContext, SkillcheckContextType } from "../_layout";
+import readingTests from "@/assets/data/skillcheck-reading.json";
+
+// Define types for the JSON data
+interface Passage {
+  html: string;
+}
+
+interface ReadingTest {
+  passages: Passage[];
+  questionSheets: Passage[];
+  solutions: string[];
+}
+
+// Type assertion for readingTests
+const typedReadingTests = readingTests as ReadingTest[];
 
 export interface ReadingContextType {
-    curIndex: number;
-    maxIndex: number;
-    passage: { html: string };
-    questionSheet: { html: string };
-    answers: string[];
-    timeRemaining: number;
-    prevPassage: () => void;
-    nextPassage: () => void;
-    setAnswers: Dispatch<SetStateAction<any[]>>;
-    setTimeRemaining: Dispatch<SetStateAction<number>>;
+  curIndex: number;
+  maxIndex: number;
+  passage: { html: string };
+  questionSheet: { html: string };
+  answers: string[];
+  solutions: string[];
+  timeRemaining: number;
+  prevPassage: () => void;
+  nextPassage: () => void;
+  setAnswers: Dispatch<SetStateAction<string[]>>;
+  setTimeRemaining: Dispatch<SetStateAction<number>>;
 }
 
 const defaultContextValue: ReadingContextType = {
-    curIndex: 0,
-    maxIndex: 2,
-    passage: passages[0],
-    questionSheet: questionSheets[0],
-    answers: Array(40).fill(''),
-    timeRemaining: 60 * 60,
-    prevPassage: () => {},
-    nextPassage: () => {},
-    setAnswers: () => {},
-    setTimeRemaining: () => {},
+  curIndex: 0,
+  maxIndex: 2,
+  passage: { html: "" },
+  questionSheet: { html: "" },
+  answers: Array(40).fill(""),
+  solutions: [],
+  timeRemaining: 60 * 60,
+  prevPassage: () => {},
+  nextPassage: () => {},
+  setAnswers: () => {},
+  setTimeRemaining: () => {},
 };
 
-export const ReadingContext = createContext<ReadingContextType>(defaultContextValue);
+export const ReadingContext =
+  createContext<ReadingContextType>(defaultContextValue);
 
 const SkillCheckReadingStack = () => {
-    const [currentPassageIndex, setCurrentPassageIndex] = useState(0);
-    const [answers, setAnswers] = useState(Array(40).fill(''));
-    const [timeRemaining, setTimeRemaining] = useState(60 * 60);
+  const { currentReadingTestIndex, setReadingTestIndex } =
+    useContext<SkillcheckContextType>(SkillcheckContext);
+  const [currentPassageIndex, setCurrentPassageIndex] = useState(0);
+  const [answers, setAnswers] = useState<string[]>(Array(40).fill(""));
+  const [timeRemaining, setTimeRemaining] = useState(60 * 60);
 
-    const nextPassage = () => {
-        setCurrentPassageIndex((index) => Math.min(index + 1, passages.length - 1));
-    };
+  // Fetch the current reading test data
+  let currentReadingTest = typedReadingTests[currentReadingTestIndex];
+  let passages = currentReadingTest.passages;
+  let solutions = currentReadingTest.solutions;
+  useEffect(() => {
+    currentReadingTest = typedReadingTests[currentReadingTestIndex];
+    passages = currentReadingTest.passages;
+  }, [currentReadingTestIndex, setReadingTestIndex]);
+  const questionSheets = currentReadingTest.questionSheets;
 
-    const prevPassage = () => {
-        setCurrentPassageIndex((index) => Math.max(index - 1, 0));
-    };
+  const nextPassage = () => {
+    setCurrentPassageIndex((index) => Math.min(index + 1, passages.length - 1));
+  };
 
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setTimeRemaining((prevTime) => {
-                if (prevTime <= 0) {
-                    clearInterval(timer);
-                    return 0;
-                }
-                return prevTime - 1;
-            });
-        }, 1000);
+  const prevPassage = () => {
+    setCurrentPassageIndex((index) => Math.max(index - 0, 0));
+  };
 
-        return () => clearInterval(timer);
-    }, []);
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeRemaining((prevTime) => {
+        if (prevTime <= 0) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prevTime - 1;
+      });
+    }, 1000);
 
-    return (
-        <SafeAreaView style={{flex: 1}}>
-            <ReadingContext.Provider value={{
-                curIndex: currentPassageIndex,
-                maxIndex: passages.length - 1,
-                passage: passages[currentPassageIndex],
-                questionSheet: questionSheets[currentPassageIndex],
-                answers: answers,
-                timeRemaining: timeRemaining,
-                prevPassage,
-                nextPassage,
-                setAnswers,
-                setTimeRemaining,
-            }}>
-                {Platform.OS === "ios" && <StatusBar style='dark' backgroundColor='white' />}
-                <Stack screenOptions={{ animation: 'none' }} />
-            </ReadingContext.Provider>
-        </SafeAreaView>
-    )
-}
+    return () => clearInterval(timer);
+  }, []);
 
-export default SkillCheckReadingStack
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <ReadingContext.Provider
+        value={{
+          curIndex: currentPassageIndex,
+          maxIndex: passages.length - 1,
+          passage: passages[currentPassageIndex],
+          questionSheet: questionSheets[currentPassageIndex],
+          answers,
+          solutions,
+          timeRemaining,
+          prevPassage,
+          nextPassage,
+          setAnswers,
+          setTimeRemaining,
+        }}
+      >
+        {Platform.OS === "ios" && (
+          <StatusBar style="dark" backgroundColor="white" />
+        )}
+        <Stack screenOptions={{ animation: "none" }} />
+      </ReadingContext.Provider>
+    </SafeAreaView>
+  );
+};
+
+export default SkillCheckReadingStack;

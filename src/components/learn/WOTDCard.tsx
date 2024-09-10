@@ -155,6 +155,7 @@ const WOTDCard = () => {
             <TouchableOpacity onPress={handleOpenModal}>
                 <View style={styles.container}>
                     <Text style={styles.title}>Word of the day</Text>
+                    <View style={{paddingVertical: 1}} />
                     <Text style={styles.label}>{wordOfTheDay}</Text>
                 </View>
             </TouchableOpacity>
@@ -214,7 +215,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#27AE60',
         width: width * 0.42,
         height: 100,
-        padding: 12,
         borderRadius: 12,
         alignItems: 'center',
         justifyContent: 'center'
