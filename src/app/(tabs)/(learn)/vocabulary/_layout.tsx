@@ -3,9 +3,7 @@ import {Stack} from 'expo-router'
 
 const VocabularyStack = () => {
   return (  
-    
       <Stack screenOptions={{headerShown: false}}/>
-
   )
 }
 

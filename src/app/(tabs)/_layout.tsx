@@ -27,7 +27,7 @@ export default function TabsLayout(){
                 options={{
                     headerTransparent: true,
                     headerTitle: '',
-                    tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="book-open-page-variant-outline" size={size} color={color} />,
+                    tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="book-open-page-variant-outline" size={size} color="3DB2FF" />,
                     tabBarLabel: 'Learn',
                     headerShown: false,
                     tabBarStyle: { display: checkPageToHideTabBar() ? 'none' : 'flex' }
@@ -36,7 +36,7 @@ export default function TabsLayout(){
             <Tabs.Screen
                 name="(dictionary)"
                 options={{
-                    tabBarIcon: ({ color, size }) => <Ionicons name="file-tray-full" size={size} color={color} />,
+                    tabBarIcon: ({ color, size }) => <Ionicons name="file-tray-full" size={size} color="3DB2FF" />,
                     tabBarLabel: 'Dictionary',
                     headerShown: false,
                 }}
@@ -46,7 +46,7 @@ export default function TabsLayout(){
                 options={{
                     headerTransparent: true,
                     headerTitle: '',
-                    tabBarIcon: ({ color, size }) => <Ionicons name="folder-open-outline" size={size} color={color} />,
+                    tabBarIcon: ({ color, size }) => <Ionicons name="folder-open-outline" size={size} color="3DB2FF" />,
                     tabBarLabel: 'Resources',
                 }}
             />
@@ -55,7 +55,7 @@ export default function TabsLayout(){
                 name="(profile)"
                 options={{
                     headerShown: false,
-                    tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
+                    tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color="3DB2FF" />,
                     tabBarLabel: 'My Profile',
                 }}
             />

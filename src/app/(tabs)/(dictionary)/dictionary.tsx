@@ -1,8 +1,11 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, {
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
-  Platform,
   ScrollView,
-  StatusBar as RNStatusBar,
   StyleSheet,
   Text,
   TextInput,
@@ -125,20 +128,34 @@ const Dictionary = () => {
   };
 
   const playAudio = async () => {
-    if (data && data.phonetics[0]?.audio) {
+    if (!data || !data.phonetics) {
+      console.log("No phonetics data available");
+      return;
+    }
+
+    let audioUri = data.phonetics[0]?.audio || data.phonetics[1]?.audio;
+
+    if (!audioUri) {
+      console.log("No audio available for this word");
+      return;
+    }
+
+    try {
       if (sound) {
         await sound.unloadAsync();
       }
 
-      const audioUri = data.phonetics[0].audio;
-      const { sound: newSound, status } = await Audio.Sound.createAsync({
-        uri: audioUri,
-      });
+      console.log("Audio URI:", audioUri);
 
-      if (status.isLoaded) {
-        setSound(newSound);
-        await newSound.playAsync();
-      }
+      const { sound: newSound } = await Audio.Sound.createAsync(
+        { uri: audioUri },
+        { shouldPlay: true }
+      );
+
+      setSound(newSound);
+      console.log("Audio played successfully");
+    } catch (error) {
+      console.error("Error playing audio:", error);
     }
   };
 
@@ -329,7 +346,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginHorizontal: 10
+    marginHorizontal: 10,
   },
   word: {
     fontSize: 24,
