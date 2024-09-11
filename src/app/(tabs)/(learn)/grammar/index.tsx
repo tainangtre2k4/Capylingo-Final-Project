@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigation, router, useLocalSearchParams } from "expo-router";
 import { ActivityIndicator, View, Text, FlatList, StyleSheet, Dimensions, Platform, StatusBar as RNStatusBar, TouchableOpacity, Image } from 'react-native';
-import { getVocabTopicList } from '@/src/fetchData/fetchLearn';
+import { getGrammarTopicList } from '@/src/fetchData/fetchLearn';
 import { AdvancedImage } from "cloudinary-react-native";
 import { cld } from "@/src/lib/cloudinary";
 import { fit } from "@cloudinary/url-gen/actions/resize";
@@ -30,7 +30,7 @@ const TopicList = () => {
       setLoading(true);
       setError(null);
       try {
-        const topicList = await getVocabTopicList(user.user?.id, level);
+        const topicList = await getGrammarTopicList(user.user?.id, level);
         setTopics(topicList);
       } catch (err: any) {
         setError(err.message);
@@ -48,7 +48,7 @@ const TopicList = () => {
       headerShown: true,
       header: () => (
         <View style={styles.headerContainer}>
-           <CloudHeader title={`Vocabulary Lv${level}`} />
+           <CloudHeader title={`Grammar Lv${level}`} />
         </View>
       ),
     });
@@ -64,7 +64,7 @@ const TopicList = () => {
   }
 
   if (error) {
-    return <Text>Sorry! Failed to load Vocabulary</Text>;
+    return <Text>Sorry! Failed to load Grammars</Text>;
   }
 
   return (
@@ -77,13 +77,13 @@ const TopicList = () => {
       </TouchableOpacity>
       <FlatList
         data={topics}
-        showsVerticalScrollIndicator = {false}
+        showsVerticalScrollIndicator={false}
         renderItem={({ item, index }) => {
           let imageContent;
 
           if (item.ImageUrl) {
             const image = cld.image(item.ImageUrl);
-            image.resize(fit().width(100).height(100)); // Resize ảnh Cloudinary
+            image.resize(fit().width(100).height(100));
             imageContent = (
               <AdvancedImage
                 cldImg={image}
@@ -100,17 +100,19 @@ const TopicList = () => {
             );
           }
         
-          const isCompleted = item.CompletedTopicVocab?.some((completed: CompletedTopic) =>
+          const isCompleted = item.CompletedTopicGrammar?.some((completed: CompletedTopic) =>
             completed.completedLearning && completed.completedPracticing
           );
           return (
             <TouchableOpacity
               style={[styles.card, { backgroundColor: cardColors[index % cardColors.length] }]}
               onPress={() => {
-                const isCompletedLearning = item.CompletedTopicVocab?.some((completed: CompletedTopic) => completed.completedLearning) ?? false;
-                const isCompletedPracticing = item.CompletedTopicVocab?.some((completed: CompletedTopic) => completed.completedPracticing) ?? false;
+                const isCompletedLearning = item.CompletedTopicGrammar?.some((completed: CompletedTopic) => completed.completedLearning) ?? false;
+                const isCompletedPracticing = item.CompletedTopicGrammar?.some((completed: CompletedTopic) => completed.completedPracticing) ?? false;
             
-                router.push(`/(learn)/vocabulary/learnTopic?title=${item.title}&topicID=${item.id}&imageUrl=${item.ImageUrl}&completedLearning=${isCompletedLearning}&completedPracticing=${isCompletedPracticing}`);
+                router.push(
+                  `(learn)/grammar/learnTopic?title=${encodeURIComponent(item.title)}&topicID=${item.id}&imageUrl=${encodeURIComponent(item.ImageUrl)}&lectureLink=${encodeURIComponent(item.lectureLink)}&completedLearning=${isCompletedLearning}&completedPracticing=${isCompletedPracticing}`
+                );
               }}
             >
               <View style={styles.textBox}>
@@ -122,7 +124,7 @@ const TopicList = () => {
               {isCompleted && (
                 <Icon 
                   name="checkmark-circle" 
-                  size={30} 
+                  size={25} 
                   color="white" 
                   style={styles.checkIcon} 
                 />
@@ -168,18 +170,18 @@ const styles = StyleSheet.create({
   },
   textBox: {
     marginTop: width*0.02,
-    marginLeft: width*0.064,
+    marginLeft: width*0.025,
     width: width*0.53,
     justifyContent: 'center',
   },
   cardText: {
-    fontSize: 22,
+    fontSize: 21,
     fontWeight: '600',
     color: 'white',
   },
   checkIcon: {
     position: 'absolute',
-    top: width*0.02,
+    top: width*0.018,
     left: width*0.028,
   },
   chooseLevelButton: {

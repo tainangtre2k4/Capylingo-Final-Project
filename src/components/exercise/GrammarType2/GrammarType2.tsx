@@ -9,15 +9,18 @@ import {Styles} from './styles'
 
 const { width, height } = Dimensions.get('window');
 
-const words = ['What’s', 'Your', 'Name', '?', 'I', 'Am', 'Ujang'];
-const correctAnswer = ['I', 'Am', 'Ujang', 'What’s', 'Your', 'Name', '?'];
-
-
-interface Type1Props {
+interface Type2Props {
   onNext: () => void;
+  onCorrectAnswer: () => void;
+  onIncorrectAnswer: () => void;
+  words: string[];
+  correctAnswer: string[];
 }
 
-const type2: React.FC<Type1Props> = ({ onNext }) => {
+// const words = ['What’s', 'Your', 'Name', '?', 'I', 'Am', 'Ujang'];
+// const correctAnswer = ['I', 'Am', 'Ujang', 'What’s', 'Your', 'Name', '?'];
+
+const ExGrammarType2: React.FC<Type2Props> = ({ onNext, onCorrectAnswer, onIncorrectAnswer, words, correctAnswer }) => {
     const [selectedWords, setSelectedWords] = useState<string[]>(Array(correctAnswer.length).fill(''));
     const [availableWords, setAvailableWords] = useState<string[]>(words);
     
@@ -49,8 +52,10 @@ const type2: React.FC<Type1Props> = ({ onNext }) => {
     const handleCheckAnswer = () => {
       if (selectedWords.join(' ') === correctAnswer.join(' ')) {
         setResult('correct');
+        onCorrectAnswer();
       } else {
         setResult('incorrect');
+        onIncorrectAnswer();
       }
     }
 
@@ -133,4 +138,4 @@ const styles = StyleSheet.create({
   });
 
 
-export default type2;
+export default ExGrammarType2;

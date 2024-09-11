@@ -17,7 +17,7 @@ export const sharedStyles = StyleSheet.create({
     //marginTop: width * 0.01,
     marginHorizontal: width*0.03,
     fontWeight: '500',
-    fontSize: width * 0.063,
+    fontSize: 22,
     textAlign: 'center',
     marginBottom: height * 0.045,
   },
