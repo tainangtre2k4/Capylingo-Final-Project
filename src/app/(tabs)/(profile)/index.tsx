@@ -1,10 +1,40 @@
+import { cld } from '@/src/lib/cloudinary';
 import { supabase } from '@/src/lib/supabase';
+import { useAuth } from '@/src/providers/AuthProvider';
+import { AdvancedImage } from 'cloudinary-react-native';
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Image, Dimensions, TouchableOpacity } from 'react-native';
+import { thumbnail } from "@cloudinary/url-gen/actions/resize";
+import { prepareUIRegistry } from 'react-native-reanimated/lib/typescript/reanimated2/frameCallback/FrameCallbackRegistryUI';
 
 const { width } = Dimensions.get('window');
 export default function Index() {
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+  const {user} = useAuth();
+  const [avatar,setAvatar] = useState<string | null>(null);
+  const [userName,setUserName] = useState<string | null>('New User');
+  const fetchUserData = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user?.id)
+        .single();
+
+      if (error) {
+        throw error;
+      }
+      setAvatar(data.avatar_url);
+      setUserName(data.username)
+
+    } catch (error: any) {
+      console.log('Error fetching user data:', error.message);
+    } 
+  };
+
   // Assume these variables are passed in as props or derived from state
   const numberOfNewAchievement = 2; // Example value, replace with actual state or props
   const actionNeeded = true; // Example value, replace with actual state or props
@@ -14,6 +44,11 @@ export default function Index() {
   const logOutHandler = () => {
     supabase.auth.signOut()
   }
+
+  const avatarCldImage = avatar
+    ? cld.image(avatar).resize(thumbnail().width(width).height(width))
+    : null;
+
   return (
     <View style={styles.container}>
       {/* Background Image */}
@@ -27,12 +62,18 @@ export default function Index() {
         <Text style={styles.header}>My Profile</Text>
 
         <View style={{ flexDirection: 'row', marginTop: 40 }}>
-          <Image 
-            source={require('@/assets/images/profileScreen/avatar.png')}
+          { avatarCldImage ?  (
+            <AdvancedImage
+            cldImg={avatarCldImage}
             style={styles.avatar}
           />
+          ):
+          (<Image 
+            source={require('@/assets/images/profileScreen/avatar.png')}
+            style={styles.avatar}
+          />)}
           <View style={{ padding: 15.6 }}>
-            <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 8 }}>John Doe</Text>
+            <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 8 }}>{userName}</Text>
             <Text style={{ fontSize: 16, color: '#898989' }}>Newbie</Text>
           </View>
           <TouchableOpacity style={{ alignItems: 'flex-end', flex: 1 }} onPress={ChangeInformationHandler}>
@@ -185,7 +226,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
   },
   dashboardContainer: {
-    marginTop: 30,
+    marginTop: 20,
     paddingVertical: 15,
     borderWidth: 1,
     borderColor: '#E0E0E0',

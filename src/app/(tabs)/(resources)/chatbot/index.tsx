@@ -1,81 +1,174 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Image, FlatList, TouchableOpacity } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import ChatFaceData from '@/constants/ChatFaceData';
-import Header from '@/src/components/community/Header';
+import React, { useState, useEffect, useCallback } from 'react';
+import { TouchableOpacity, View ,Text} from 'react-native';
+import { Bubble, GiftedChat, InputToolbar, Send, IMessage, InputToolbarProps, BubbleProps, SendProps } from 'react-native-gifted-chat';
+import { FontAwesome } from '@expo/vector-icons';
+import GlobalApi from '@/src/utils/globalApi';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
-
-interface ChatFace {
-  id: number;
+interface ChatUser {
+  _id: string | number; // Adjusted to match IMessage type
   name: string;
-  image: string;
-  primary: string;
-  secondary: string;
+  avatar: string;
 }
 
-export default function HomeScreen() {
-  const [chatFaceData, setChatFaceData] = useState<ChatFace[]>([]);
-  const [selectedChatFace, setSelectedChatFace] = useState<ChatFace | null>(null);
-  const router = useRouter(); // Place useRouter inside the component
+interface ChatMessage extends IMessage {
+  user: ChatUser;
+}
+
+const CHAT_BOT_FACE_DEFAULT = 'https://res.cloudinary.com/dnfxraert/image/upload/v1725883301/k2sqmmubwd2ampt9co0j.png';
+
+export default function ChatScreen() {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    setChatFaceData(ChatFaceData);
     checkFaceId();
   }, []);
 
   const checkFaceId = async () => {
-    const id = await AsyncStorage.getItem('chatFaceId');
-    id ? setSelectedChatFace(ChatFaceData[parseInt(id)]) : setSelectedChatFace(ChatFaceData[0]);
+    try {
+    
+      setMessages([
+        {
+          _id: 1,
+          text: `Hello, I am Raichu, How Can I help you? 
+          \nThe first message can be longer, please wait a minute.
+          \nIf any error occurs, please reopen the chat bot, and I'll be back to assist you.`,
+          createdAt: new Date(),
+          user: {
+            _id: 2,
+            name: 'React Native',
+            avatar: CHAT_BOT_FACE_DEFAULT, // Directly use faceData.image here
+          },
+        } as ChatMessage,
+      ]);
+    } catch (error) {
+      console.error('Failed to retrieve chat face id:', error);
+    }
   };
 
-  const onChatFacePress = async (id: number) => {
-    setSelectedChatFace(ChatFaceData[id - 1]);
-    await AsyncStorage.setItem('chatFaceId', (id - 1).toString());
-  };
+  const onSend = useCallback((messages: IMessage[] = []) => {
+    setMessages(previousMessages => GiftedChat.append(previousMessages, messages as ChatMessage[]));
+    if (messages[0]?.text) {
+      getBardResp(messages[0].text);
+    }
+  }, []); // Add chatBotFace as a dependency here
 
-  if (!selectedChatFace) return null;
+  const getBardResp = async (msg: string, retries = 3) => {
+    setLoading(true);
+    for (let i = 0; i < retries; i++) {
+      try {
+        const resp = await GlobalApi.getGeminiApi(msg);
+        const responseContent = resp.data.response || "Sorry, I cannot help with it";
+        const chatAIResp: ChatMessage[] = [
+          {
+            _id: Math.random() * (9999999 - 1),
+            text: responseContent,
+            createdAt: new Date(),
+            user: {
+              _id: 2,
+              name: 'ChatBot', // You can change this name as needed
+              avatar: CHAT_BOT_FACE_DEFAULT, // Ensure avatar is the current chatBotFace
+            },
+          },
+        ];
+        setMessages(previousMessages => GiftedChat.append(previousMessages, chatAIResp));
+        break; // Exit loop if successful
+      } catch (error) {
+        if (i < retries - 1) {
+          await new Promise(res => setTimeout(res, 1000)); // Wait before retrying
+        } else {
+          console.error('Failed to fetch response:', error);
+  
+          let errorMessage = 'An error occurred. Please try again later.';
+          if (error instanceof Error) {
+            // Check if it's an Axios error (or any error with `response`)
+            const axiosError = (error as any)?.response?.data?.message;
+            errorMessage = axiosError || error.message;
+          }
+  
+          const errorResponse: ChatMessage[] = [
+            {
+              _id: Math.random() * (9999999 - 1),
+              text: errorMessage,
+              createdAt: new Date(),
+              user: {
+                _id: 2,
+                name: 'ChatBot',
+                avatar: CHAT_BOT_FACE_DEFAULT,
+              },
+            },
+          ];
+          setMessages(previousMessages => GiftedChat.append(previousMessages, errorResponse));
+        }
+      }
+    }
+    setLoading(false);
+  };
+  
+  
+
+  const renderBubble = (props: BubbleProps<ChatMessage>) => (
+    <Bubble
+      {...props}
+      wrapperStyle={{
+        right: { backgroundColor: 'blue' || '#671ddf' }, // Use chatFaceColor for bubble color
+        left: {},
+      }}
+      textStyle={{
+        right: { padding: 2 },
+        left: { color: 'blue' || '#671ddf', padding: 2 },
+      }}
+    />
+  );
+
+  const renderInputToolbar = (props: InputToolbarProps<ChatMessage>) => (
+    <InputToolbar
+      {...props}
+      containerStyle={{
+        padding: 3,
+      }}
+    />
+  );
+
+  const renderSend = (props: SendProps<ChatMessage>) => (
+    <Send {...props}>
+      <View style={{ marginRight: 10, marginBottom: 5 }}>
+        <FontAwesome name="send" size={24} color="black" />
+      </View>
+    </Send>
+  );
+  const router = useRouter();
+
+  const backHandler = () =>{
+    router.back();
+  }
 
   return (
-    <View>
-      <Header title={'Chat Bot'} backHandler={() => {router.back();}} search={false} />
-
-      <View className="items-center pt-5">
-        <Text className={`text-2xl`} style={{ color: selectedChatFace.primary }}>
-          Hello,
-        </Text>
-        <Text className={`text-2xl font-bold`} style={{ color: selectedChatFace.primary }}>
-          I am {selectedChatFace.name}
-        </Text>
-        <Image source={{ uri: selectedChatFace.image }} className="h-36 w-36 mt-5" />
-        <Text className="mt-8 text-xl">How Can I help you?</Text>
-
-        <View className="mt-5 bg-gray-100 items-center h-28 p-2.5 rounded-lg">
-          <FlatList
-            data={chatFaceData}
-            horizontal={true}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => {
-              if (item.id === selectedChatFace.id) {
-                return null;
-              }
-              return (
-                <TouchableOpacity className="m-3.5" onPress={() => onChatFacePress(item.id)}>
-                  <Image source={{ uri: item.image }} className="w-10 h-10" />
-                </TouchableOpacity>
-              );
-            }}
-          />
-          <Text className="mt-1.5 text-lg text-gray-400">Choose Your Fav ChatBuddy</Text>
-        </View>
-
-        <TouchableOpacity
-          className="mt-10 py-4 w-3/5 rounded-full items-center"
-          style={{ backgroundColor: selectedChatFace.primary }}
-          onPress={() => {router.push('/chatbot/chatScreen')}}
-        >
-          <Text className="text-base text-white">Let's Chat</Text>
+    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center',padding: 10,marginTop:10}}>
+        {/* Back button aligned to start */}
+        <TouchableOpacity onPress={backHandler} style={{ padding: 10}}>
+          <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
+
+        {/* Text container with flex: 1 to center the text */}
+        <View style={{justifyContent: 'center', alignItems: 'center',marginLeft: 90 }}>
+          <Text style={{ fontSize: 24 }}>Chat bot AI</Text>
+        </View>
       </View>
+
+
+
+      <GiftedChat
+        messages={messages}
+        isTyping={loading}
+        onSend={messages => onSend(messages)}
+        user={{ _id: 1 }}
+        renderBubble={renderBubble}
+        renderInputToolbar={renderInputToolbar}
+        renderSend={renderSend}
+      />
     </View>
   );
 }

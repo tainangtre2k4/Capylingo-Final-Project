@@ -18,11 +18,11 @@ const LearnTopic: React.FC = () => {
   const title = params.title as string;
   const topicID = Number(params.topicID);
   const imageUrl = params.imageUrl as string;
+  const lectureLink = params.lectureLink as string;
   const completedLearning = params.completedLearning === 'true';
   const completedPracticing = params.completedPracticing === 'true';
 
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
       navigation.setOptions({
         headerShown: true,
@@ -69,7 +69,7 @@ const LearnTopic: React.FC = () => {
           <View style={styles.buttonContainer}>
               <TouchableOpacity
                   style={[styles.button, {backgroundColor: '#9BD2FC'}]}
-                  onPress={() => router.push(`/(learn)/vocabulary/learnVocab?topicID=${topicID}`)}
+                  onPress={() => router.push(`/(learn)/grammar/learnGrammar?topicID=${topicID}&lectureLink=${lectureLink}`)}
               >
                   {completedLearning && (
                     <Icon 
@@ -81,13 +81,13 @@ const LearnTopic: React.FC = () => {
                   )}
                   <Image source={require('@/assets/images/learn/learnVocab/learnVocabulary.png')} style={styles.imageBox}/>
                   <View style={styles.underline}>
-                      <Text style={styles.buttonText}>Learn Vocabulary</Text>
+                      <Text style={styles.buttonText}>Learn Grammar</Text>
                   </View>
               </TouchableOpacity>
 
               <TouchableOpacity
                   style={[styles.button, {backgroundColor: '#2980B9'}]}
-                  onPress={() => router.push(`/(learn)/vocabulary/exercises?topicID=${topicID}`)}
+                  onPress={() => router.push(`/(learn)/grammar/exercises?topicID=${topicID}`)}
               >
                    {completedPracticing && (
                     <Icon 

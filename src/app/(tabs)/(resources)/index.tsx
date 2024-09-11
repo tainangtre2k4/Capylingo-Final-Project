@@ -41,7 +41,7 @@ const DATA: DataItem[] = [
         title: "Play Games",
         description: "Play exciting games that make learning English fun. Improve your language skills through entertaining and interactive challenges.",
         image: require('@/assets/images/resources/capyGames.png'),
-        navigate: '/(resources)/community',
+        navigate: '/(resources)/playgame',
     },
 ];
 

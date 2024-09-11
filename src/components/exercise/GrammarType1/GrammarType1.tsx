@@ -8,21 +8,24 @@ import ResultContent from './resultContent';
 
 interface Type1Props {
   onNext: () => void;
+  onCorrectAnswer: () => void;
+  onIncorrectAnswer: () => void;
+  question: string;
+  answer: string;
 }
 
-const type1: React.FC<Type1Props> = ({ onNext }) => {
-
-  const question = "What is the capital of France?";
-  const correctAnswer = "Paris";
+const ExGrammarType1: React.FC<Type1Props> = ({ onNext, onCorrectAnswer, onIncorrectAnswer, question, answer }) => {
   
   const [userAnswer, setUserAnswer] = useState('');
   const [result, setResult] = useState<'correct' | 'incorrect' | null>(null);
   
   const checkAnswer = () => {
-    if (userAnswer.trim().toLowerCase() === correctAnswer.toLowerCase()) {
+    if (userAnswer.trim().toLowerCase() === answer.toLowerCase()) {
       setResult('correct');
+      onCorrectAnswer();
     } else {
       setResult('incorrect');
+      onIncorrectAnswer();
     }
   };
 
@@ -40,7 +43,7 @@ const type1: React.FC<Type1Props> = ({ onNext }) => {
           editable={!result}
         />
 
-        <ResultBox result={result} content={<ResultContent result={result} answer={correctAnswer} />} />
+        <ResultBox result={result} content={<ResultContent result={result} answer={answer} />} />
 
         <CheckAnswerButton onPress={checkAnswer} onNext={onNext} result={result} />
       </View>
@@ -48,4 +51,4 @@ const type1: React.FC<Type1Props> = ({ onNext }) => {
   );
 };
 
-export default type1;
+export default ExGrammarType1;
