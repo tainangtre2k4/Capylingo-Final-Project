@@ -1,58 +1,203 @@
-import {StatusBar as RNStatusBar, StyleSheet, Text, View} from 'react-native'
-import React, {useEffect} from 'react'
-import {Link, useNavigation} from 'expo-router'
-import BackButton from '@/src/components/BackButton';
+import React, { useEffect, useState } from 'react';
+import { useNavigation, router, useLocalSearchParams } from "expo-router";
+import { ActivityIndicator, View, Text, FlatList, StyleSheet, Dimensions, Platform, StatusBar as RNStatusBar, TouchableOpacity, Image } from 'react-native';
+import { getVocabTopicList } from '@/src/fetchData/fetchLearn';
+import { AdvancedImage } from "cloudinary-react-native";
+import { cld } from "@/src/lib/cloudinary";
+import { fit } from "@cloudinary/url-gen/actions/resize";
+import CloudHeader from '@/src/components/CloudHeader';
+import { useAuth } from '@/src/providers/AuthProvider';
+import Icon from 'react-native-vector-icons/Ionicons';
 
-const VocabularyLesson = () => {
-    const navigation = useNavigation();
+type CompletedTopic = {
+  completedLearning: number;
+  completedPracticing: number;
+};
+const { width, height } = Dimensions.get('screen');
+const cardColors = ['#9BD2FC', '#F1C40F', '#16A085', '#2980B9'];
+
+const TopicList = () => {
+  const navigation = useNavigation();
+  const [topics, setTopics] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const params = useLocalSearchParams();
+  const level = Number(params.level);
+  const user = useAuth();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const topicList = await getVocabTopicList(user.user?.id, level);
+        setTopics(topicList);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+  
 
   useEffect(() => {
     navigation.setOptions({
       headerShown: true,
       header: () => (
-        <View style={styles.header}>
-          <BackButton/>
-          <Text style={styles.title}>Vocabulary</Text>
+        <View style={styles.headerContainer}>
+           <CloudHeader title={`Vocabulary Lv${level}`} />
         </View>
       ),
-      headerTitleStyle: {
-        color: 'white'
-      },
     });
   }, [navigation]);
 
+  if (loading) {
     return (
-        <View style={styles.container}>
-            <Link href='/vocabulary/exercises'>exercises</Link>
-            <Link href='/vocabulary/learnVocab'>learn vocabs</Link>
-            <Link href={{
-                pathname: '/resultScreen',
-                params: {correct: 12, all: 40}
-            }}>
-                result demo
-            </Link>
+        <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}>
+            <ActivityIndicator size="large" color="#2980B9" />
+            <Text style={{ marginTop: 10,fontSize: 20, fontWeight: '500', color: '#0693F1',}}>Loading...</Text>
         </View>
-    )
-}
+    );
+  }
 
-export default VocabularyLesson
+  if (error) {
+    return <Text>Sorry! Failed to load Vocabulary</Text>;
+  }
+
+  return (
+    <View style={styles.container}>
+      <TouchableOpacity 
+        style={styles.chooseLevelButton}
+        onPress={() => router.push('/level')}
+      >
+        <Text style={styles.chooseLevelText}>Choose Level</Text>
+      </TouchableOpacity>
+      <FlatList
+        data={topics}
+        showsVerticalScrollIndicator = {false}
+        renderItem={({ item, index }) => {
+          let imageContent;
+
+          if (item.ImageUrl) {
+            const image = cld.image(item.ImageUrl);
+            image.resize(fit().width(100).height(100)); // Resize ảnh Cloudinary
+            imageContent = (
+              <AdvancedImage
+                cldImg={image}
+                style={styles.image}
+                accessibilityLabel={item.title}
+              />
+            );
+          } else {
+            imageContent = (
+              <Image
+                source={require('@/assets/images/learn/learnVocab/topicDefault.png')}
+                style={styles.image}
+              />
+            );
+          }
+        
+          const isCompleted = item.CompletedTopicVocab?.some((completed: CompletedTopic) =>
+            completed.completedLearning && completed.completedPracticing
+          );
+          return (
+            <TouchableOpacity
+              style={[styles.card, { backgroundColor: cardColors[index % cardColors.length] }]}
+              onPress={() => {
+                const isCompletedLearning = item.CompletedTopicVocab?.some((completed: CompletedTopic) => completed.completedLearning) ?? false;
+                const isCompletedPracticing = item.CompletedTopicVocab?.some((completed: CompletedTopic) => completed.completedPracticing) ?? false;
+            
+                router.push(`/(learn)/vocabulary/learnTopic?title=${item.title}&topicID=${item.id}&imageUrl=${item.ImageUrl}&completedLearning=${isCompletedLearning}&completedPracticing=${isCompletedPracticing}`);
+              }}
+            >
+              <View style={styles.textBox}>
+                <Text style={styles.cardText}>{item.title}</Text>
+              </View>
+
+              {imageContent}
+
+              {isCompleted && (
+                <Icon 
+                  name="checkmark-circle" 
+                  size={30} 
+                  color="white" 
+                  style={styles.checkIcon} 
+                />
+              )}
+           
+              
+            </TouchableOpacity>
+          );
+        }}
+        keyExtractor={(item, index) => index.toString()}
+      />
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-    container: {
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    header: {
-        paddingVertical: 6,
-        paddingHorizontal: 20,
-        backgroundColor: '#3DB2FF',
-        alignItems: 'center',
-        flexDirection: 'row'
-    },
-    title: {
-        marginHorizontal: 10,
-        color: 'white',
-        fontSize: 22,
-        fontWeight: '500'
-    }
-})
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    paddingBottom: height*0.0246,
+    paddingTop: height*0.07,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    marginTop: Platform.OS === 'android' ? RNStatusBar.currentHeight || 20 : 0,
+  },
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: width * 0.85,
+    height: height * 0.113,
+    padding: height * 0.01,
+    marginVertical: 8,
+    borderRadius: 16,
+  },
+  image: {
+    width: height * 0.095,
+    height: height * 0.095,
+    resizeMode: 'contain',
+    borderRadius: 12,
+  },
+  textBox: {
+    marginTop: width*0.02,
+    marginLeft: width*0.064,
+    width: width*0.53,
+    justifyContent: 'center',
+  },
+  cardText: {
+    fontSize: 22,
+    fontWeight: '600',
+    color: 'white',
+  },
+  checkIcon: {
+    position: 'absolute',
+    top: width*0.02,
+    left: width*0.028,
+  },
+  chooseLevelButton: {
+    position: 'absolute',
+    right: width*0.077 ,
+    top: 16,
+    borderRadius: 14,
+    backgroundColor: '#3DB2FF',
+    width: 0.32 * width,
+    height: height*0.043,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  chooseLevelText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+  }
+});
+
+export default TopicList;

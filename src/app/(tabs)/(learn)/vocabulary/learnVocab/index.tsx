@@ -1,24 +1,21 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useNavigation } from "expo-router";
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigation, useLocalSearchParams } from "expo-router";
 import BackButton from "@/src/components/BackButton";
 import { StatusBar } from "expo-status-bar";
-import {
-  ScrollView,
-  Platform,
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-} from "react-native";
-import Flashcard from "@/src/components/learnVocab/flashcard";
-import RewriteVocab from "@/src/components/learnVocab/rewriteVocab";
-import { getVocabList } from "@/src/fetchData/fetchLearn";
-import ProgressTracker from "@/src/components/ProgressTracker";
+import { ActivityIndicator, ScrollView, Platform, View, Text, StyleSheet, Dimensions, StatusBar as RNStatusBar } from 'react-native';
+import Flashcard from '@/src/components/learnVocab/flashcard';
+import RewriteVocab from '@/src/components/learnVocab/rewriteVocab';
+import { getVocabList } from '@/src/fetchData/fetchLearn';
+import ProgressTracker from '@/src/components/ProgressTracker';
+import { useRouter } from 'expo-router';
+import { useAuth } from '@/src/providers/AuthProvider';
+import { completeLearningVocab } from '@/src/updateData/updateLearningProgress';
 
-const topicID = 1;
-const { width, height } = Dimensions.get("screen");
+const { width, height } = Dimensions.get('screen');
 
 const LearnVocab = () => {
+  const router = useRouter();
+  const user = useAuth();
   const navigation = useNavigation();
   const [vocabs, setVocabs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,6 +24,8 @@ const LearnVocab = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [incorrectVocabs, setIncorrectVocabs] = useState<any[]>([]);
 
+  const { topicID } = useLocalSearchParams();
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -34,15 +33,17 @@ const LearnVocab = () => {
       try {
         const vocabList = await getVocabList(topicID);
         setVocabs(vocabList);
+
       } catch (err: any) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
+
+  const vocabsLength = vocabs.length;
 
   useEffect(() => {
     navigation.setOptions({
@@ -66,8 +67,21 @@ const LearnVocab = () => {
     });
   }, [navigation, currentIndex, incorrectVocabs.length]);
 
+  useEffect(() => {
+    if (vocabsLength === 0 && !loading && !error) {
+      completeLearningVocab(user.user?.id, topicID);
+      router.push(`/(tabs)/(learn)/resultScreen?correct=${0}&all=${0}`);
+    }
+  }, [vocabsLength, loading, error]);
+
+
   if (loading) {
-    return <Text>Loading...</Text>;
+    return (
+        <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}>
+            <ActivityIndicator size="large" color="#2980B9" />
+            <Text style={{ marginTop: 10,fontSize: 20, fontWeight: '500', color: '#0693F1',}}>Loading...</Text>
+        </View>
+    );
   }
 
   if (error) {
@@ -82,6 +96,10 @@ const LearnVocab = () => {
         x: nextIndex * width,
         animated: true,
       });
+    }
+    else {
+      completeLearningVocab(user.user?.id, topicID);
+      router.push(`/(tabs)/(learn)/resultScreen?correct=${vocabs.length}&all=${vocabs.length}`);
     }
   };
 
@@ -166,8 +184,9 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    alignItems: "center",
-    backgroundColor: "#f5f5f5",
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    marginTop: height*0.02,
   },
 });
 

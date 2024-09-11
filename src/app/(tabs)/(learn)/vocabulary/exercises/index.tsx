@@ -1,6 +1,6 @@
-import { Platform, Image, Modal, TouchableOpacity, Text, StyleSheet, Dimensions, ScrollView, View, StatusBar as RNStatusBar } from 'react-native';
+import { ActivityIndicator, Platform, Image, Modal, TouchableOpacity, Text, StyleSheet, Dimensions, ScrollView, View, StatusBar as RNStatusBar } from 'react-native';
 import React, { useEffect, useState, useRef } from 'react';
-import { useNavigation } from "expo-router";
+import { useNavigation, useLocalSearchParams } from "expo-router";
 import ProgressTracker from '@/src/components/ProgressTracker';
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from 'expo-router';
@@ -9,14 +9,14 @@ import BackButton from "@/src/components/BackButton";
 import ExVocabType1 from '@/src/components/exercise/VocabType1/VocabType1';
 import ExVocabType2 from '@/src/components/exercise/VocabType2/VocabType2';
 import ExVocabType3 from '@/src/components/exercise/VocabType3/VocabType3';
-
+import { completedPracticingVocab } from '@/src/updateData/updateLearningProgress';
+import { useAuth } from '@/src/providers/AuthProvider';
 
 const { width, height } = Dimensions.get('screen');
 
-const topicID = 1;
-
 const VocabExercises = () => {
   const navigation = useNavigation();
+  const user = useAuth();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [numberCorrectAnswers, setNumberCorrectAnswers] = useState(0);
   const [numberIncorrectAnswers, setNumberIncorrectAnswers] = useState(0);
@@ -28,6 +28,8 @@ const VocabExercises = () => {
   const [error, setError] = useState<string | null>(null);
   const scrollViewRef = useRef<ScrollView>(null);
   const router = useRouter();
+
+  const { topicID } = useLocalSearchParams();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -72,8 +74,20 @@ const VocabExercises = () => {
     });
   }, [navigation, currentIndex, exerciseLength]);
 
+  useEffect(() => {
+    if (exerciseLength === 0 && !loading && !error) {
+      completedPracticingVocab(user.user?.id, topicID);
+      router.push(`/(tabs)/(learn)/resultScreen?correct=${0}&all=${0}`);
+    }
+  }, [exerciseLength, loading, error]);
+
   if (loading) {
-    return <Text>Loading...</Text>;
+    return (
+        <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}>
+            <ActivityIndicator size="large" color="#2980B9" />
+            <Text style={{ marginTop: 10,fontSize: 20, fontWeight: '500', color: '#0693F1',}}>Loading...</Text>
+        </View>
+    );
   }
 
   if (error) {
@@ -90,14 +104,12 @@ const VocabExercises = () => {
     } else {
       const totalAnswered = numberCorrectAnswers + numberIncorrectAnswers;
       if (totalAnswered === exerciseLength) {
-        router.push({
-          pathname: './resultScreen',
-          params: {
-            correctAnswers: numberCorrectAnswers,
-            wrongAnswers: numberIncorrectAnswers,
-            totalQuestions: exerciseLength,
-          },
-        });
+
+        if (numberCorrectAnswers/exerciseLength >= 0.8){
+          completedPracticingVocab(user.user?.id, topicID);
+        }
+
+        router.push(`/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}`);
       } else {
         setModalVisible(true);
       }
@@ -106,14 +118,7 @@ const VocabExercises = () => {
 
   const handleModalSubmit = () => {
     setModalVisible(false);
-    router.push({
-      pathname: './resultScreen',
-      params: {
-        correctAnswers: numberCorrectAnswers,
-        wrongAnswers: numberIncorrectAnswers,
-        totalQuestions: exerciseLength,
-      },
-    });
+    router.push(`/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}`);
   };
   const handleModalCancel = () => {
     setModalVisible(false);

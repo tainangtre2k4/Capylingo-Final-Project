@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
+import CircularProgress from './CircularProgress';
 
 type ProgressCardProps = {
     level: number;
@@ -16,7 +17,7 @@ const ProgressCard: React.FC<ProgressCardProps> = ({ level, percentage }) => {
     const [currentPercentage, setCurrentPercentage] = useState<number>(percentage);
 
     useEffect(() => {
-        setCurrentLevel(level - 1);
+        setCurrentLevel(level + 1);
         setCurrentPercentage(percentage);
     }, [level, percentage]);
 
@@ -28,7 +29,7 @@ const ProgressCard: React.FC<ProgressCardProps> = ({ level, percentage }) => {
                 <Text style={styles.levelDescription}>{levelDescription}</Text>
                 <Text style={styles.levelText}>Level {currentLevel}</Text>
             </View>
-            <AnimatedCircularProgress
+            {/* <AnimatedCircularProgress
                 size={48}
                 width={6}
                 backgroundWidth={2}
@@ -41,7 +42,9 @@ const ProgressCard: React.FC<ProgressCardProps> = ({ level, percentage }) => {
                 childrenContainerStyle={styles.progressCircleInnerContainer}
             >
                 {() => <Text style={styles.percentageText}> {currentPercentage}%</Text>}
-            </AnimatedCircularProgress>
+            </AnimatedCircularProgress> */}
+            <CircularProgress size={48} percentage={percentage}/>
+
         </View>
     );
 };
