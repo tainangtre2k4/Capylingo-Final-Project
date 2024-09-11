@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.3,
     shadowRadius: 6,
-    elevation: 6,
+    //elevation: 6,
   },
   cardBack: {
     position: 'absolute',

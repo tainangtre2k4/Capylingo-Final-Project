@@ -16,24 +16,24 @@ const illustrationMap: Record<SubjectType, ImageSourcePropType> = {
 const link = {
   vocabulary: 'vocabularyLesson',
   grammar: 'grammarLesson',
-  skillcheck: 'skillcheckLesson'
 }
 
 interface SubjectCardProps {
   type: SubjectType;
+  level?: number;
 }
 
-const SubjectCard: React.FC<SubjectCardProps> = ({ type }) => {
+const SubjectCard: React.FC<SubjectCardProps> = ({ type, level }) => {
   const label = (type === 'vocabulary') ? 'Vocabulary' : (type === 'grammar') ? 'Grammar' : 'Skill Check';
   const router = useRouter();
 
   const pressHandler = () => {
     switch (type) {
       case 'vocabulary':
-        router.push('/(tabs)/(learn)/vocabulary');
+        router.push(`/(tabs)/(learn)/vocabulary?level=${level}`);
         break;
       case 'grammar':
-        router.push('/(tabs)/(learn)/grammar');
+        router.push(`/(tabs)/(learn)/grammar?level=${level}`);
         break;
       case 'skillcheck':
         router.push('/(tabs)/(learn)/skillcheck');

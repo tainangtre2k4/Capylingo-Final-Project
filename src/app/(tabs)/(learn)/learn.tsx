@@ -1,15 +1,58 @@
-import {Dimensions, Image, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {Dimensions, ActivityIndicator, Image, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import {Ionicons} from '@expo/vector-icons'
 import WOTDCard from '@/src/components/learn/WOTDCard';
 import SubjectCard from '@/src/components/learn/SubjectCard';
 import {StatusBar} from 'expo-status-bar';
+import { useRouter } from 'expo-router';
+import { useAuth } from '@/src/providers/AuthProvider';
+import { fetchUserLevel } from '@/src/fetchData/fetchLearn';
+import { fetchVocabLevelPercent, fetchGrammarLevelPercent } from '@/src/fetchData/fetchProgress';
 import ProgressCard from '@/src/components/learn/ProgressCard'
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 
 const { width, height } = Dimensions.get('window');
 
 const Learn = () => {
+    const router = useRouter();
+    const user = useAuth();
+    const [level, setLevel] = useState<any>(null);
+    const [percent, setPercent] = useState<number | 0>(0);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
+    useEffect(() => {
+        const fetchData = async () => {
+          setLoading(true);
+          setError(null);
+          try {
+            const userLevel = await fetchUserLevel(user.user?.id);
+            const percentV = await fetchVocabLevelPercent(user.user?.id, userLevel.level+1);
+            const percentG = await fetchGrammarLevelPercent(user.user?.id, userLevel.level+1);
+            const totalPercent = Math.round((percentV + percentG) / 2);
+            setLevel(userLevel.level);
+            setPercent(totalPercent);
+          } catch (err: any) {
+            setError(err.message);
+          } finally {
+            setLoading(false);
+          }
+        };
+        fetchData();
+    }, []);
+
+    if (loading) {
+        return (
+            <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}>
+                <ActivityIndicator size="large" color="#2980B9" />
+                <Text style={{ marginTop: 10,fontSize: 20, fontWeight: '500', color: '#0693F1',}}>Loading...</Text>
+            </View>
+        );
+      }
+    
+    if (error) {
+    return <Text>Failed to load user's level {error}</Text>;
+    }
+    
     return (
         <>
             <StatusBar style='light' backgroundColor='#3DB2FF' />
@@ -33,14 +76,16 @@ const Learn = () => {
                 <View style={styles.bodyContainer}>
                     {/*<View style={styles.indicator} />*/}
                     <Text style={styles.bodyTitle}>Your Learning Progress</Text>
-                    <View style={styles.trackingCardsContainer}>
+                    <View style={styles.trackingCardsContainer}>      
                         <WOTDCard />
-                        <ProgressCard level={3} percentage={75} />
+                        <TouchableOpacity onPress={()=>router.push('/level')}>
+                            <ProgressCard level={level} percentage={percent} />
+                        </TouchableOpacity>
                     </View>
                     <View style={styles.SubjectCardsContainer}>
-                        <SubjectCard type='vocabulary' />
-                        <SubjectCard type='grammar' />
-                        <SubjectCard type='skillcheck' />
+                        <SubjectCard type='vocabulary' level={level+1}/>
+                        <SubjectCard type='grammar' level={level+1}/>
+                        <SubjectCard type='skillcheck'/>
                     </View>
                 </View>
             </View>
