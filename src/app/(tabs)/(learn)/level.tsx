@@ -1,4 +1,4 @@
-import { StatusBar as RNStatusBar, StyleSheet, Text, View, Platform, Dimensions, TouchableOpacity, Image } from 'react-native';
+import { ActivityIndicator, StatusBar as RNStatusBar, StyleSheet, Text, View, Platform, Dimensions, TouchableOpacity, Image } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useNavigation } from 'expo-router';
@@ -85,7 +85,12 @@ const Level: React.FC = () => {
   }, [navigation]);
 
   if (loading) {
-    return <Text>Loading...</Text>;
+    return (
+        <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}>
+            <ActivityIndicator size="large" color="#2980B9" />
+            <Text style={{ marginTop: 10,fontSize: 20, fontWeight: '500', color: '#0693F1',}}>Loading...</Text>
+        </View>
+    );
   }
 
   if (error) {

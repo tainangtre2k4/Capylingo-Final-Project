@@ -18,11 +18,11 @@ const LearnTopic: React.FC = () => {
   const title = params.title as string;
   const topicID = Number(params.topicID);
   const imageUrl = params.imageUrl as string;
+  const lectureLink = params.lectureLink as string;
   const completedLearning = params.completedLearning === 'true';
   const completedPracticing = params.completedPracticing === 'true';
 
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
       navigation.setOptions({
         headerShown: true,
@@ -69,7 +69,7 @@ const LearnTopic: React.FC = () => {
           <View style={styles.buttonContainer}>
               <TouchableOpacity
                   style={[styles.button, {backgroundColor: '#9BD2FC'}]}
-                  onPress={() => router.push(`/(learn)/grammar/learnGrammar?topicID=${topicID}`)}
+                  onPress={() => router.push(`/(learn)/grammar/learnGrammar?topicID=${topicID}&lectureLink=${lectureLink}`)}
               >
                   {completedLearning && (
                     <Icon 

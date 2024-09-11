@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigation, router, useLocalSearchParams } from "expo-router";
-import { View, Text, FlatList, StyleSheet, Dimensions, Platform, StatusBar as RNStatusBar, TouchableOpacity, Image } from 'react-native';
+import { ActivityIndicator, View, Text, FlatList, StyleSheet, Dimensions, Platform, StatusBar as RNStatusBar, TouchableOpacity, Image } from 'react-native';
 import { getGrammarTopicList } from '@/src/fetchData/fetchLearn';
 import { AdvancedImage } from "cloudinary-react-native";
 import { cld } from "@/src/lib/cloudinary";
@@ -55,7 +55,12 @@ const TopicList = () => {
   }, [navigation]);
 
   if (loading) {
-    return <Text>Loading...</Text>;
+    return (
+        <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}>
+            <ActivityIndicator size="large" color="#2980B9" />
+            <Text style={{ marginTop: 10,fontSize: 20, fontWeight: '500', color: '#0693F1',}}>Loading...</Text>
+        </View>
+    );
   }
 
   if (error) {
@@ -64,14 +69,21 @@ const TopicList = () => {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity 
+        style={styles.chooseLevelButton}
+        onPress={() => router.push('/level')}
+      >
+        <Text style={styles.chooseLevelText}>Choose Level</Text>
+      </TouchableOpacity>
       <FlatList
         data={topics}
+        showsVerticalScrollIndicator={false}
         renderItem={({ item, index }) => {
           let imageContent;
 
           if (item.ImageUrl) {
             const image = cld.image(item.ImageUrl);
-            image.resize(fit().width(100).height(100)); // Resize ảnh Cloudinary
+            image.resize(fit().width(100).height(100));
             imageContent = (
               <AdvancedImage
                 cldImg={image}
@@ -98,7 +110,9 @@ const TopicList = () => {
                 const isCompletedLearning = item.CompletedTopicGrammar?.some((completed: CompletedTopic) => completed.completedLearning) ?? false;
                 const isCompletedPracticing = item.CompletedTopicGrammar?.some((completed: CompletedTopic) => completed.completedPracticing) ?? false;
             
-                router.push(`/(learn)/grammar/learnTopic?title=${item.title}&topicID=${item.id}&imageUrl=${item.ImageUrl}&completedLearning=${isCompletedLearning}&completedPracticing=${isCompletedPracticing}`);
+                router.push(
+                  `(learn)/grammar/learnTopic?title=${encodeURIComponent(item.title)}&topicID=${item.id}&imageUrl=${encodeURIComponent(item.ImageUrl)}&lectureLink=${encodeURIComponent(item.lectureLink)}&completedLearning=${isCompletedLearning}&completedPracticing=${isCompletedPracticing}`
+                );
               }}
             >
               <View style={styles.textBox}>
@@ -132,7 +146,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     paddingBottom: height*0.0246,
-    paddingTop: height*0.031,
+    paddingTop: height*0.07,
   },
   headerContainer: {
     flexDirection: 'row',
@@ -170,6 +184,22 @@ const styles = StyleSheet.create({
     top: width*0.02,
     left: width*0.028,
   },
+  chooseLevelButton: {
+    position: 'absolute',
+    right: width*0.077 ,
+    top: 16,
+    borderRadius: 14,
+    backgroundColor: '#3DB2FF',
+    width: 0.32 * width,
+    height: height*0.043,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  chooseLevelText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+  }
 });
 
 export default TopicList;

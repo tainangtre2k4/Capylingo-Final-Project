@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigation, useLocalSearchParams } from "expo-router";
 import BackButton from "@/src/components/BackButton";
 import { StatusBar } from "expo-status-bar";
-import { ScrollView, Platform, View, Text, StyleSheet, Dimensions, StatusBar as RNStatusBar } from 'react-native';
+import { ActivityIndicator, ScrollView, Platform, View, Text, StyleSheet, Dimensions, StatusBar as RNStatusBar } from 'react-native';
 import Flashcard from '@/src/components/learnVocab/flashcard';
 import RewriteVocab from '@/src/components/learnVocab/rewriteVocab';
 import { getVocabList } from '@/src/fetchData/fetchLearn';
@@ -68,16 +68,17 @@ const LearnVocab = () => {
 
 
   if (loading) {
-    return <Text>Loading...</Text>;
+    return (
+        <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}>
+            <ActivityIndicator size="large" color="#2980B9" />
+            <Text style={{ marginTop: 10,fontSize: 20, fontWeight: '500', color: '#0693F1',}}>Loading...</Text>
+        </View>
+    );
   }
 
   if (error) {
     return <Text>Sorry! Failed to load Vocabulary</Text>;
   }
-
-
-
-
 
   const goToNextVocab = () => {
     if (currentIndex < vocabs.length*2 + incorrectVocabs.length - 1) {
@@ -176,6 +177,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     backgroundColor: '#f5f5f5',
+    marginTop: height*0.02,
   },
 });
 
