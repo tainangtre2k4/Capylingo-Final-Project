@@ -51,7 +51,7 @@ const Flashcard: React.FC<FlashcardProps> = ({
     loadPersistedData();
   }, []);
 
-  // Save history, favorite, and cache to AsyncStorage whenever they change
+  // Save favorite to AsyncStorage whenever they change
   useEffect(() => {
     const saveToStorage = async () => {
       try {

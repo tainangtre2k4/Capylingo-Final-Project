@@ -1,5 +1,7 @@
 {
   "history": "@dictionary_history",
   "favorite": "@dictionary_favorite",
-  "cache": "@dictionary_cache"
+  "cache": "@dictionary_cache",
+  "word": "@word_of_the_day",
+  "date": "@word_of_the_day_date"
 }

@@ -85,6 +85,32 @@ const DictionaryStack = () => {
     saveToStorage();
   }, [history, favorite, cache]);
 
+  // Recheck storage every 3 seconds for differences
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        const savedHistory = await AsyncStorage.getItem(STORAGE_KEYS.history);
+        const savedFavorite = await AsyncStorage.getItem(STORAGE_KEYS.favorite);
+        const savedCache = await AsyncStorage.getItem(STORAGE_KEYS.cache);
+
+        if (savedHistory && JSON.stringify(history) !== savedHistory) {
+          setHistory(JSON.parse(savedHistory));
+        }
+        if (savedFavorite && JSON.stringify(favorite) !== savedFavorite) {
+          setFavorite(JSON.parse(savedFavorite));
+        }
+        if (savedCache && JSON.stringify(cache) !== savedCache) {
+          setCache(JSON.parse(savedCache));
+        }
+      } catch (error) {
+        console.error("Failed to load data from storage", error);
+      }
+    }, 3000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
+  }, [history, favorite, cache]);
+
   return (
     <SafeAreaView style={styles.container}>
       <DictionaryContext.Provider

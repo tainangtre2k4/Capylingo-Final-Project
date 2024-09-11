@@ -31,11 +31,11 @@ export interface ReadingContextType {
   maxIndex: number;
   passage: { html: string };
   questionSheet: { html: string };
+  passages: Passage[];
   answers: string[];
   solutions: string[];
   timeRemaining: number;
-  prevPassage: () => void;
-  nextPassage: () => void;
+  setCurrentIndex: Dispatch<SetStateAction<number>>;
   setAnswers: Dispatch<SetStateAction<string[]>>;
   setTimeRemaining: Dispatch<SetStateAction<number>>;
 }
@@ -44,15 +44,16 @@ const defaultContextValue: ReadingContextType = {
   curIndex: 0,
   maxIndex: 2,
   passage: { html: "" },
+  passages: [],
   questionSheet: { html: "" },
   answers: Array(40).fill(""),
   solutions: [],
   timeRemaining: 60 * 60,
-  prevPassage: () => {},
-  nextPassage: () => {},
+  setCurrentIndex: () => {},
   setAnswers: () => {},
   setTimeRemaining: () => {},
 };
+
 
 export const ReadingContext =
   createContext<ReadingContextType>(defaultContextValue);
@@ -74,14 +75,6 @@ const SkillCheckReadingStack = () => {
   }, [currentReadingTestIndex, setReadingTestIndex]);
   const questionSheets = currentReadingTest.questionSheets;
 
-  const nextPassage = () => {
-    setCurrentPassageIndex((index) => Math.min(index + 1, passages.length - 1));
-  };
-
-  const prevPassage = () => {
-    setCurrentPassageIndex((index) => Math.max(index - 0, 0));
-  };
-
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeRemaining((prevTime) => {
@@ -101,14 +94,14 @@ const SkillCheckReadingStack = () => {
       <ReadingContext.Provider
         value={{
           curIndex: currentPassageIndex,
+          setCurrentIndex: setCurrentPassageIndex,
           maxIndex: passages.length - 1,
           passage: passages[currentPassageIndex],
+          passages,
           questionSheet: questionSheets[currentPassageIndex],
           answers,
           solutions,
           timeRemaining,
-          prevPassage,
-          nextPassage,
           setAnswers,
           setTimeRemaining,
         }}

@@ -19,7 +19,7 @@ import {MaterialCommunityIcons} from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
 
-const ReadingQuestionSheet = () => {
+const QuestionSheet = () => {
     const navigation = useNavigation();
     const { curIndex, maxIndex, answers, solutions, questionSheet, timeRemaining, setAnswers, setTimeRemaining } = useContext(ReadingContext);
     const fontSize = 14;
@@ -30,24 +30,24 @@ const ReadingQuestionSheet = () => {
         return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
     };
 
-    useEffect(() => {
-        navigation.setOptions({
-            header: () => (
-                <View style={styles.headerContainer}>
-                    <BackButton />
-                    <HeaderProgressTracker current={curIndex + 1} all={maxIndex + 1} />
-                    <TouchableOpacity style={styles.headerRightIconContainer}
-                                      onPress={() => { router.replace('/skillcheck/reading/') }}
-                                      activeOpacity={0.6}>
-                        <MaterialCommunityIcons name="lead-pencil" size={20} color="white" />
-                    </TouchableOpacity>
-                </View>
-            ),
-            headerTitleStyle: {
-                color: 'white'
-            },
-        });
-    }, [navigation, curIndex, maxIndex]);
+    // useEffect(() => {
+    //     navigation.setOptions({
+    //         header: () => (
+    //             <View style={styles.headerContainer}>
+    //                 <BackButton />
+    //                 <HeaderProgressTracker current={curIndex + 1} all={maxIndex + 1} />
+    //                 <TouchableOpacity style={styles.headerRightIconContainer}
+    //                                   onPress={() => { router.replace('/skillcheck/reading/') }}
+    //                                   activeOpacity={0.6}>
+    //                     <MaterialCommunityIcons name="lead-pencil" size={20} color="white" />
+    //                 </TouchableOpacity>
+    //             </View>
+    //         ),
+    //         headerTitleStyle: {
+    //             color: 'white'
+    //         },
+    //     });
+    // }, [navigation, curIndex, maxIndex]);
 
     const sheetRef = useRef<BottomSheet>(null);
 
@@ -185,7 +185,7 @@ const ReadingQuestionSheet = () => {
     )
 }
 
-export default ReadingQuestionSheet;
+export default QuestionSheet;
 
 const styles = StyleSheet.create({
     headerContainer: {

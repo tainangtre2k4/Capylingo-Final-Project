@@ -1,50 +1,25 @@
 import {
   Dimensions,
-  Image,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
-  ScrollView,
-  Pressable,
   Platform,
 } from "react-native";
 import React, { useEffect, useState, useContext } from "react";
-import { useNavigation, router } from "expo-router";
+import { useNavigation } from "expo-router";
 import BackButton from "@/src/components/BackButton";
 import HeaderProgressTracker from "@/src/components/skillcheck/HeaderProgressTracker";
-import { RenderHTML } from "react-native-render-html";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { ReadingContext } from "./_layout";
+import QuestionSheet from "./QuestionSheet";
+import Passage from "./Passage";
 
 const { width, height } = Dimensions.get("window");
 
-const ReadingArticle = () => {
+const ReadingTest = () => {
   const navigation = useNavigation();
-  const MIN_FONT_SIZE = 14;
-  const MAX_FONT_SIZE = 28;
-  const DEFAULT_FONT_SIZE = 14;
-  const [fontSize, setFontSize] = useState(DEFAULT_FONT_SIZE);
-  const {
-    curIndex,
-    maxIndex,
-    passage,
-    timeRemaining,
-    prevPassage,
-    nextPassage,
-  } = useContext(ReadingContext);
-
-  const increaseFontSize = () => {
-    if (fontSize < MAX_FONT_SIZE) {
-      setFontSize((prevSize) => prevSize + 2);
-    }
-  };
-
-  const decreaseFontSize = () => {
-    if (fontSize > MIN_FONT_SIZE) {
-      setFontSize((prevSize) => prevSize - 2);
-    }
-  };
+  const [isQuestionSheet, setIsQuestionSheet] = useState(false);
+  const { curIndex, maxIndex } = useContext(ReadingContext);
 
   useEffect(() => {
     navigation.setOptions({
@@ -53,13 +28,26 @@ const ReadingArticle = () => {
           <BackButton />
           <HeaderProgressTracker current={curIndex + 1} all={maxIndex + 1} />
           <TouchableOpacity
-            style={styles.headerRightIconContainer}
+            style={[styles.headerRightIconContainer, {backgroundColor: isQuestionSheet ? '#0693F1' : 'white'}]}
             onPress={() => {
-              router.replace("/skillcheck/reading/QuestionSheet");
+              console.log(isQuestionSheet);
+              setIsQuestionSheet(!isQuestionSheet);
             }}
             activeOpacity={0.6}
           >
-            <Ionicons name="document-text-outline" size={20} color="#0693F1" />
+            {isQuestionSheet ? (
+              <MaterialCommunityIcons
+                name="lead-pencil"
+                size={20}
+                color="white"
+              />
+            ) : (
+              <Ionicons
+                name="document-text-outline"
+                size={20}
+                color="#0693F1"
+              />
+            )}
           </TouchableOpacity>
         </View>
       ),
@@ -73,63 +61,12 @@ const ReadingArticle = () => {
         },
       }),
     });
-  }, [navigation, curIndex, maxIndex, passage]);
+  }, [isQuestionSheet, navigation, curIndex, maxIndex]);
 
-  return (
-    <>
-      <ScrollView style={styles.container}>
-        <RenderHTML
-          defaultTextProps={{ selectable: true, style: { fontSize } }}
-          source={passage}
-          contentWidth={width}
-        />
-      </ScrollView>
-      <View style={styles.footer}>
-        <Pressable
-          style={styles.footerIconContainer}
-          onPress={increaseFontSize}
-          android_ripple={{ color: "#F3F3F3" }}
-        >
-          <Image
-            source={require("@/assets/images/skillcheck/text_up.png")}
-            style={styles.footerText}
-          />
-          <Text style={styles.footerLabel}>Zoom in</Text>
-        </Pressable>
-        <Pressable
-          style={styles.footerIconContainer}
-          onPress={decreaseFontSize}
-        >
-          <Image
-            source={require("@/assets/images/skillcheck/text_down.png")}
-            style={styles.footerText}
-          />
-          <Text style={styles.footerLabel}>Zoom out</Text>
-        </Pressable>
-        <Pressable style={styles.footerIconContainer}>
-          <Ionicons
-            name="arrow-back"
-            size={24}
-            color="black"
-            onPress={prevPassage}
-          />
-          <Text style={styles.footerLabel}>Previous</Text>
-        </Pressable>
-        <Pressable style={styles.footerIconContainer}>
-          <Ionicons
-            name="arrow-forward"
-            size={24}
-            color="black"
-            onPress={nextPassage}
-          />
-          <Text style={styles.footerLabel}>Next</Text>
-        </Pressable>
-      </View>
-    </>
-  );
+  return isQuestionSheet ? <QuestionSheet /> : <Passage />;
 };
 
-export default ReadingArticle;
+export default ReadingTest;
 
 const styles = StyleSheet.create({
   headerContainer: {
@@ -140,9 +77,12 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     backgroundColor: "white",
   },
-  container: {
+  horizontalScrollView: {
     flex: 1,
     backgroundColor: "white",
+  },
+  verticalScrollView: {
+    width: width,
     paddingHorizontal: 20,
   },
   headerRightIconContainer: {
