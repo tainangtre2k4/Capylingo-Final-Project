@@ -15,7 +15,7 @@ const data = [
 ];
 
 export default function App() {
-  const [firstLaunch, setFirstLaunch] = useState(null);
+  const [firstLaunch, setFirstLaunch] = useState<boolean | null>(null);
   const navigation = useNavigation();
 
   // Check if it's the first time the app is launched

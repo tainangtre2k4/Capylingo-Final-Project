@@ -1,11 +1,13 @@
-import { Dimensions, Platform, StatusBar as RNStatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useEffect } from 'react'
+import { Dimensions, Platform, StatusBar as RNStatusBar, StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native'
+import React, { useContext, useEffect } from 'react'
 import { router, useNavigation } from 'expo-router'
 import BackButton from "@/src/components/BackButton";
+import { SkillcheckContext } from './_layout';
 
 const { width, height } = Dimensions.get('window')
 
 const SkillCheckLesson = () => {
+    const {totalReadingTests, totalListeningTests, setListeningTestIndex, setReadingTestIndex} = useContext(SkillcheckContext);
     const navigation = useNavigation();
 
     useEffect(() => {
@@ -29,15 +31,46 @@ const SkillCheckLesson = () => {
         });
     }, [navigation]);
 
+    const renderLessonCards = () => {
+        const cards = [];
+        
+        for (let i = 0; i < totalReadingTests; i++) {
+            cards.push(
+                <TouchableOpacity 
+                    key={`reading-${i}`} 
+                    style={styles.lessonCard} 
+                    onPress={() => {
+                        setReadingTestIndex(i);
+                        router.push('/skillcheck/reading');
+                    }}
+                >
+                    <Text style={styles.lessonTitle}>Reading Test {i + 1}</Text>
+                </TouchableOpacity>
+            );
+        }
+
+        for (let i = 0; i < totalListeningTests; i++) {
+            cards.push(
+                <TouchableOpacity 
+                    key={`listening-${i}`} 
+                    style={styles.lessonCard} 
+                    onPress={() => {
+                        setListeningTestIndex(i);
+                        router.push('/skillcheck/listening');
+                    }}
+                >
+                    <Text style={styles.lessonTitle}>Listening Test {i + 1}</Text>
+                </TouchableOpacity>
+            );
+        }
+
+        return cards;
+    };
+
     return (
-        <View style={styles.container}>
-            <TouchableOpacity style={styles.lessonCard} onPress={() => router.push('/skillcheck/reading')}>
-                <Text style={styles.lessonTitle}>Reading: Article Title</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.lessonCard} onPress={() => router.push('/skillcheck/listening')}>
-                <Text style={styles.lessonTitle}>Listening: Article Title</Text>
-            </TouchableOpacity>
-        </View>
+        <ScrollView contentContainerStyle={styles.container}>
+            {renderLessonCards()}
+        </ScrollView>
     )
 }
 
@@ -45,10 +78,9 @@ export default SkillCheckLesson
 
 const styles = StyleSheet.create({
     container: {
-        justifyContent: 'space-around',
         alignItems: 'center',
-        flex: 1,
-        marginHorizontal: 30,
+        paddingVertical: 20,
+        paddingHorizontal: 30,
     },
     header: {
         paddingHorizontal: 20,
@@ -58,9 +90,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row'
     },
     title: {
-        marginHorizontal: 10, // random color for testing
+        marginHorizontal: 10,
         color: 'white',
-        fontSize: 24,
+        fontSize: 22,
         fontWeight: '500',
     },
     lessonCard: {
@@ -68,9 +100,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         width: '100%',
-        paddingVertical: 40, // random number for testing
-        backgroundColor: '#F1C40F', // random color for testing
+        paddingVertical: 20,
+        backgroundColor: '#F1C40F',
         borderRadius: 8,
+        marginBottom: 15,
     },
     lessonTitle: {
         color: 'white',

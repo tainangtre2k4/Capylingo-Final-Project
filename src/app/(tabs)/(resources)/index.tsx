@@ -20,7 +20,7 @@ const DATA: DataItem[] = [
         title: "Daily English News",
         description: "Catch up on the latest news and enhance your English skills with our daily reading feature. Improve your vocabulary and comprehension with every article.",
         image: require('@/assets/images/resources/capyNews.png'),
-        navigate: '/(resources)/community',
+        navigate: '/(resources)/news',
     },
     {
         key: "2",

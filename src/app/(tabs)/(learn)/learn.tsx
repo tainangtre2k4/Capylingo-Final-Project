@@ -9,6 +9,7 @@ import { fetchUserLevel } from '@/src/fetchData/fetchLearn';
 import { fetchVocabLevelPercent, fetchGrammarLevelPercent } from '@/src/fetchData/fetchProgress';
 import ProgressCard from '@/src/components/learn/ProgressCard'
 import React, {useState, useEffect} from 'react';
+import QuickSearch from '@/src/components/learn/QuickSearch';
 
 const { width, height } = Dimensions.get('window');
 
@@ -61,12 +62,7 @@ const Learn = () => {
                     <View style={styles.GreetingContainer}>
                         <Text style={styles.greeting}>Welcome, New User!</Text>
                         <Text style={styles.dictionaryLabel}>Capybara Dictionary</Text>
-                        <View style={styles.searchBox}>
-                            <TextInput style={styles.searchInput} placeholder='Quick Search' />
-                            <TouchableOpacity style={styles.searchButton}>
-                                <Ionicons name='search-outline' size={18} color='white' />
-                            </TouchableOpacity>
-                        </View>
+                        <QuickSearch />
                     </View>
                     <Image
                         source={require('@/assets/images/learn/learn-greeter.png')}
@@ -125,27 +121,6 @@ const styles = StyleSheet.create({
         marginBottom: height * .02,
         marginLeft: 10,
         marginRight: 30
-    },
-    searchBox: {
-        flexDirection: 'row',
-        backgroundColor: 'white',
-        borderRadius: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 2,
-        elevation: 4
-    },
-    searchButton: {
-        backgroundColor: '#3DB2FF',
-        padding: 4,
-        borderRadius: 8
-    },
-    searchInput: {
-        flexDirection: 'row',
-        flex: 1,
-        fontSize: 16,
-        fontStyle: 'italic',
-        paddingLeft: 8
     },
     image: {
         marginTop: height * .034,

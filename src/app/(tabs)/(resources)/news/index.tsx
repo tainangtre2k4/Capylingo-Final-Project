@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Platform } from 'react-native'
 import React, {useEffect, useState} from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Header from '@/src/components/(news)/Header'
@@ -9,11 +9,13 @@ import BreakingNews from '@/src/components/(news)/BreakingNews'
 import Categories from '@/src/components/(news)/Categories'
 import NewsList from '@/src/components/(news)/NewsList'
 import Loading from '@/src/components/(news)/Loading'
-import { router } from 'expo-router'
+import { router, useNavigation } from 'expo-router'
+import BackButton from "@/src/components/BackButton";
 
 type Props = {}
 
 const News = (props: Props) => {
+  const navigation = useNavigation();
   const {top: safeTop} = useSafeAreaInsets();
   const [breakingNews, setBreakingNews] = useState<NewsDataType[]>([]);
   const [news, setNews] = useState<NewsDataType[]>([]);
@@ -23,6 +25,25 @@ const News = (props: Props) => {
     getBreakingNews();
     getNews();
   }, []);
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerShown: true,
+      header: () => (
+        <View style={styles.headerContainer}>
+          <BackButton />
+          <Text style={styles.headerTitle}>News</Text>
+          <View style={styles.headerFillerContainer} />
+        </View>
+      ),
+      ...Platform.select({
+        android: {
+          statusBarColor: 'white',
+          statusBarStyle: 'dark',
+        }
+      })
+    });
+  }, [navigation]);
 
   const getBreakingNews = async() => {
     try {
@@ -68,7 +89,7 @@ const News = (props: Props) => {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.discoverButton}
-          onPress={() => router.push('/discover')}
+          onPress={() => router.push('/news/discover')}
         >
           <Text style={styles.discoverButtonText}>Discover</Text>
         </TouchableOpacity>
@@ -76,7 +97,7 @@ const News = (props: Props) => {
         {/* Saved Button */}
         <TouchableOpacity
           style={styles.savedButton}
-          onPress={() => router.push('/saved')}  
+          onPress={() => router.push('/news/saved')}  
         >
           <Text style={styles.savedButtonText}>Saved</Text>
         </TouchableOpacity>
@@ -98,6 +119,25 @@ const styles = StyleSheet.create(
   {
     container: {
       //flex:1,
+    },
+    headerContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 12,
+      backgroundColor: '#3DB2FF',
+      paddingHorizontal: 20,
+    },
+    headerFillerContainer: {
+      height: 42,
+      width: 42,
+      backgroundColor: 'transparent',
+    },
+    headerTitle: {
+      fontSize: 24,
+      textAlign: 'center',
+      color: 'white',
+      fontWeight: 'bold',
     },
     buttonContainer: {
       flexDirection: 'row', // Aligns buttons in a row

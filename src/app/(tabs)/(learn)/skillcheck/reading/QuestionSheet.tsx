@@ -1,9 +1,7 @@
 import {
     View,
-    Image,
     TouchableOpacity,
     StyleSheet,
-    StatusBar as RNStatusBar,
     Dimensions,
     ScrollView,
     Text,
@@ -18,13 +16,12 @@ import { RenderHTML } from "react-native-render-html";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {MaterialCommunityIcons} from '@expo/vector-icons';
-import {solutions} from './Resources';
 
 const { width, height } = Dimensions.get('window');
 
-const ReadingQuestionSheet = () => {
+const QuestionSheet = () => {
     const navigation = useNavigation();
-    const { curIndex, maxIndex, answers, questionSheet, timeRemaining, setAnswers, setTimeRemaining } = useContext(ReadingContext);
+    const { curIndex, maxIndex, answers, solutions, questionSheet, timeRemaining, setAnswers, setTimeRemaining } = useContext(ReadingContext);
     const fontSize = 14;
 
     const formatTime = (seconds: number) => {
@@ -33,26 +30,25 @@ const ReadingQuestionSheet = () => {
         return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
     };
 
-    useEffect(() => {
-        navigation.setOptions({
-            header: () => (
-                <View style={styles.headerContainer}>
-                    <BackButton />
-                    <HeaderProgressTracker current={curIndex + 1} all={maxIndex + 1} />
-                    <TouchableOpacity style={styles.headerRightIconContainer}
-                                      onPress={() => { router.replace('/skillcheck/reading/') }}
-                                      activeOpacity={0.6}>
-                        <MaterialCommunityIcons name="lead-pencil" size={20} color="white" />
-                    </TouchableOpacity>
-                </View>
-            ),
-            headerTitleStyle: {
-                color: 'white'
-            },
-        });
-    }, [navigation, curIndex, maxIndex]);
+    // useEffect(() => {
+    //     navigation.setOptions({
+    //         header: () => (
+    //             <View style={styles.headerContainer}>
+    //                 <BackButton />
+    //                 <HeaderProgressTracker current={curIndex + 1} all={maxIndex + 1} />
+    //                 <TouchableOpacity style={styles.headerRightIconContainer}
+    //                                   onPress={() => { router.replace('/skillcheck/reading/') }}
+    //                                   activeOpacity={0.6}>
+    //                     <MaterialCommunityIcons name="lead-pencil" size={20} color="white" />
+    //                 </TouchableOpacity>
+    //             </View>
+    //         ),
+    //         headerTitleStyle: {
+    //             color: 'white'
+    //         },
+    //     });
+    // }, [navigation, curIndex, maxIndex]);
 
-    // hooks
     const sheetRef = useRef<BottomSheet>(null);
 
     const snapPoints = useMemo(() => ["25%", "50%", "100%"], []);
@@ -189,7 +185,7 @@ const ReadingQuestionSheet = () => {
     )
 }
 
-export default ReadingQuestionSheet;
+export default QuestionSheet;
 
 const styles = StyleSheet.create({
     headerContainer: {
@@ -201,7 +197,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white'
     },
     headerRightIconContainer: {
-        padding: 8,
+        padding: 9.5,
         borderRadius: 12,
         backgroundColor: '#0693F1',
         alignItems: 'center',
@@ -258,7 +254,7 @@ const styles = StyleSheet.create({
     },
     answerInput: {
         flex: 1,
-        fontSize: 28,
+        fontSize: 20,
     },
     submitText: {
         fontSize: 18,

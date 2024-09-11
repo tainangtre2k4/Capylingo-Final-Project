@@ -1,20 +1,20 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Modal,
+  Text,
+  ScrollView,
   ActivityIndicator,
   Dimensions,
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
   TouchableWithoutFeedback,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { Ionicons } from "@expo/vector-icons";
 import { playPronunciation } from "@/utils/audioUtils";
-import { generate } from "random-words";
 import STORAGE_KEYS from "@/assets/data/storage-keys.json";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -29,23 +29,24 @@ type WordData = {
   meanings: Meaning[];
 };
 
-const FALLBACK_WORD = "apple";
-
-const WOTDCard = () => {
+const QuickSearch = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [data, setData] = useState<WordData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [wordOfTheDay, setWordOfTheDay] = useState("");
-  const [cachedWords, setCachedWords] = useState<Record<string, WordData>>({});
 
   const [favorite, setFavorite] = useState<string[]>([]);
+  const [history, setHistory] = useState<string[]>([]);
+
 
   useEffect(() => {
     const loadPersistedData = async () => {
       try {
         const savedFavorite = await AsyncStorage.getItem(STORAGE_KEYS.favorite);
         if (savedFavorite) setFavorite(JSON.parse(savedFavorite));
+        const savedHistory = await AsyncStorage.getItem(STORAGE_KEYS.history);
+        if (savedHistory) setHistory(JSON.parse(savedHistory));
       } catch (error) {
         console.error("Failed to load data from storage", error);
       }
@@ -54,7 +55,7 @@ const WOTDCard = () => {
     loadPersistedData();
   }, []);
 
-  // Save favorite to AsyncStorage whenever they change
+  // Save history and favorite to AsyncStorage whenever they change
   useEffect(() => {
     const saveToStorage = async () => {
       try {
@@ -62,24 +63,35 @@ const WOTDCard = () => {
           STORAGE_KEYS.favorite,
           JSON.stringify(favorite)
         );
+        await AsyncStorage.setItem(
+          STORAGE_KEYS.history,
+          JSON.stringify(history)
+        );
       } catch (error) {
         console.error("Failed to save data to storage", error);
       }
     };
 
     saveToStorage();
-  }, [favorite]);
+  }, [favorite, history]);
 
   const isFavorite = () => {
-    return favorite.includes(wordOfTheDay);
+    return favorite.includes(searchTerm);
   };
 
   const addFavorite = () => {
-    setFavorite((prev) => [...prev, wordOfTheDay]);
+    setFavorite((prev) => [...prev, searchTerm]);
+  };
+
+  const updateHistory = () => {
+    setHistory((prevHistory) => {
+      const filteredHistory = prevHistory.filter((w) => w !== searchTerm);
+      return [searchTerm, ...filteredHistory];
+    });
   };
 
   const removeFavorite = () => {
-    setFavorite((prev) => prev.filter((fav) => fav !== wordOfTheDay));
+    setFavorite((prev) => prev.filter((fav) => fav !== searchTerm));
   };
 
   const toggleFavorite = () => {
@@ -90,105 +102,37 @@ const WOTDCard = () => {
     }
   };
 
-  const generateValidWord = () => {
-    let newWord;
-    do {
-      const result = generate({ minLength: 3, maxLength: 10 });
-      newWord = Array.isArray(result) ? result.join(" ") : result; // Ensure newWord is a string
-      console.log(newWord);
-    } while (newWord.length < 3);
-    return newWord;
-  };
-
-  const getWordOfTheDay = useCallback(async () => {
-    try {
-      const storedWord = await AsyncStorage.getItem(STORAGE_KEYS.word);
-      const storedDate = await AsyncStorage.getItem(STORAGE_KEYS.date);
-      const today = new Date().toDateString();
-
-      if (storedWord && storedDate === today) {
-        return storedWord;
-      } else {
-        const newWord = generateValidWord();
-        await AsyncStorage.setItem(STORAGE_KEYS.word, newWord);
-        await AsyncStorage.setItem(STORAGE_KEYS.date, today);
-        return newWord;
-      }
-    } catch (error) {
-      console.error("Failed to fetch or set word of the day", error);
-      return FALLBACK_WORD;
-    }
-  }, []);
-
-  useEffect(() => {
-    const fetchWord = async () => {
-      const word = await getWordOfTheDay();
-      setWordOfTheDay(word);
-    };
-
-    fetchWord();
-
-    const now = new Date();
-    const midnight = new Date(now);
-    midnight.setHours(24, 0, 0, 0);
-    const timeUntilMidnight = midnight.getTime() - now.getTime();
-
-    const timer = setTimeout(fetchWord, timeUntilMidnight);
-
-    return () => clearTimeout(timer);
-  }, [getWordOfTheDay]);
-
   const fetchWordData = useCallback(async () => {
-    if (!wordOfTheDay.trim()) return;
-
-    // Check if the word data is already cached
-    if (cachedWords[wordOfTheDay]) {
-      setData(cachedWords[wordOfTheDay]);
-      setLoading(false);
-      return;
-    }
+    if (!searchTerm.trim()) return;
 
     setLoading(true);
     setError(null);
-    let word = wordOfTheDay;
-    const startTime = Date.now();
-    const timeout = 3000; // 3 seconds timeout
 
-    while (Date.now() - startTime < timeout) {
-      try {
-        const url = `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`;
-        const response = await fetch(url);
-        const fetchedData = await response.json();
+    try {
+      const url = `https://api.dictionaryapi.dev/api/v2/entries/en/${searchTerm}`;
+      const response = await fetch(url);
+      const fetchedData = await response.json();
 
-        if (response.status === 200) {
-          setData(fetchedData[0]);
-          // Update the cache with the new word data
-          setCachedWords((prevCache) => ({
-            ...prevCache,
-            [word]: fetchedData[0],
-          }));
-          setLoading(false);
-          return;
-        } else {
-          word = generateValidWord();
-          setWordOfTheDay(word);
-          await AsyncStorage.setItem(STORAGE_KEYS.word, word);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
+      if (response.status === 200) {
+        setData(fetchedData[0]);
+        updateHistory();
+      } else {
+        setError("Word not found. Please try another word.");
       }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
+  }, [searchTerm]);
 
-    // Fallback to 'apple' if timeout reached or persistent errors occur
-    setWordOfTheDay(FALLBACK_WORD);
-    setError(null);
-    setLoading(false);
-  }, [wordOfTheDay, cachedWords]);
-
-  const handleOpenModal = useCallback(() => {
+  const handleSearch = useCallback(() => {
     setModalVisible(true);
     fetchWordData();
-  }, [fetchWordData]);
+    if(!history.includes(searchTerm) && error === null)
+      updateHistory();
+  }, [fetchWordData, updateHistory]);
 
   const handleCloseModal = useCallback(() => {
     setModalVisible(false);
@@ -196,18 +140,21 @@ const WOTDCard = () => {
     setError(null);
   }, []);
 
-  const { height: screenHeight } = Dimensions.get("window");
-  const maxHeight = screenHeight * 0.7;
+  const maxHeight = height * 0.7;
 
   return (
     <>
-      <TouchableOpacity onPress={handleOpenModal}>
-        <View style={styles.container}>
-          <Text style={styles.title}>Word of the day</Text>
-          <View style={{ paddingVertical: 1 }} />
-          <Text style={styles.label}>{wordOfTheDay}</Text>
-        </View>
-      </TouchableOpacity>
+      <View style={styles.searchBox}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Quick Search"
+          value={searchTerm}
+          onChangeText={setSearchTerm}
+        />
+        <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+          <Ionicons name="search-outline" size={18} color="white" />
+        </TouchableOpacity>
+      </View>
 
       <Modal
         visible={modalVisible}
@@ -230,7 +177,7 @@ const WOTDCard = () => {
                   <Text style={styles.word}>{data.word}</Text>
                   <TouchableOpacity
                     style={styles.cardButton}
-                    onPress={() => playPronunciation(wordOfTheDay)}
+                    onPress={() => playPronunciation(data.word)}
                   >
                     <Ionicons name="volume-high" size={24} color="#0693F1" />
                   </TouchableOpacity>
@@ -277,39 +224,27 @@ const WOTDCard = () => {
   );
 };
 
-export default WOTDCard;
-
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#27AE60",
-    width: width * 0.42,
-    height: 100,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "500",
-  },
-  label: {
-    color: "white",
-    fontSize: 24,
-    fontWeight: "bold",
-    marginVertical: 6,
-  },
-  wordContainer: {
+  searchBox: {
     flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  buttonContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    backgroundColor: "white",
+    borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "white",
+    padding: 2,
+    elevation: 4,
+  },
+  searchButton: {
+    backgroundColor: "#3DB2FF",
+    padding: 4,
+    borderRadius: 8,
+  },
+  searchInput: {
+    flexDirection: "row",
+    flex: 1,
+    fontSize: 16,
+    fontStyle: "italic",
+    paddingLeft: 8,
   },
   modalContainer: {
     flex: 1,
@@ -323,12 +258,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: "rgba(0, 0, 0, 0.2)",
-  },
-  word: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 10,
-    marginRight: 4,
   },
   modalContent: {
     width: "80%",
@@ -356,6 +285,16 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 10,
   },
+  resultHeaderContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  word: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 10,
+    marginRight: 4,
+  },
   cardButton: {
     padding: 4,
     marginLeft: 6,
@@ -369,8 +308,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 10,
   },
-  resultHeaderContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
 });
+
+export default QuickSearch;

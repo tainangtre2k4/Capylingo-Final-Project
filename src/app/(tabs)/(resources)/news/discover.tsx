@@ -1,13 +1,14 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import SearchBar from '@/src/components/(news)/SearchBar'
 import { colors } from 'react-native-elements'
 import newsCategoryList from '@/constants/types/Categories'
 import CheckBox from '@/src/components/(news)/CheckBox'
-import {useNewsCategories} from "@/src/app/hooks/useNewsCategories"
-import { useNewsCountries } from '../../hooks/useNewsCountry'
-import { Link, router, Stack } from 'expo-router'
+import {useNewsCategories} from "@/src/hooks/useNewsCategories"
+import { useNewsCountries } from '@/src/hooks/useNewsCountry'
+import { Link, router, Stack, useNavigation } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
+import BackButton from '@/src/components/BackButton'
 
 type Props = {}
 
@@ -17,6 +18,26 @@ const Discover = (props: Props) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCatergory] = useState("");
   const [country, setCountry] = useState("");
+  const navigation = useNavigation();
+  
+  useEffect(() => {
+    navigation.setOptions({
+      headerShown: true,
+      header: () => (
+        <View style={styles.headerContainer}>
+          <BackButton />
+          <Text style={styles.headerTitle}>Discover</Text>
+          <View style={styles.headerFillerContainer} />
+        </View>
+      ),
+      ...Platform.select({
+        android: {
+          statusBarColor: 'white',
+          statusBarStyle: 'dark',
+        }
+      })
+    });
+  }, [navigation]);
 
   return (
     <>
@@ -61,7 +82,7 @@ const Discover = (props: Props) => {
       </View>
 
         <Link href={{
-          pathname: `/(news)/search`,
+          pathname: `/news/search`,
           params: {query: searchQuery, category, country}
         }} asChild>
       <TouchableOpacity style = {styles.searchButton}>
@@ -80,6 +101,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    backgroundColor: '#3DB2FF',
+    paddingHorizontal: 20,
+  },
+  headerFillerContainer: {
+    height: 42,
+    width: 42,
+    backgroundColor: 'transparent',
+  },
+  headerTitle: {
+    fontSize: 24,
+    textAlign: 'center',
+    color: 'white',
+    fontWeight: 'bold',
   },
   title: {
     fontSize: 18,
