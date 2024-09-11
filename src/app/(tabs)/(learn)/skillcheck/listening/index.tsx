@@ -19,7 +19,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { useNavigation } from "expo-router";
+import { router, useNavigation } from "expo-router";
 import BackButton from "@/src/components/BackButton";
 import HeaderProgressTracker from "@/src/components/skillcheck/HeaderProgressTracker";
 import { RenderHTML } from "react-native-render-html";
@@ -137,17 +137,14 @@ const ListeningArticle = () => {
       }
     }
 
-    Alert.alert(
-      "Result",
-      "Your Grade: " + matchCount + "/40",
-      [
-        {
-          text: "Confirm",
-          onPress: () => {},
-        },
-      ],
-      { cancelable: false }
-    );
+    router.push({
+      pathname: "resultScreen",
+      params: {
+        correct: matchCount,
+        all: solutions.length,
+        backPage: "skillcheck",
+      },
+    });
   };
 
   return (

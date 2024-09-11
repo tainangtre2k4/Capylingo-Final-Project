@@ -7,7 +7,7 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
-import { useNavigation, useRouter, useLocalSearchParams } from "expo-router";
+import { useNavigation, useRouter, useLocalSearchParams, Href } from "expo-router";
 import React, { useEffect } from "react";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 
@@ -20,10 +20,16 @@ const headings = [
   "Excellent",
 ];
 
-const ResultScreen = ({ backPage }: { backPage: string }) => {
+type SearchParams = {
+  correct: number;
+  all: number;
+  backPage: Href<string | object>;
+};
+
+const ResultScreen = () => {
   const navigation = useNavigation();
   const router = useRouter();
-  const { correct, all } = useLocalSearchParams();
+  const { correct, all, backPage } = useLocalSearchParams<SearchParams>();
 
   const getHeading = (percent: number) => {
     if (percent < 50) return headings[0];
@@ -31,6 +37,7 @@ const ResultScreen = ({ backPage }: { backPage: string }) => {
     if (percent >= 70 && percent < 80) return headings[2];
     return headings[3];
   };
+
   const percentage = Math.round((correct / all) * 100);
   const heading = getHeading(percentage);
 

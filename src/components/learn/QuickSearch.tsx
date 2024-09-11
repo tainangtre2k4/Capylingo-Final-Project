@@ -39,7 +39,6 @@ const QuickSearch = () => {
   const [favorite, setFavorite] = useState<string[]>([]);
   const [history, setHistory] = useState<string[]>([]);
 
-
   useEffect(() => {
     const loadPersistedData = async () => {
       try {
@@ -55,7 +54,6 @@ const QuickSearch = () => {
     loadPersistedData();
   }, []);
 
-  // Save history and favorite to AsyncStorage whenever they change
   useEffect(() => {
     const saveToStorage = async () => {
       try {
@@ -73,6 +71,34 @@ const QuickSearch = () => {
     };
 
     saveToStorage();
+  }, [favorite, history]);
+
+  const checkAndUpdateStorage = useCallback(async () => {
+    try {
+      const savedFavorite = await AsyncStorage.getItem(STORAGE_KEYS.favorite);
+      const savedHistory = await AsyncStorage.getItem(STORAGE_KEYS.history);
+
+      const parsedFavorite = savedFavorite ? JSON.parse(savedFavorite) : [];
+      const parsedHistory = savedHistory ? JSON.parse(savedHistory) : [];
+
+      if (JSON.stringify(parsedFavorite) !== JSON.stringify(favorite)) {
+        await AsyncStorage.setItem(
+          STORAGE_KEYS.favorite,
+          JSON.stringify(favorite)
+        );
+        setFavorite(parsedFavorite);
+      }
+
+      if (JSON.stringify(parsedHistory) !== JSON.stringify(history)) {
+        await AsyncStorage.setItem(
+          STORAGE_KEYS.history,
+          JSON.stringify(history)
+        );
+        setHistory(parsedHistory);
+      }
+    } catch (error) {
+      console.error("Failed to check and update storage", error);
+    }
   }, [favorite, history]);
 
   const isFavorite = () => {
@@ -127,12 +153,12 @@ const QuickSearch = () => {
     }
   }, [searchTerm]);
 
-  const handleSearch = useCallback(() => {
+  const handleSearch = useCallback(async () => {
     setModalVisible(true);
+    await checkAndUpdateStorage(); // Check and update history and favorites
     fetchWordData();
-    if(!history.includes(searchTerm) && error === null)
-      updateHistory();
-  }, [fetchWordData, updateHistory]);
+    if (!history.includes(searchTerm) && error === null) updateHistory();
+  }, [fetchWordData, updateHistory, checkAndUpdateStorage]);
 
   const handleCloseModal = useCallback(() => {
     setModalVisible(false);
@@ -151,7 +177,12 @@ const QuickSearch = () => {
           value={searchTerm}
           onChangeText={setSearchTerm}
         />
-        <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+        <TouchableOpacity
+          style={styles.searchButton}
+          onPress={() => {
+            if (searchTerm !== "") handleSearch;
+          }}
+        >
           <Ionicons name="search-outline" size={18} color="white" />
         </TouchableOpacity>
       </View>
@@ -186,9 +217,7 @@ const QuickSearch = () => {
                     onPress={toggleFavorite}
                   >
                     <Ionicons
-                      name={
-                        isFavorite() ? "star" : "star-outline"
-                      }
+                      name={isFavorite() ? "star" : "star-outline"}
                       size={24}
                       color="#0693F1"
                     />

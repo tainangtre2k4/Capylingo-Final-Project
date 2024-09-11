@@ -8,7 +8,7 @@ type ProgressCardProps = {
     percentage: number;
 };
 
-const levelDescriptions = ["Beginner", "Beginner", "Intermediate", "Intermediate", "Advanced"];
+const levelDescriptions = ["Beginner", "Intermediate", "Intermediate", "Advanced"];
 
 const { width, height } = Dimensions.get('window');
 
@@ -29,21 +29,7 @@ const ProgressCard: React.FC<ProgressCardProps> = ({ level, percentage }) => {
                 <Text style={styles.levelDescription}>{levelDescription}</Text>
                 <Text style={styles.levelText}>Level {currentLevel}</Text>
             </View>
-            {/* <AnimatedCircularProgress
-                size={48}
-                width={6}
-                backgroundWidth={2}
-                fill={currentPercentage}
-                tintColor="#0693F1"
-                backgroundColor="#F3F3F3"
-                rotation={0}
-                lineCap="round"
-                style={styles.progressCircle}
-                childrenContainerStyle={styles.progressCircleInnerContainer}
-            >
-                {() => <Text style={styles.percentageText}> {currentPercentage}%</Text>}
-            </AnimatedCircularProgress> */}
-            <CircularProgress size={48} percentage={percentage}/>
+            <CircularProgress size={48} percentage={currentPercentage}/>
 
         </View>
     );
