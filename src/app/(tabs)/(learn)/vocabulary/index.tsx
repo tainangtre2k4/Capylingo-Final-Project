@@ -77,7 +77,7 @@ const TopicList = () => {
       </TouchableOpacity>
       <FlatList
         data={topics}
-        showsVerticalScrollIndicator={false}
+        showsVerticalScrollIndicator = {false}
         renderItem={({ item, index }) => {
           let imageContent;
 

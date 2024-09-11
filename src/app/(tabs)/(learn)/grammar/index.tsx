@@ -124,7 +124,7 @@ const TopicList = () => {
               {isCompleted && (
                 <Icon 
                   name="checkmark-circle" 
-                  size={30} 
+                  size={25} 
                   color="white" 
                   style={styles.checkIcon} 
                 />
@@ -175,13 +175,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   cardText: {
-    fontSize: 22,
+    fontSize: 21,
     fontWeight: '600',
     color: 'white',
   },
   checkIcon: {
     position: 'absolute',
-    top: width*0.02,
+    top: width*0.018,
     left: width*0.028,
   },
   chooseLevelButton: {

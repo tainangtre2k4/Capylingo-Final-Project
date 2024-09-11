@@ -1,4 +1,4 @@
-import { ActivityIndicator, StatusBar as RNStatusBar, StyleSheet, Text, View, Platform, Dimensions, TouchableOpacity, Image } from 'react-native';
+import { Modal, ActivityIndicator, StatusBar as RNStatusBar, StyleSheet, Text, View, Platform, Dimensions, TouchableOpacity, Image } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useNavigation } from 'expo-router';
@@ -6,7 +6,9 @@ import { useAuth } from '@/src/providers/AuthProvider';
 import BackButton from "@/src/components/BackButton";
 import { fetchUserLevel } from '@/src/fetchData/fetchLearn';
 import { fetchVocabLevelPercent, fetchGrammarLevelPercent } from '@/src/fetchData/fetchProgress';
+import { updateUserLevel } from '@/src/updateData/updateLearningProgress';
 import CircularProgress from '@/src/components/learn/CircularProgress';
+import MedalCelebration from '@/src/components/MedalCelebration';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 const { width, height } = Dimensions.get('screen');
@@ -48,29 +50,63 @@ const Level: React.FC = () => {
   const [percent, setPercent] = useState<number | 0>(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showCongratulations, setShowCongratulations] = useState(false);
+  const [showCloseButton, setShowCloseButton] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
       try {
+        // Lấy level hiện tại của người dùng
         const userLevel = await fetchUserLevel(user.user?.id);
         setLevel(userLevel.level);
-        const percentV = await fetchVocabLevelPercent(user.user?.id, userLevel.level+1);
-        const percentG = await fetchGrammarLevelPercent(user.user?.id, userLevel.level+1);
-        const totalPercent = Math.round((percentV + percentG) / 2);
-        setPercentVocab(percentV);
-        setPercentGrammar(percentG);
+  
+        // Lấy phần trăm từ các nguồn
+        const percentV = await fetchVocabLevelPercent(user.user?.id, userLevel.level + 1);
+        const percentG = await fetchGrammarLevelPercent(user.user?.id, userLevel.level + 1);
+        const totalPercent = 100;// Math.round((percentV + percentG) / 2);
+  
+        setPercentVocab(Math.round(percentV));
+        setPercentGrammar(Math.round(percentG));
         setPercent(totalPercent);
+
+        if (totalPercent === 100) {
+          setShowCongratulations(true);
+          const updateResult = await updateUserLevel(user.user?.id, userLevel.level);
+  
+          if (updateResult.success) {
+           
+            const newLevel = userLevel.level + 1;
+
+            const newPercentV = await fetchVocabLevelPercent(user.user?.id, newLevel+1);
+            const newPercentG = await fetchGrammarLevelPercent(user.user?.id, newLevel+1);
+            const newTotalPercent = Math.round((newPercentV + newPercentG) / 2);
+
+            setLevel(newLevel);
+  
+            setPercentVocab(Math.round(newPercentV));
+            setPercentGrammar(Math.round(newPercentG));
+            setPercent(newTotalPercent);
+  
+          
+            setTimeout(() => {
+              setShowCloseButton(true);
+            }, newLevel>=4? 3500 : 8200);
+          } else {
+            console.error('Failed to update user level');
+          }
+        }
       } catch (err: any) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
+  
     fetchData();
   }, []);
-
+  
   useEffect(() => {
     navigation.setOptions({
       headerShown: true,
@@ -93,12 +129,35 @@ const Level: React.FC = () => {
     );
   }
 
+
   if (error) {
   return <Text>Failed to load user's level {error}</Text>;
   }
 
+  const handleCloseModal = () => {
+    setShowCongratulations(false);
+    setShowCloseButton(false);
+  };
+
   return (
       <View style={styles.container}>
+          <Modal
+            transparent={true}
+            visible={showCongratulations}
+            animationType="fade"
+          >
+            <View style={styles.congratulationsContainer}>
+              <MedalCelebration imageMedal={levels[level-1].image} completedLevel={level}/>
+              {showCloseButton && (
+                <TouchableOpacity
+                  style={styles.closeButton}
+                  onPress={handleCloseModal}
+                >
+                  <Ionicons name="close-circle" size={47} color="#FF4D4D" />
+                </TouchableOpacity>
+              )}
+            </View>
+          </Modal>
           <View style={styles.buttonContainer}>
               {levels.map((levelItem, index) => {
                 let vocabPercent = 0;
@@ -222,5 +281,23 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -13,
     right: -13,
+  },
+  congratulationsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  congratulationsText: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#fff',
+    textAlign: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: height*0.057,
+    left: 22,
+    zIndex: 1,
   },
 });

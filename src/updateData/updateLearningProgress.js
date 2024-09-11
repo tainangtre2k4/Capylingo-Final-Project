@@ -1,5 +1,19 @@
 import { supabase } from '@/src/lib/supabase';
 
+export const updateUserLevel = async (userID, level) => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({ level: level + 1 })
+    .eq('id', userID);
+
+  if (error) {
+    // Cung cấp thông tin chi tiết về lỗi
+    console.error('Error updating level:', error.message || error.details || error);
+    return { success: false, error };
+  }
+
+  return { success: true, data };
+};
 
 export const completeLearningVocab = async (userID, topicID) => {
   // Kiểm tra nếu bản ghi đã tồn tại
