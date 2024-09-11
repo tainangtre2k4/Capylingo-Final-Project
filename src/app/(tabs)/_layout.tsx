@@ -60,14 +60,6 @@ export default function TabsLayout(){
                 }}
             />
 
-            <Tabs.Screen
-                name="(news)"
-                options={{
-                    headerShown: false,
-                    tabBarIcon: ({ color, size }) => <Ionicons name="newspaper-outline" size={size} color={color} />,
-                    tabBarLabel: 'News',
-                }}
-            />
     </Tabs>
     )
 }
