@@ -154,25 +154,29 @@ const WebViewScreen = () => {
 
   return (
     <>
-    <Stack.Screen options = {{
-        headerLeft: () => (
-            <TouchableOpacity onPress={() => router.back()}>
-                <Ionicons name= "arrow-back" size = {22} />
-            </TouchableOpacity>
+   <Stack.Screen options={{
+    headerLeft: () => (
+      <TouchableOpacity onPress={() => router.back()}>
+        <Ionicons name="arrow-back" size={22} />
+      </TouchableOpacity>
     ),
-        headerRight: () => (
-          <TouchableOpacity onPress={() => bookmark ? removeBookmark(news[0].article_id) : saveBookmark(news[0].article_id)}>
-                <Ionicons name= {bookmark ? "heart" : "heart-outline"} 
-                size = {22} 
-                color = {bookmark ? "red" : colors.black}
-                />
-          </TouchableOpacity>
-        ),
-    title: "News Detail"
-}
-    } />
+    headerRight: () => (
+      !isLoading ? (
+        <TouchableOpacity onPress={() => bookmark ? removeBookmark(news[0].article_id) : saveBookmark(news[0].article_id)}>
+          <Ionicons
+            name={bookmark ? "heart" : "heart-outline"}
+            size={22}
+            color={bookmark ? "red" : colors.black}
+          />
+        </TouchableOpacity>
+      ) : null 
+    ),
+    title: "News Detail",
+  }} />
+
     <View style={styles.container}>
       <WebView
+      originWhitelist={['*']}
       style = {{marginTop: 0}}
       source={{ uri: url }}
     />
