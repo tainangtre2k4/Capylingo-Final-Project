@@ -65,7 +65,7 @@ const Level: React.FC = () => {
         // Lấy phần trăm từ các nguồn
         const percentV = await fetchVocabLevelPercent(user.user?.id, userLevel.level + 1);
         const percentG = await fetchGrammarLevelPercent(user.user?.id, userLevel.level + 1);
-        const totalPercent = 100;// Math.round((percentV + percentG) / 2);
+        const totalPercent = Math.round((percentV + percentG) / 2);
   
         setPercentVocab(Math.round(percentV));
         setPercentGrammar(Math.round(percentG));
