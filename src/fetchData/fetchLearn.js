@@ -28,7 +28,8 @@ export const getVocabTopicList = async (userId, level) => {
       )
     `)
     .eq('level', level)
-    .eq('CompletedTopicVocab.user_id', userId);
+    .eq('CompletedTopicVocab.user_id', userId)
+    .order('id', { ascending: true });
 
   if (error) {
     console.error('Error fetching record:', error);
@@ -54,7 +55,8 @@ export const getGrammarTopicList = async (userId, level) => {
       )
     `)
     .eq('level', level)
-    .eq('CompletedTopicGrammar.user_id', userId);
+    .eq('CompletedTopicGrammar.user_id', userId)
+    .order('id', { ascending: true });
 
   if (error) {
     console.error('Error fetching record:', error);

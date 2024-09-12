@@ -124,8 +124,8 @@ const Square: React.FC<SquareProps> = ({ scrollX }) => {
                 backgroundColor: '#fff',
                 borderRadius: 86,
                 position: 'absolute',
-                top: -height * 0.68,
-                left: -height * 0.32,
+                top: -height * 0.71,
+                left: -height * 0.33,
                 transform: [{ rotate }, { translateX }]
             }}
         />
