@@ -18,6 +18,8 @@ const Learn = () => {
     const user = useAuth();
     const [level, setLevel] = useState<any>(null);
     const [percent, setPercent] = useState<number | 0>(0);
+    const [percentVocab, setPercentVocab] = useState<number | 0>(0);
+    const [percentGrammar, setPercentGrammar] = useState<number | 0>(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -31,6 +33,8 @@ const Learn = () => {
             const percentG = await fetchGrammarLevelPercent(user.user?.id, userLevel.level+1);
             const totalPercent = Math.round((percentV + percentG) / 2);
             setLevel(userLevel.level);
+            setPercentVocab(Math.round(percentV));
+            setPercentGrammar(Math.round(percentG));
             setPercent(totalPercent);
           } catch (err: any) {
             setError(err.message);
@@ -79,8 +83,8 @@ const Learn = () => {
                         </TouchableOpacity>
                     </View>
                     <View style={styles.SubjectCardsContainer}>
-                        <SubjectCard type='vocabulary' level={level+1}/>
-                        <SubjectCard type='grammar' level={level+1}/>
+                        <SubjectCard type='vocabulary' level={level+1} percent={percentVocab}/>
+                        <SubjectCard type='grammar' level={level+1} percent={percentGrammar}/>
                         <SubjectCard type='skillcheck'/>
                     </View>
                 </View>

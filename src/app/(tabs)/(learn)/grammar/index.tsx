@@ -69,12 +69,6 @@ const TopicList = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity 
-        style={styles.chooseLevelButton}
-        onPress={() => router.push('/level')}
-      >
-        <Text style={styles.chooseLevelText}>Choose Level</Text>
-      </TouchableOpacity>
       <FlatList
         data={topics}
         showsVerticalScrollIndicator={false}
@@ -146,7 +140,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     paddingBottom: height*0.0246,
-    paddingTop: height*0.07,
+    paddingTop: height*0.03,
   },
   headerContainer: {
     flexDirection: 'row',
@@ -183,22 +177,6 @@ const styles = StyleSheet.create({
     top: width*0.018,
     left: width*0.028,
   },
-  chooseLevelButton: {
-    position: 'absolute',
-    right: width*0.077 ,
-    top: 16,
-    borderRadius: 14,
-    backgroundColor: '#3DB2FF',
-    width: 0.32 * width,
-    height: height*0.043,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  chooseLevelText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
-  }
 });
 
 export default TopicList;

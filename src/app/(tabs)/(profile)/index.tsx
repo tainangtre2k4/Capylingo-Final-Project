@@ -3,19 +3,27 @@ import { supabase } from '@/src/lib/supabase';
 import { useAuth } from '@/src/providers/AuthProvider';
 import { AdvancedImage } from 'cloudinary-react-native';
 import { router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Image, Dimensions, TouchableOpacity } from 'react-native';
 import { thumbnail } from "@cloudinary/url-gen/actions/resize";
-import { prepareUIRegistry } from 'react-native-reanimated/lib/typescript/reanimated2/frameCallback/FrameCallbackRegistryUI';
 
 const { width } = Dimensions.get('window');
+
 export default function Index() {
-  useEffect(() => {
-    fetchUserData();
-  }, []);
-  const {user} = useAuth();
-  const [avatar,setAvatar] = useState<string | null>(null);
-  const [userName,setUserName] = useState<string | null>('New User');
+  const { user } = useAuth();
+  const [avatar, setAvatar] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>('New User');
+  const [totalLearnTime, setTotalLearnTime] = useState<string | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const timeSpentRef = useRef<number>(0);
+  const [level, setLevel] = useState<number>(0);
+  const [userLevel, setUserLevel] = useState<string | null>(null);
+
+  const formatTime = (totalTimeInMinutes: number) => {
+    const hours = Math.floor(totalTimeInMinutes / 60);
+    return `${hours} hours`; // Display as "Xh"
+  };
+
   const fetchUserData = async () => {
     try {
       const { data, error } = await supabase
@@ -28,26 +36,135 @@ export default function Index() {
         throw error;
       }
       setAvatar(data.avatar_url);
-      setUserName(data.username)
+      setUserName(data.username);
+
+      const learnTimeInMinutes = Number(data.total_learn_time) * 60;
+      if (!isNaN(learnTimeInMinutes)) {
+        const formattedLearnTime = formatTime(learnTimeInMinutes);
+        setTotalLearnTime(formattedLearnTime);
+      } else {
+        setTotalLearnTime('Loading...'); // or handle error
+      }
 
     } catch (error: any) {
       console.log('Error fetching user data:', error.message);
-    } 
+    }
   };
 
-  // Assume these variables are passed in as props or derived from state
-  const numberOfNewAchievement = 2; // Example value, replace with actual state or props
-  const actionNeeded = true; // Example value, replace with actual state or props
+  const getLevel = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('level')
+        .eq('id', user?.id)
+        .single();
+  
+      if (error) {
+        throw error;
+      }
+  
+      // Set the level only if data is available
+      setLevel(data?.level + 1 ?? 0); // Default to 0 if level is null or undefined
+
+      let levelText = '';
+      switch (data.level + 1) {
+        case 1:
+          levelText = 'Beginner';
+          break;
+        case 2:
+        case 3:
+          levelText = 'Intermediate';
+          break;
+        case 4:
+          levelText = 'Advanced';
+          break;
+        default:
+          levelText = 'Newbie'; // Default to empty if level is not defined
+      }
+      setUserLevel(levelText);
+  
+    } catch (error: any) {
+      console.log('Error fetching level:', error.message);
+    }
+
+
+  };
+  
+  const updateLearnTime = async () => {
+    try {
+      if (user?.id) {
+        // Fetch current total learn time
+        const { data: profile, error: fetchError } = await supabase
+          .from('profiles')
+          .select('total_learn_time')
+          .eq('id', user.id)
+          .single();
+  
+        if (fetchError) {
+          throw fetchError;
+        }
+  
+        const currentTotalLearnTime = profile?.total_learn_time || 0;
+        const newTotalLearnTime = currentTotalLearnTime + (timeSpentRef.current / 60); // Convert minutes to hours
+        timeSpentRef.current = 0;
+  
+        // Update the total learn time
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ total_learn_time: newTotalLearnTime })
+          .eq('id', user.id);
+  
+        if (updateError) {
+          throw updateError;
+        }
+  
+        // Optionally, fetch updated data to show the new time
+        fetchUserData();
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.log('Error updating learn time:', error.message);
+      } else {
+        console.log('An unknown error occurred');
+      }
+    }
+  };
+  
+
+  useEffect(() => {
+    fetchUserData();
+    getLevel();
+
+    // Set up an interval to update the database every minute
+    intervalRef.current = setInterval(() => {
+      timeSpentRef.current += 1; // Increment the time spent by 1 minute
+      updateLearnTime(); // Update the database with the new time
+    }, 60000); // 60000 milliseconds = 1 minute
+
+    return () => {
+      // Clear the interval when the component unmounts
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [user?.id]);
+
+
   const ChangeInformationHandler = () => {
-    router.push('/changeInformation')
-  }
+    router.push('/changeInformation');
+  };
+
   const logOutHandler = () => {
-    supabase.auth.signOut()
-  }
+    supabase.auth.signOut();
+  };
 
   const avatarCldImage = avatar
     ? cld.image(avatar).resize(thumbnail().width(width).height(width))
     : null;
+
+  const goToComingSoon = () => {
+    router.push('/(profile)/ComingSoonScreen');
+  };
 
   return (
     <View style={styles.container}>
@@ -62,19 +179,20 @@ export default function Index() {
         <Text style={styles.header}>My Profile</Text>
 
         <View style={{ flexDirection: 'row', marginTop: 40 }}>
-          { avatarCldImage ?  (
+          {avatarCldImage ? (
             <AdvancedImage
-            cldImg={avatarCldImage}
-            style={styles.avatar}
-          />
-          ):
-          (<Image 
-            source={require('@/assets/images/profileScreen/avatar.png')}
-            style={styles.avatar}
-          />)}
+              cldImg={avatarCldImage}
+              style={styles.avatar}
+            />
+          ) : (
+            <Image 
+              source={require('@/assets/images/profileScreen/avatar.png')}
+              style={styles.avatar}
+            />
+          )}
           <View style={{ padding: 15.6 }}>
             <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 8 }}>{userName}</Text>
-            <Text style={{ fontSize: 16, color: '#898989' }}>Newbie</Text>
+            <Text style={{ fontSize: 16, color: '#898989' }}>{userLevel}</Text>
           </View>
           <TouchableOpacity style={{ alignItems: 'flex-end', flex: 1 }} onPress={ChangeInformationHandler}>
             <Image 
@@ -89,7 +207,7 @@ export default function Index() {
         {/* Information Row */}
         <View style={styles.infoRow}>
           <View style={styles.infoItem}>
-            <Text style={styles.infoValue}>2+ hours</Text>
+            <Text style={styles.infoValue}>{totalLearnTime || 'Loading...'}</Text>
             <Text style={styles.infoLabel}>Total Learn</Text>
           </View>
           <View style={styles.verticalLine} />
@@ -99,7 +217,7 @@ export default function Index() {
           </View>
           <View style={styles.verticalLine} />
           <View style={styles.infoItem}>
-            <Text style={styles.infoValue}>2</Text>
+            <Text style={styles.infoValue}>{level}</Text>
             <Text style={styles.infoLabel}>Current Level</Text>
           </View>
         </View>
@@ -109,7 +227,7 @@ export default function Index() {
           <Text style={styles.dashboardHeader}>Dashboard</Text>
 
           {/* Dashboard Item - Settings */}
-          <TouchableOpacity style={styles.dashboardItem}>
+          <TouchableOpacity style={styles.dashboardItem} onPress={goToComingSoon}>
             <View style={styles.iconContainer}>
               <View style={[styles.iconBackground, { backgroundColor: '#4C9AFF' }]}>
                 <Image source={require('@/assets/images/profileScreen/setting.png')} style={styles.icon} />
@@ -120,7 +238,7 @@ export default function Index() {
           </TouchableOpacity>
 
           {/* Dashboard Item - Achievements */}
-          <TouchableOpacity style={styles.dashboardItem}>
+          <TouchableOpacity style={styles.dashboardItem} onPress={goToComingSoon}>
             <View style={styles.iconContainer}>
               <View style={[styles.iconBackground, { backgroundColor: '#FFC107' }]}>
                 <Image source={require('@/assets/images/profileScreen/achievement.png')} style={styles.icon} />
@@ -128,15 +246,12 @@ export default function Index() {
               <Text style={styles.itemText}>Achievements</Text>
             </View>
             <View style={styles.badgeAndArrowContainer}>
-              {numberOfNewAchievement > 0 && (
-                <Text style={styles.badgeText}>{numberOfNewAchievement} New</Text>
-              )}
               <Image source={require('@/assets/images/profileScreen/arrow.png')} style={styles.arrow} />
             </View>
           </TouchableOpacity>
 
           {/* Dashboard Item - Privacy */}
-          <TouchableOpacity style={styles.dashboardItem}>
+          <TouchableOpacity style={styles.dashboardItem} onPress={goToComingSoon}>
             <View style={styles.iconContainer}>
               <View style={[styles.iconBackground, { backgroundColor: '#9E9E9E' }]}>
                 <Image source={require('@/assets/images/profileScreen/privacy.png')} style={styles.icon} />
@@ -144,20 +259,21 @@ export default function Index() {
               <Text style={styles.itemText}>Privacy</Text>
             </View>
             <View style={styles.badgeAndArrowContainer}>
-              {actionNeeded && (
-                <Text style={[styles.badgeText, { backgroundColor: '#FF5722' }]}>Action Needed</Text>
-              )}
               <Image source={require('@/assets/images/profileScreen/arrow.png')} style={styles.arrow} />
             </View>
           </TouchableOpacity>
         </View>
 
-        <View style={[styles.dashboardContainer,{gap: 10}]}>
-            <Text style={{fontSize:12, color:'#898A8D'}}>My Account</Text>
-            <TouchableOpacity onPress={logOutHandler}>
-              <Text style={{fontSize:14, color: '#3E5FAF',marginBottom:5}}>Switch to Another Account</Text>
-              <Text style={{fontSize:14, color: '#FB6D64'}}>Logout Account</Text>
-            </TouchableOpacity>
+        <View style={[styles.dashboardContainer, { gap: 10 }]}>
+          <Text style={{ fontSize: 12, color: '#898A8D' }}>My Account</Text>
+          
+          <TouchableOpacity onPress={logOutHandler}>
+            <Text style={{ fontSize: 14, color: '#3E5FAF' }}>Switch to Another Account</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={logOutHandler}>
+            <Text style={{ fontSize: 14, color: '#FB6D64', marginBottom: 5 }}>Logout Account</Text>
+          </TouchableOpacity>
+
         </View>
       </SafeAreaView>
     </View>
@@ -282,4 +398,3 @@ const styles = StyleSheet.create({
     height: 20,
   },
 });
-
