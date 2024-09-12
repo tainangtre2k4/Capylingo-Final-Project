@@ -21,7 +21,7 @@ export default function Index() {
 
   const formatTime = (totalTimeInMinutes: number) => {
     const hours = Math.floor(totalTimeInMinutes / 60);
-    return `${hours}h`; // Display as "Xh"
+    return `${hours} hours`; // Display as "Xh"
   };
 
   const fetchUserData = async () => {
@@ -149,9 +149,6 @@ export default function Index() {
     };
   }, [user?.id]);
 
-  // Assume these variables are passed in as props or derived from state
-  const numberOfNewAchievement = 2; // Example value, replace with actual state or props
-  const actionNeeded = true; // Example value, replace with actual state or props
 
   const ChangeInformationHandler = () => {
     router.push('/changeInformation');
@@ -249,9 +246,6 @@ export default function Index() {
               <Text style={styles.itemText}>Achievements</Text>
             </View>
             <View style={styles.badgeAndArrowContainer}>
-              {numberOfNewAchievement > 0 && (
-                <Text style={styles.badgeText}>{numberOfNewAchievement} New</Text>
-              )}
               <Image source={require('@/assets/images/profileScreen/arrow.png')} style={styles.arrow} />
             </View>
           </TouchableOpacity>
@@ -265,9 +259,6 @@ export default function Index() {
               <Text style={styles.itemText}>Privacy</Text>
             </View>
             <View style={styles.badgeAndArrowContainer}>
-              {actionNeeded && (
-                <Text style={[styles.badgeText, { backgroundColor: '#FF5722' }]}>Action Needed</Text>
-              )}
               <Image source={require('@/assets/images/profileScreen/arrow.png')} style={styles.arrow} />
             </View>
           </TouchableOpacity>
@@ -275,10 +266,14 @@ export default function Index() {
 
         <View style={[styles.dashboardContainer, { gap: 10 }]}>
           <Text style={{ fontSize: 12, color: '#898A8D' }}>My Account</Text>
+          
           <TouchableOpacity onPress={logOutHandler}>
-            <Text style={{ fontSize: 14, color: '#3E5FAF', marginBottom: 5 }}>Switch to Another Account</Text>
-            <Text style={{ fontSize: 14, color: '#FB6D64' }}>Logout Account</Text>
+            <Text style={{ fontSize: 14, color: '#3E5FAF' }}>Switch to Another Account</Text>
           </TouchableOpacity>
+          <TouchableOpacity onPress={logOutHandler}>
+            <Text style={{ fontSize: 14, color: '#FB6D64', marginBottom: 5 }}>Logout Account</Text>
+          </TouchableOpacity>
+
         </View>
       </SafeAreaView>
     </View>

@@ -5,7 +5,7 @@ import React from "react";
 
 export default function ProfileLayout() {
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#3DB2FF' }}>
             <Stack screenOptions={{
                 headerShown: false, ...Platform.select({
                     android: {

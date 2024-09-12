@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, Image, ActivityIndicator, TouchableOpacity, useWindowDimensions } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Image, ActivityIndicator, TouchableOpacity, useWindowDimensions, Platform, Dimensions } from 'react-native';
 import { supabase } from '../../../lib/supabase';
 import * as ImagePicker from 'expo-image-picker';
 import { AdvancedImage } from 'cloudinary-react-native';
 import colors from '@/constants/Colors';
 import { cld, uploadImage } from '@/src/lib/cloudinary';
 import { thumbnail } from "@cloudinary/url-gen/actions/resize";
-import { useRouter } from 'expo-router';
+import { useNavigation, useRouter } from 'expo-router';
 import { useAuth } from '@/src/providers/AuthProvider';
+import BackButton from '@/src/components/BackButton';
+
+const { width, height } = Dimensions.get('window');
 
 const Profile = () => {
   const [fullName, setFullName] = useState('');
@@ -20,6 +23,8 @@ const Profile = () => {
   const router = useRouter();
   const { width } = useWindowDimensions();
   const user = useAuth();
+  const navigation = useNavigation();
+  
   useEffect(() => {
       fetchUserData();
   }, []);
@@ -82,6 +87,28 @@ const Profile = () => {
     }
   };
 
+  useEffect(() => {
+    navigation.setOptions({
+        headerShown: true,
+        header: () => (
+            <View style={styles.headerContainer}>
+                <BackButton />
+                <Text style={styles.headerTitle}>Change Information</Text>
+                <View style={styles.headerFillerContainer} />
+          </View>
+        ),
+        headerTitleStyle: {
+            color: 'white'
+        },
+        ...Platform.select({
+            android: {
+                statusBarColor: '#3DB2FF',
+                statusBarStyle: 'light',
+            }
+        })
+    });
+  }, [navigation]);
+
   if (loading) {
     return <ActivityIndicator size="large" color={colors.primary.primary80} />;
   }
@@ -106,7 +133,7 @@ const Profile = () => {
 
   return (
     <View style={styles.container}>
-      <View style={{ marginBottom: 16 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: height*0.02, marginTop: height*0.04 }}>
         {image ? (
           <Image
             source={{ uri: image || defaultPizzaImage }}
@@ -123,9 +150,12 @@ const Profile = () => {
             className='w-52 aspect-square self-center rounded-full bg-slate-300'
           />
         )}
-        <Text onPress={pickImage}>
-          Select Image
-        </Text>
+        <TouchableOpacity onPress={() => pickImage()}>
+          <Image
+            source={require('@/assets/images/profileScreen/changePhoto.png')}
+            style={{resizeMode: 'contain', width: width*0.08, height: width*0.08, position:'absolute', bottom: height*0.005, right: width*0.3}}
+          />
+        </TouchableOpacity>
       </View>
       <View>
         <Text style={{ fontSize: 16 }}>Full Name</Text>
@@ -159,9 +189,26 @@ const Profile = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     backgroundColor: '#FFF',
     padding: 16,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: height * 0.072,
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    backgroundColor: '#3DB2FF',
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  headerFillerContainer: {
+    height: 42,
+    width: 42,
+    backgroundColor: 'transparent',
   },
   inputField: {
     marginVertical: 8,

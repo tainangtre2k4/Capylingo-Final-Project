@@ -1,4 +1,4 @@
-import { Image, Dimensions, Platform, StatusBar as RNStatusBar, StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native'
+import { Image, Dimensions, Platform, StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native'
 import React, { useContext, useEffect } from 'react'
 import { router, useNavigation } from 'expo-router'
 import BackButton from "@/src/components/BackButton";
@@ -92,7 +92,6 @@ const styles = StyleSheet.create({
     },
     headerContainer: {
         flexDirection: 'row',
-        marginTop: Platform.OS === 'android' ? RNStatusBar.currentHeight || 20 : 0,
         alignItems: 'center',
         height: height * 0.072,
         justifyContent: 'space-between',
