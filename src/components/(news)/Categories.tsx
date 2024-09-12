@@ -74,8 +74,13 @@ const styles = StyleSheet.create({
         borderRadius: 10,
     },
     itemActive: {
-        backgroundColor: "#FFAC1C",
-        borderColor: "#FFAC1C",
+        backgroundColor: "#3DB2FF",
+        borderColor: "#3DB2FF",
+        elevation: 4,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        shadowColor: "black",
     },
     itemText: {
         fontSize: 14,

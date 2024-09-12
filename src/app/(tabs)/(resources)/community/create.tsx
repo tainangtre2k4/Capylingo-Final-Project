@@ -1,13 +1,14 @@
-import { View, Text, Image, TextInput, Pressable, ActivityIndicator } from 'react-native';
+import { View, Text, Image, TextInput, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
 import { useEffect, useState } from 'react';
-import Header from '@/src/components/community/Header';
-import { useRouter } from 'expo-router';
+import { useNavigation, useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import Button from '@/src/components/community/Button';
 import { uploadImage } from '@/src/lib/cloudinary';
 import { supabase } from '@/src/lib/supabase';
 import { Video, ResizeMode } from 'expo-av';
 import { useAuth } from '@/src/providers/AuthProvider';
+import React from 'react';
+import BackButton from '@/src/components/BackButton';
 
 const create = () => {
   const { user } = useAuth();
@@ -16,6 +17,7 @@ const create = () => {
   const [mediaType, setMediaType] = useState<'video' | 'image' | undefined>();
   const [loading, setLoading] = useState(false); // New loading state
   const router = useRouter();
+  const navigation = useNavigation();
 
   const pickMedia = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -34,6 +36,19 @@ const create = () => {
   useEffect(() => {
     if (!media) pickMedia();
   }, [media]);
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerShown: true,
+      header: () => (
+        <View style={styles.headerContainer}>
+          <BackButton iconColor="black" />
+          <View style={{ marginHorizontal: 8 }} />
+          <Text style={styles.headerTitle}>New Post</Text>
+        </View>
+      ),
+    });
+  }, [navigation]);
 
   const createPost = async () => {
     if (!media) return;
@@ -65,9 +80,7 @@ const create = () => {
   };
 
   return (
-    <View>
-      <Header title="Create" backHandler={() => router.back()} search={false} />
-      {/* Image Picker */}
+    <View style={styles.container}>
       <View className="p-3 items-center">
         {!media ? (
           <View className="w-52 aspect-[3/4] rounded-lg bg-slate-300" />
@@ -112,3 +125,29 @@ const create = () => {
 };
 
 export default create;
+
+const styles = StyleSheet.create({
+  container: {
+    paddingVertical: 20,
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    backgroundColor: 'white',
+    paddingHorizontal: 20,
+    elevation: 4,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowColor: 'black',
+  },
+  headerTitle: {
+    fontSize: 22,
+    textAlign: 'center',
+    color: 'black',
+    fontWeight: 'bold',
+  }
+});

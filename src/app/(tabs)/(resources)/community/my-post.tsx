@@ -3,8 +3,9 @@ import { View, Text, FlatList, StyleSheet, Alert } from 'react-native';
 import { supabase } from '@/src/lib/supabase';
 import PostListItem from '@/src/components/community/PostListItem';
 import Header from '@/src/components/community/Header';
-import { router } from 'expo-router';
+import { router, useNavigation } from 'expo-router';
 import { useAuth } from '@/src/providers/AuthProvider';
+import BackButton from '@/src/components/BackButton';
 
 type User = {
   id: string;
@@ -27,10 +28,24 @@ const MyPostsScreen: React.FC = () => {
   const { user } = useAuth(); // Get authenticated user from Clerk
   const [myPosts, setMyPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const navigation = useNavigation();
 
   useEffect(() => {
     fetchMyPosts();
   }, []);
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerShown: true,
+      header: () => (
+        <View style={styles.headerContainer}>
+          <BackButton iconColor="black" />
+          <View style={{ marginHorizontal: 8 }} />
+          <Text style={styles.headerTitle}>My Posts</Text>
+        </View>
+      ),
+    });
+  }, [navigation]);
 
   const fetchMyPosts = async () => {
     setLoading(true);
@@ -57,12 +72,6 @@ const MyPostsScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Header
-        title="My Posts"
-        backHandler={() => router.back()}
-        search={false}
-      />
-
       {myPosts.length === 0 ? (
         <Text style={styles.noPostsText}>You have not posted anything yet.</Text>
       ) : (
@@ -100,6 +109,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 16,
   },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    backgroundColor: 'white',
+    paddingHorizontal: 20,
+    elevation: 4,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowColor: 'black',
+  },
+  headerTitle: {
+    fontSize: 22,
+    textAlign: 'center',
+    color: 'black',
+    fontWeight: 'bold',
+  }
 });
 
 export default MyPostsScreen;

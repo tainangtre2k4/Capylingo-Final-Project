@@ -1,23 +1,35 @@
-import React, { useState, useEffect } from 'react';
-import { View, Button, Modal, Text, Alert, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { levels } from '@/constants/gameData'; // Import levels data from gameData.ts
-import colors from '@/constants/Colors';
-import Header from '@/src/components/community/Header';
-import { router } from 'expo-router';
-import { cld } from '@/src/lib/cloudinary';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Button,
+  Modal,
+  Text,
+  Alert,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Dimensions,
+} from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { levels } from "@/constants/gameData"; // Import levels data from gameData.ts
+import colors from "@/constants/Colors";
+import Header from "@/src/components/community/Header";
+import { router } from "expo-router";
+import { cld } from "@/src/lib/cloudinary";
 import { thumbnail } from "@cloudinary/url-gen/actions/resize";
-import { AdvancedImage } from 'cloudinary-react-native';
-import AntDesign from '@expo/vector-icons/AntDesign';
+import { AdvancedImage } from "cloudinary-react-native";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import BackButton from "@/src/components/BackButton";
+import { StatusBar } from "expo-status-bar";
 
-
-const characterImageUri = 'game/nsenkuk8kw5ckwnsgtao';
-const treasureImageUri = 'game/q7ruhk88afkzvliw9wnc';
-const blackStoneImageUri = 'game/lrp1oh7itbvhsx0nv3xh';
+const characterImageUri = "game/nsenkuk8kw5ckwnsgtao";
+const treasureImageUri = "game/q7ruhk88afkzvliw9wnc";
+const blackStoneImageUri = "game/lrp1oh7itbvhsx0nv3xh";
 
 // Get screen dimensions
-const screenWidth = Dimensions.get('window').width;
-const screenHeight = Dimensions.get('window').height;
+const screenWidth = Dimensions.get("window").width;
+const screenHeight = Dimensions.get("window").height;
 
 // Type definitions for the player position and question
 type PlayerPosition = { row: number; col: number };
@@ -31,10 +43,12 @@ type Level = {
 
 const TreasureHuntGame: React.FC = () => {
   const [modalVisibled, setModalVisibled] = useState(false);
-    const [playGameVisible,setPlayGameVisible]=useState(false);
+  const [playGameVisible, setPlayGameVisible] = useState(false);
   const [currentLevel, setCurrentLevel] = useState<number | null>(null); // No level selected initially
   const [map, setMap] = useState<number[][] | null>(null);
-  const [playerPosition, setPlayerPosition] = useState<PlayerPosition | null>(null);
+  const [playerPosition, setPlayerPosition] = useState<PlayerPosition | null>(
+    null
+  );
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null); // Store the current question object
   const [nextPosition, setNextPosition] = useState<PlayerPosition | null>(null); // To store where the player should move after answering
@@ -42,25 +56,34 @@ const TreasureHuntGame: React.FC = () => {
   const [gridSize, setGridSize] = useState<number | null>(null); // Dynamically set grid size
 
   const characterCldImage = characterImageUri
-  ? cld.image(characterImageUri).resize(thumbnail().width(screenWidth).height(screenWidth))
-  : null;
+    ? cld
+        .image(characterImageUri)
+        .resize(thumbnail().width(screenWidth).height(screenWidth))
+    : null;
 
   const stoneCldImage = blackStoneImageUri
-  ? cld.image(blackStoneImageUri).resize(thumbnail().width(screenWidth).height(screenWidth))
-  : null;
+    ? cld
+        .image(blackStoneImageUri)
+        .resize(thumbnail().width(screenWidth).height(screenWidth))
+    : null;
 
   const treasureCldImage = treasureImageUri
-  ? cld.image(treasureImageUri).resize(thumbnail().width(screenWidth).height(screenWidth))
-  : null;
-
+    ? cld
+        .image(treasureImageUri)
+        .resize(thumbnail().width(screenWidth).height(screenWidth))
+    : null;
 
   type CustomAlertProps = {
     visible: boolean;
     message: string;
     onClose: () => void;
   };
-  
-  const CustomAlert: React.FC<CustomAlertProps> = ({ visible, message, onClose }) => {
+
+  const CustomAlert: React.FC<CustomAlertProps> = ({
+    visible,
+    message,
+    onClose,
+  }) => {
     return (
       <Modal
         transparent={true}
@@ -71,7 +94,10 @@ const TreasureHuntGame: React.FC = () => {
         <View style={styles.customAlertContainer}>
           <View style={styles.customAlertBox}>
             <Text style={styles.customAlertText}>{message}</Text>
-            <TouchableOpacity style={styles.customAlertButton} onPress={onClose}>
+            <TouchableOpacity
+              style={styles.customAlertButton}
+              onPress={onClose}
+            >
               <Text style={styles.customAlertButtonText}>OK</Text>
             </TouchableOpacity>
           </View>
@@ -79,25 +105,24 @@ const TreasureHuntGame: React.FC = () => {
       </Modal>
     );
   };
-  
 
   const [customAlertVisible, setCustomAlertVisible] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
+  const [alertMessage, setAlertMessage] = useState("");
 
   const showCustomAlert = (message: string) => {
     setAlertMessage(message);
     setCustomAlertVisible(true);
   };
-  
 
-
-  
   // Function to handle when a level is selected
   const selectLevel = (levelIndex: number) => {
     const selectedLevel = levels[levelIndex];
 
     // Randomly select one map from the available initial maps
-    const randomMap = selectedLevel.initialMaps[Math.floor(Math.random() * selectedLevel.initialMaps.length)];
+    const randomMap =
+      selectedLevel.initialMaps[
+        Math.floor(Math.random() * selectedLevel.initialMaps.length)
+      ];
 
     setCurrentLevel(levelIndex);
     setMap(randomMap); // Set the randomly selected map
@@ -120,20 +145,22 @@ const TreasureHuntGame: React.FC = () => {
   }, [timer, modalVisible]);
 
   // Calculate dynamic tile size
-  const tileSize = gridSize ? Math.min(screenWidth, screenHeight) / gridSize - 10 : 0; // Adjust 10 for padding/margin
+  const tileSize = gridSize
+    ? Math.min(screenWidth, screenHeight) / gridSize - 10
+    : 0; // Adjust 10 for padding/margin
 
   // Function to move the player
-  const movePlayer = (direction: 'up' | 'down' | 'left' | 'right') => {
+  const movePlayer = (direction: "up" | "down" | "left" | "right") => {
     if (!playerPosition || !map || !gridSize) return;
 
     const { row, col } = playerPosition;
     let newRow = row;
     let newCol = col;
 
-    if (direction === 'up' && row > 0) newRow--;
-    if (direction === 'down' && row < gridSize - 1) newRow++;
-    if (direction === 'left' && col > 0) newCol--;
-    if (direction === 'right' && col < gridSize - 1) newCol++;
+    if (direction === "up" && row > 0) newRow--;
+    if (direction === "down" && row < gridSize - 1) newRow++;
+    if (direction === "left" && col > 0) newCol--;
+    if (direction === "right" && col < gridSize - 1) newCol++;
 
     if (map[newRow][newCol] === 1) {
       showCustomAlert("Blocked by a stone!");
@@ -141,7 +168,10 @@ const TreasureHuntGame: React.FC = () => {
     }
 
     if (map[newRow][newCol] === 2) {
-      const randomQuestion = levels[currentLevel!].questions[Math.floor(Math.random() * levels[currentLevel!].questions.length)]; // Pick a random question
+      const randomQuestion =
+        levels[currentLevel!].questions[
+          Math.floor(Math.random() * levels[currentLevel!].questions.length)
+        ]; // Pick a random question
       setModalVisible(true);
       setCurrentQuestion(randomQuestion);
       setNextPosition({ row: newRow, col: newCol });
@@ -158,7 +188,6 @@ const TreasureHuntGame: React.FC = () => {
       }, 2000); // Adjust the delay as necessary (2000ms = 2 seconds)
       return;
     }
-
 
     setPlayerPosition({ row: newRow, col: newCol });
   };
@@ -224,7 +253,10 @@ const TreasureHuntGame: React.FC = () => {
     if (currentLevel === null) return;
     const selectedLevel = levels[currentLevel];
     // Re-randomize the map
-    const randomMap = selectedLevel.initialMaps[Math.floor(Math.random() * selectedLevel.initialMaps.length)];
+    const randomMap =
+      selectedLevel.initialMaps[
+        Math.floor(Math.random() * selectedLevel.initialMaps.length)
+      ];
     setMap(randomMap); // Reset the map to the newly randomized map
     setPlayerPosition(selectedLevel.initialPlayerPosition); // Reset the player's position
     setTimer(15); // Reset the timer
@@ -237,68 +269,91 @@ const TreasureHuntGame: React.FC = () => {
     setPlayerPosition(null);
   };
 
-
-  if (currentLevel === null) {
-    // Level selection screen
-    return (
-        <View style={{flex: 1,backgroundColor:'white'}}>
-          <TouchableOpacity 
-          style={{
-            position:'absolute',
-            zIndex:2,
-            paddingHorizontal: 16, 
-            paddingVertical: 12,
-            backgroundColor:'white',
-            borderRadius: 16,
-            marginTop: 32,
-            marginLeft: 16
-          }} 
-          onPress={()=>router.back()}>
-          <Image
-            source={require('@/assets/images/Vector.png')}
-            style={{
-              width:9,
-              height:18,
-            }}
-          />
-          </TouchableOpacity>
-          <Image source={require('@/assets/images/game/gamePoster.png')} 
-          style={{
-            position:'absolute',
-            width:'100%',
-            height: 340,
-            zIndex:-1,
-          }}/>
-          <Text style={{fontSize: 26,color:'black',fontWeight:'bold',marginTop:350,marginLeft: 20}}>Finding Treasure</Text>
-          <View style={styles.infoRow}>
-            <TouchableOpacity style={styles.infoItem} onPress={()=>{setModalVisibled(true)}}>
-            <AntDesign name="questioncircleo" size={24} color="#3DB2FF" />
-              <Text style={[styles.infoLabel,{color: '#3DB2FF',}]}>How To Play</Text>
-            </TouchableOpacity>
-            <View style={styles.verticalLine} />
-            <View style={styles.infoItem}>
-              <Text style={[styles.infoValue,{color:'#FF2442'}]}>Intermediate+</Text>
-              <Text style={[styles.infoLabel,{color:'#FF2442'}]}>Recommend Level</Text>
-            </View>
-            
-        </View>
-
-        <View style={{marginLeft: 16,marginRight:7}}>
-          <Text style={{fontSize:18,marginBottom:5}}>Description</Text>
-          <Text style={{color:'#6F6F6F'}}>Capybara Treasure Hunt is an exciting adventure game where you guide a cute capybara 
-            through various obstacles and puzzles to discover hidden treasure. 
-            Along the way, you'll face thrilling challenges and unexpected surprises. 
-            Immerse yourself in the adventure as you solve puzzles, avoid obstacles, and explore new paths, 
-            all while leading the capybara to victory. Get ready for a fun-filled journey that will test your skills and keep you entertained!</Text>
-        </View>
-
-        <TouchableOpacity style={{padding:16, backgroundColor:'#3DB2FF',margin: 16,borderRadius:20, alignItems:'center'}}
-        onPress={()=>setPlayGameVisible(true)}
+  // Level selection screen
+  return currentLevel === null ? (
+    <View style={{ flex: 1, backgroundColor: "white" }}>
+      <View
+        style={{
+          position: "absolute",
+          zIndex: 2,
+          marginTop: 20,
+          marginLeft: 20,
+        }}
+      >
+        <BackButton iconColor="black" />
+      </View>
+      <Image
+        source={require("@/assets/images/game/gamePoster.png")}
+        style={{
+          position: "absolute",
+          width: "100%",
+          height: 340,
+          zIndex: -1,
+        }}
+      />
+      <Text
+        style={{
+          fontSize: 26,
+          color: "black",
+          fontWeight: "bold",
+          marginTop: 350,
+          marginLeft: 20,
+        }}
+      >
+        Finding Treasure
+      </Text>
+      <View style={styles.infoRow}>
+        <TouchableOpacity
+          style={styles.infoItem}
+          onPress={() => {
+            setModalVisibled(true);
+          }}
         >
-          <Text style={{fontSize:16, color:'white',fontWeight:'bold',}}>Play Now !</Text>
+          <AntDesign name="questioncircleo" size={24} color="#3DB2FF" />
+          <Text style={[styles.infoLabel, { color: "#3DB2FF" }]}>
+            How To Play
+          </Text>
         </TouchableOpacity>
+        <View style={styles.verticalLine} />
+        <View style={styles.infoItem}>
+          <Text style={[styles.infoValue, { color: "#FF2442" }]}>
+            Intermediate+
+          </Text>
+          <Text style={[styles.infoLabel, { color: "#FF2442" }]}>
+            Recommend Level
+          </Text>
+        </View>
+      </View>
 
-        {/* <Text style={{margin: 16}}>
+      <View style={{ marginLeft: 16, marginRight: 7 }}>
+        <Text style={{ fontSize: 18, marginBottom: 5 }}>Description</Text>
+        <Text style={{ color: "#6F6F6F" }}>
+          Capybara Treasure Hunt is an exciting adventure game where you guide a
+          cute capybara through various obstacles and puzzles to discover hidden
+          treasure. Along the way, you'll face thrilling challenges and
+          unexpected surprises. Immerse yourself in the adventure as you solve
+          puzzles, avoid obstacles, and explore new paths, all while leading the
+          capybara to victory. Get ready for a fun-filled journey that will test
+          your skills and keep you entertained!
+        </Text>
+      </View>
+      <View style={{ flex: 1 }} />
+      <TouchableOpacity
+        style={{
+          padding: 16,
+          backgroundColor: "#3DB2FF",
+          margin: 16,
+          borderRadius: 20,
+          alignItems: "center",
+        }}
+        onPress={() => setPlayGameVisible(true)}
+      >
+        <Text style={{ fontSize: 16, color: "white", fontWeight: "bold" }}>
+          Play Now !
+        </Text>
+      </TouchableOpacity>
+
+      {/* <Text style={{margin: 16}}>
         <Text style={{fontWeight: 'bold'}}>Game Introduction: </Text>
         <Text>Help the capybara find the treasure by crossing water puddles and avoiding blocking stones.</Text>
         </Text>
@@ -315,8 +370,6 @@ const TreasureHuntGame: React.FC = () => {
         ))}
       </View> */}
 
-
-
       <Modal
         animationType="slide"
         transparent={true}
@@ -325,16 +378,46 @@ const TreasureHuntGame: React.FC = () => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={[styles.modalText,{fontWeight:'bold',fontSize:24,marginBottom: 20,}]}>How to Play</Text>
-            <Text style={[styles.modalText,{marginBottom:5}]}>In Capybara Treasure Hunt, your goal is to help the capybara find the treasure by navigating through a map full of obstacles.</Text>
-            <Text style={[styles.modalText,{marginBottom:5}]}>{'\u2022'} Use the arrow buttons (up, down, left, right) to move the capybara around.</Text>
-            <Text style={[styles.modalText,{marginBottom:5}]}>{'\u2022'} You cannot move through square tiles with obstacles like black stones.</Text>
-            <Text style={[styles.modalText,{marginBottom:5}]}>  {'\u2022'} To cross rivers, you must answer a question. If you answer correctly, the capybara will successfully cross the river. If you answer incorrectly, the river turns into a rock, blocking your path.</Text>
-            <Text style={[styles.modalText,{marginVertical:15,fontSize:16, fontWeight:'bold'}]}>Find the shortest route to reach the treasure and guide the capybara safely! </Text>
+            <Text
+              style={[
+                styles.modalText,
+                { fontWeight: "bold", fontSize: 24, marginBottom: 20 },
+              ]}
+            >
+              How to Play
+            </Text>
+            <Text style={[styles.modalText, { marginBottom: 5 }]}>
+              In Capybara Treasure Hunt, your goal is to help the capybara find
+              the treasure by navigating through a map full of obstacles.
+            </Text>
+            <Text style={[styles.modalText, { marginBottom: 5 }]}>
+              {"\u2022"} Use the arrow buttons (up, down, left, right) to move
+              the capybara around.
+            </Text>
+            <Text style={[styles.modalText, { marginBottom: 5 }]}>
+              {"\u2022"} You cannot move through square tiles with obstacles
+              like black stones.
+            </Text>
+            <Text style={[styles.modalText, { marginBottom: 5 }]}>
+              {" "}
+              {"\u2022"} To cross rivers, you must answer a question. If you
+              answer correctly, the capybara will successfully cross the river.
+              If you answer incorrectly, the river turns into a rock, blocking
+              your path.
+            </Text>
+            <Text
+              style={[
+                styles.modalText,
+                { marginVertical: 15, fontSize: 16, fontWeight: "bold" },
+              ]}
+            >
+              Find the shortest route to reach the treasure and guide the
+              capybara safely!{" "}
+            </Text>
 
             {/* Button to close the modal */}
-            <TouchableOpacity 
-              style={styles.closeButton} 
+            <TouchableOpacity
+              style={styles.closeButton}
               onPress={() => setModalVisibled(false)}
             >
               <Text style={styles.closeButtonText}>Close</Text>
@@ -342,7 +425,6 @@ const TreasureHuntGame: React.FC = () => {
           </View>
         </View>
       </Modal>
-
 
       <Modal
         animationType="slide"
@@ -352,23 +434,21 @@ const TreasureHuntGame: React.FC = () => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            
-          <View>
-            <Text style={styles.header}>Select a Level:</Text>
-            {levels.map((level, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.levelButton}
-                onPress={() => selectLevel(index)}
-              >
-                <Text style={styles.levelText}>Level {level.level}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+            <View>
+              <Text style={styles.header}>Select a Level:</Text>
+              {levels.map((level, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.levelButton}
+                  onPress={() => selectLevel(index)}
+                >
+                  <Text style={styles.levelText}>Level {level.level}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
 
-
-            <TouchableOpacity 
-              style={styles.closeButton} 
+            <TouchableOpacity
+              style={styles.closeButton}
               onPress={() => setPlayGameVisible(false)}
             >
               <Text style={styles.closeButtonText}>Cancel</Text>
@@ -376,12 +456,18 @@ const TreasureHuntGame: React.FC = () => {
           </View>
         </View>
       </Modal>
-      </View>
-    );
-  }
-
-  return (
+    </View>
+  ) : (
     <View style={styles.container}>
+      <View
+        style={{
+          position: "absolute",
+          zIndex: 2,
+          left: 20,
+        }}
+      >
+        <BackButton iconColor="black" />
+      </View>
       <ScrollView horizontal={true}>
         <ScrollView>
           {/* Map Layout */}
@@ -398,20 +484,45 @@ const TreasureHuntGame: React.FC = () => {
                     ]}
                   >
                     {/* Display the character if the player is in this tile */}
-                    {playerPosition?.row === rowIndex && playerPosition.col === colIndex && characterCldImage && (
-                        <AdvancedImage cldImg={characterCldImage} style={[styles.character, { width: tileSize - 10, height: tileSize - 10 }]} />
-                    )}
+                    {playerPosition?.row === rowIndex &&
+                      playerPosition.col === colIndex &&
+                      characterCldImage && (
+                        <AdvancedImage
+                          cldImg={characterCldImage}
+                          style={[
+                            styles.character,
+                            { width: tileSize - 10, height: tileSize - 10 },
+                          ]}
+                        />
+                      )}
                     {/* Display the black stone if it's a black stone tile */}
                     {tile === 1 && stoneCldImage && (
-                      <AdvancedImage cldImg={stoneCldImage} style={{ width: tileSize - 10, height: tileSize - 10 }} />
+                      <AdvancedImage
+                        cldImg={stoneCldImage}
+                        style={{
+                          width: tileSize - 10,
+                          height: tileSize - 10,
+                        }}
+                      />
                     )}
                     {/* Display the yellow stone */}
                     {tile === 2 && (
-                      <View style={[styles.yellowStone, { width: tileSize - 10, height: tileSize - 10 }]} />
+                      <View
+                        style={[
+                          styles.yellowStone,
+                          { width: tileSize - 10, height: tileSize - 10 },
+                        ]}
+                      />
                     )}
                     {/* Display the treasure if it's the treasure tile */}
                     {tile === 3 && treasureCldImage && (
-                      <AdvancedImage cldImg={treasureCldImage} style={{ width: tileSize - 10, height: tileSize - 10 }} />
+                      <AdvancedImage
+                        cldImg={treasureCldImage}
+                        style={{
+                          width: tileSize - 10,
+                          height: tileSize - 10,
+                        }}
+                      />
                     )}
                   </View>
                 ))}
@@ -423,28 +534,43 @@ const TreasureHuntGame: React.FC = () => {
 
       {/* Arrow Controls */}
       <View style={styles.controls}>
-        <TouchableOpacity onPress={() => movePlayer('up')}>
-          <Ionicons name="arrow-up" size={40} color="black" />
+        <TouchableOpacity onPress={() => movePlayer("up")} style={styles.controller}>
+          <Ionicons name="arrow-up" size={30} color="white" />
         </TouchableOpacity>
         <View style={styles.horizontalControls}>
-          <TouchableOpacity onPress={() => movePlayer('left')}>
-            <Ionicons name="arrow-back" size={40} color="black" />
+          <TouchableOpacity onPress={() => movePlayer("left")} style={styles.controller}>
+            <Ionicons name="arrow-back" size={30} color="white" />
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => movePlayer('right')}>
-            <Ionicons name="arrow-forward" size={40} color="black" />
+          <TouchableOpacity onPress={() => movePlayer("right")} style={styles.controller}>
+            <Ionicons name="arrow-forward" size={30} color="white" />
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity onPress={() => movePlayer('down')}>
-          <Ionicons name="arrow-down" size={40} color="black" />
+        <TouchableOpacity onPress={() => movePlayer("down")} style={styles.controller}>
+          <Ionicons name="arrow-down" size={30} color="white" />
         </TouchableOpacity>
       </View>
 
       {/* Reset Button */}
-      <View style={styles.resetButton}>
-        <Button title="Reset Level" onPress={resetLevel} />
-        <Button title="Go to Level Selection" onPress={goToLevelSelection} />
+      <View style={styles.resetButtonContainer}>
+        <TouchableOpacity
+          onPress={resetLevel}
+          style={{ backgroundColor: "#3DB2FF", padding: 12, borderRadius: 10 }}
+        >
+          <Text style={{ fontSize: 16, fontWeight: "bold", color: "white" }}>
+            Reset Level
+          </Text>
+        </TouchableOpacity>
+        <View style={{ marginHorizontal: 14 }} />
+        <TouchableOpacity
+          onPress={goToLevelSelection}
+          style={{ backgroundColor: "#3DB2FF", padding: 12, borderRadius: 10 }}
+        >
+          <Text style={{ fontSize: 16, fontWeight: "bold", color: "white" }}>
+            Go to Level Selection
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {/* Question Modal */}
@@ -452,7 +578,9 @@ const TreasureHuntGame: React.FC = () => {
         <View style={styles.modal}>
           {currentQuestion && (
             <>
-              <Text style={{ fontSize: 20 }}>Question: {currentQuestion.question}</Text>
+              <Text style={{ fontSize: 20 }}>
+                Question: {currentQuestion.question}
+              </Text>
               {currentQuestion.options.map((option, index) => (
                 <TouchableOpacity
                   key={index}
@@ -463,7 +591,9 @@ const TreasureHuntGame: React.FC = () => {
                 </TouchableOpacity>
               ))}
 
-              <Text style={{marginTop: 16,fontSize:20}}>Time remaining: <Text style={{color:'red'}}>{timer}s</Text></Text>
+              <Text style={{ marginTop: 16, fontSize: 20 }}>
+                Time remaining: <Text style={{ color: "red" }}>{timer}s</Text>
+              </Text>
             </>
           )}
         </View>
@@ -478,48 +608,53 @@ const TreasureHuntGame: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1,marginTop: 16, alignItems: 'center', },
+  container: { flex: 1, marginTop: 20, alignItems: "center" },
   header: { fontSize: 24 },
-  map: { flexDirection: 'column', marginTop: 100 },
-  row: { flexDirection: 'row' },
+  map: { flexDirection: "column", marginTop: 100 },
+  row: { flexDirection: "row" },
   tile: {
     borderWidth: 1,
-    borderColor: '#ccc',
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderColor: "#ccc",
+    justifyContent: "center",
+    alignItems: "center",
   },
   emptyTile: {
-    backgroundColor: '#fff', // Define what an empty tile looks like, you can set any background color or style
+    backgroundColor: "#fff", // Define what an empty tile looks like, you can set any background color or style
   },
   character: {}, // Character image dimensions will be dynamically set
   yellowStone: { backgroundColor: colors.primary.primary40 }, // Yellow stone style
-  controls: { flexDirection: 'column', alignItems: 'center' },
+  controls: { flexDirection: "column", alignItems: "center" },
   horizontalControls: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '50%',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "50%",
     marginTop: 10,
   },
-  resetButton: { marginTop: 20,marginBottom:16 }, // Style for Reset button
+  resetButtonContainer: {
+    marginTop: 20,
+    marginBottom: 16,
+    flexDirection: "row",
+    alignItems: "center",
+  }, // Style for Reset button
   modal: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     padding: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
     margin: 10,
   },
   infoItem: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   infoValue: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   infoLabel: {
     fontSize: 14,
@@ -528,74 +663,74 @@ const styles = StyleSheet.create({
   verticalLine: {
     width: 2,
     height: 50,
-    backgroundColor: '#DADADA',
+    backgroundColor: "#DADADA",
     marginHorizontal: 15,
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalContent: {
     width: 350,
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   modalText: {
     fontSize: 16,
   },
   closeButton: {
-    backgroundColor: '#3DB2FF',
+    backgroundColor: "#3DB2FF",
     padding: 10,
     borderRadius: 5,
-    marginTop: 16
+    marginTop: 16,
   },
   closeButtonText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
   },
   levelButton: {
     padding: 10,
     marginVertical: 5,
-    backgroundColor: '#3DB2FF', // Background color for the button
+    backgroundColor: "#3DB2FF", // Background color for the button
     borderRadius: 5,
-    alignItems: 'center', // Center text horizontally
+    alignItems: "center", // Center text horizontally
   },
   levelText: {
-    color: 'white',
+    color: "white",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   optionButton: {
     padding: 16,
     marginVertical: 5,
-    backgroundColor: '#3DB2FF', // Background color for each option
+    backgroundColor: "#3DB2FF", // Background color for each option
     borderRadius: 5,
-    alignItems: 'center',
-    width: '80%', // Option button width
-    marginTop: 16
+    alignItems: "center",
+    width: "80%", // Option button width
+    marginTop: 16,
   },
   optionText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   customAlertContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
   },
   customAlertBox: {
     width: 300,
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 10,
-    alignItems: 'center',
-    shadowColor: '#000',
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
@@ -603,20 +738,31 @@ const styles = StyleSheet.create({
   },
   customAlertText: {
     fontSize: 18,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 20,
   },
   customAlertButton: {
     padding: 10,
-    backgroundColor: '#3DB2FF',
+    backgroundColor: "#3DB2FF",
     borderRadius: 5,
   },
   customAlertButtonText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
+  controller: {
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: "#3DB2FF",
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 4,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowColor: "black",
+  }
 });
-
 
 export default TreasureHuntGame;

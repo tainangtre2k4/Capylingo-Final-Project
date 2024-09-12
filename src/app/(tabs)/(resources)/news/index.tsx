@@ -42,7 +42,7 @@ const News = (props: Props) => {
         <View style={styles.headerContainer}>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <BackButton iconColor="black"/>
-            <View style={{ marginHorizontal: 4 }} />
+            <View style={{ marginHorizontal: 8 }} />
             <Text style={styles.headerTitle}>News</Text>
           </View>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -52,7 +52,7 @@ const News = (props: Props) => {
             >
               <Ionicons name="search-outline" size={20} color="black" />
             </TouchableOpacity>
-            <View style={{ marginHorizontal: 4 }} />
+            <View style={{ marginHorizontal: 6 }} />
             <TouchableOpacity
               style={styles.headerRightIcon}
               onPress={() => router.push("/news/saved")}

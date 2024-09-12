@@ -16,7 +16,7 @@ const CheckBox = ({label, checked, onPress}: Props) => {
             backgroundColor: withTiming(
                 checked ? "rgba(239, 142, 82, 0.1" : 'transparent', 
                 {duration: 150}),
-            borderColor: withTiming(checked ? "#FFAC1C" : colors.black, {duration: 150}),
+            borderColor: withTiming(checked ? "#3DB2FF" : colors.black, {duration: 150}),
             paddingLeft: 16,
             paddingRight: checked ? 10 : 16
         };
@@ -39,7 +39,7 @@ const CheckBox = ({label, checked, onPress}: Props) => {
       entering={FadeIn.duration(350)}
       exiting={FadeOut}
       >
-        <AntDesign name= 'checkcircle' size = {14} color = "#FFAC1C" />
+        <AntDesign name= 'checkcircle' size = {14} color = "#3DB2FF" />
       </Animated.View>
       )}
     </Animated.View>
