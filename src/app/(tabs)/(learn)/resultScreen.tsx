@@ -21,15 +21,18 @@ const headings = [
 ];
 
 type SearchParams = {
-  correct: number;
-  all: number;
-  backPage: Href<string | object>;
+  correct: string;
+  all: string;
+  backPage: string;
 };
 
 const ResultScreen = () => {
   const navigation = useNavigation();
   const router = useRouter();
   const { correct, all, backPage } = useLocalSearchParams<SearchParams>();
+
+  const correctNum = parseInt(correct, 10); 
+  const allNum = parseInt(all, 10);
 
   const getHeading = (percent: number) => {
     if (percent < 50) return headings[0];
@@ -38,7 +41,7 @@ const ResultScreen = () => {
     return headings[3];
   };
 
-  const percentage = Math.round((correct / all) * 100);
+  const percentage = Math.round((correctNum / allNum) * 100);
   const heading = getHeading(percentage);
 
   useEffect(() => {
