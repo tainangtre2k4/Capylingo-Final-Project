@@ -1,6 +1,7 @@
 import { Stack } from "expo-router";
 import { SafeAreaView, Platform } from "react-native";
 import { StatusBar } from 'expo-status-bar';
+import React from "react";
 
 export default function ProfileLayout() {
     return (
@@ -10,7 +11,7 @@ export default function ProfileLayout() {
                     android: {
                         statusBarColor: '#3DB2FF',
                         statusBarStyle: 'light',
-                    }
+                    },
                 })
             }} />
         </SafeAreaView>
