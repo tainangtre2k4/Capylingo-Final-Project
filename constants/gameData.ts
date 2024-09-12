@@ -93,6 +93,46 @@ export const levels = [
           options: ["reasons", "excuses", "grounds", "foundation"],
           correct: "the",
         },
+        {
+            question: "The acupoints are stimulated _______ the healing capability of the body itself.",
+            options: ["enhance", "to enhance", "enhancing", "enhanced"],
+            correct: "to enhance",
+        },
+        {
+            question: "After congratulating his team, the coach left, allowing the players to let their______ down for a while.",
+            options: ["hearts", "hair", "souls", "heads"],
+            correct: "hair",
+        },
+        {
+            question: "When she came home from school yesterday, her mother _______ in the kitchen.",
+            options: ["cooked", "was cooking", "is cooking", "cooks"],
+            correct: "was cooking",
+        },
+        {
+            question: "At the beach, seagulls _______ a bad reputation for swooping down on unsuspecting people to steal their food.",
+            options: ["pay", "take", "have", "get"],
+            correct: "have",
+        },
+        {
+            question: "The contract ________ when we reach an agreement on the price.",
+            options: ["will have signed", "signs", "is signing", "will be signed"],
+            correct: "will be signed",
+        },
+        {
+            question: "For a public campaign to_______, it is important to make use of existing social organizations as well as other relations.",
+            options: ["successful", "success", "succeed", "successfully"],
+            correct: "succeed",
+        },
+        {
+            question: "The________lay with the organizers, who failed to make the necessary arrangements for dealing with so many people.",
+            options: ["mistake", "foul", "fault", "error"],
+            correct: "fault",
+        },
+        {
+          question: "The little girl __________ in mud is now receiving a beating.",
+          options: ["covered", "covering", "is covered", "is covering"],
+          correct: "covered",
+        },
       ],
     },
     {
@@ -256,7 +296,47 @@ export const levels = [
             question: "Dawson, I hear that the new regulation will take ________from October 1st, won’t it?",
             options: ["effect", "force", "power", "use"],
             correct: "effect",
-        }
+        },
+        {
+            question: "The acupoints are stimulated _______ the healing capability of the body itself.",
+            options: ["enhance", "to enhance", "enhancing", "enhanced"],
+            correct: "to enhance",
+        },
+        {
+            question: "After congratulating his team, the coach left, allowing the players to let their______ down for a while.",
+            options: ["hearts", "hair", "souls", "heads"],
+            correct: "hair",
+        },
+        {
+            question: "When she came home from school yesterday, her mother _______ in the kitchen.",
+            options: ["cooked", "was cooking", "is cooking", "cooks"],
+            correct: "was cooking",
+        },
+        {
+            question: "At the beach, seagulls _______ a bad reputation for swooping down on unsuspecting people to steal their food.",
+            options: ["pay", "take", "have", "get"],
+            correct: "have",
+        },
+        {
+            question: "The contract ________ when we reach an agreement on the price.",
+            options: ["will have signed", "signs", "is signing", "will be signed"],
+            correct: "will be signed",
+        },
+        {
+            question: "For a public campaign to_______, it is important to make use of existing social organizations as well as other relations.",
+            options: ["successful", "success", "succeed", "successfully"],
+            correct: "succeed",
+        },
+        {
+            question: "The________lay with the organizers, who failed to make the necessary arrangements for dealing with so many people.",
+            options: ["mistake", "foul", "fault", "error"],
+            correct: "fault",
+        },
+        {
+          question: "The little girl __________ in mud is now receiving a beating.",
+          options: ["covered", "covering", "is covered", "is covering"],
+          correct: "covered",
+        },
       ],    
     },
     // Add more levels as 
