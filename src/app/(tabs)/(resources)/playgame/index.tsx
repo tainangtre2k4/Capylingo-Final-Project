@@ -8,6 +8,8 @@ import { router } from 'expo-router';
 import { cld } from '@/src/lib/cloudinary';
 import { thumbnail } from "@cloudinary/url-gen/actions/resize";
 import { AdvancedImage } from 'cloudinary-react-native';
+import AntDesign from '@expo/vector-icons/AntDesign';
+
 
 const characterImageUri = 'game/nsenkuk8kw5ckwnsgtao';
 const treasureImageUri = 'game/q7ruhk88afkzvliw9wnc';
@@ -28,6 +30,8 @@ type Level = {
 };
 
 const TreasureHuntGame: React.FC = () => {
+  const [modalVisibled, setModalVisibled] = useState(false);
+    const [playGameVisible,setPlayGameVisible]=useState(false);
   const [currentLevel, setCurrentLevel] = useState<number | null>(null); // No level selected initially
   const [map, setMap] = useState<number[][] | null>(null);
   const [playerPosition, setPlayerPosition] = useState<PlayerPosition | null>(null);
@@ -49,6 +53,35 @@ const TreasureHuntGame: React.FC = () => {
   ? cld.image(treasureImageUri).resize(thumbnail().width(screenWidth).height(screenWidth))
   : null;
 
+
+  const CustomAlert = ({ visible, message, onClose }) => {
+    return (
+      <Modal
+        transparent={true}
+        visible={visible}
+        animationType="fade"
+        onRequestClose={onClose}
+      >
+        <View style={styles.customAlertContainer}>
+          <View style={styles.customAlertBox}>
+            <Text style={styles.customAlertText}>{message}</Text>
+            <TouchableOpacity style={styles.customAlertButton} onPress={onClose}>
+              <Text style={styles.customAlertButtonText}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+  const [customAlertVisible, setCustomAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+
+  const showCustomAlert = (message) => {
+    setAlertMessage(message);
+    setCustomAlertVisible(true);
+  };
+
+  
   // Function to handle when a level is selected
   const selectLevel = (levelIndex: number) => {
     const selectedLevel = levels[levelIndex];
@@ -93,7 +126,7 @@ const TreasureHuntGame: React.FC = () => {
     if (direction === 'right' && col < gridSize - 1) newCol++;
 
     if (map[newRow][newCol] === 1) {
-      Alert.alert("Blocked by a stone!");
+      showCustomAlert("Blocked by a stone!");
       return;
     }
 
@@ -102,12 +135,12 @@ const TreasureHuntGame: React.FC = () => {
       setModalVisible(true);
       setCurrentQuestion(randomQuestion);
       setNextPosition({ row: newRow, col: newCol });
-      setTimer(1000000); // Reset the timer when a new question appears
+      setTimer(15); // Reset the timer when a new question appears
       return;
     }
 
     if (map[newRow][newCol] === 3) {
-      Alert.alert("Victory! You completed the level!");
+      showCustomAlert("Victory! You completed the level!");
       goToLevelSelection();
       return;
     }
@@ -132,8 +165,7 @@ const TreasureHuntGame: React.FC = () => {
       return mapRow;
     });
     setMap(newMap);
-
-    Alert.alert("Time's up!");
+    showCustomAlert("Time's up!");
   };
 
   // Handle answering questions
@@ -168,8 +200,7 @@ const TreasureHuntGame: React.FC = () => {
         return mapRow;
       });
       setMap(newMap);
-
-      Alert.alert("Wrong answer!");
+      showCustomAlert("Wrong Answer!");
     }
   };
 
@@ -191,12 +222,68 @@ const TreasureHuntGame: React.FC = () => {
     setPlayerPosition(null);
   };
 
+
   if (currentLevel === null) {
     // Level selection screen
     return (
-        <View style={{flex: 1}}>
-        <Header title={'Finding Treasure !'} backHandler={()=>{router.back();}} search={false}/>
-        <Text style={{margin: 16}}>
+        <View style={{flex: 1,backgroundColor:'white'}}>
+          <TouchableOpacity 
+          style={{
+            position:'absolute',
+            zIndex:2,
+            paddingHorizontal: 16, 
+            paddingVertical: 12,
+            backgroundColor:'white',
+            borderRadius: 16,
+            marginTop: 32,
+            marginLeft: 16
+          }} 
+          onPress={()=>router.back()}>
+          <Image
+            source={require('@/assets/images/Vector.png')}
+            style={{
+              width:9,
+              height:18,
+            }}
+          />
+          </TouchableOpacity>
+          <Image source={require('@/assets/images/game/gamePoster.png')} 
+          style={{
+            position:'absolute',
+            width:'100%',
+            height: 340,
+            zIndex:-1,
+          }}/>
+          <Text style={{fontSize: 26,color:'black',fontWeight:'bold',marginTop:350,marginLeft: 20}}>Finding Treasure</Text>
+          <View style={styles.infoRow}>
+            <TouchableOpacity style={styles.infoItem} onPress={()=>{setModalVisibled(true)}}>
+            <AntDesign name="questioncircleo" size={24} color="#3DB2FF" />
+              <Text style={[styles.infoLabel,{color: '#3DB2FF',}]}>How To Play</Text>
+            </TouchableOpacity>
+            <View style={styles.verticalLine} />
+            <View style={styles.infoItem}>
+              <Text style={[styles.infoValue,{color:'#FF2442'}]}>Intermediate+</Text>
+              <Text style={[styles.infoLabel,{color:'#FF2442'}]}>Recommend Level</Text>
+            </View>
+            
+        </View>
+
+        <View style={{marginLeft: 16,marginRight:7}}>
+          <Text style={{fontSize:18,marginBottom:5}}>Description</Text>
+          <Text style={{color:'#6F6F6F'}}>Capybara Treasure Hunt is an exciting adventure game where you guide a cute capybara 
+            through various obstacles and puzzles to discover hidden treasure. 
+            Along the way, you'll face thrilling challenges and unexpected surprises. 
+            Immerse yourself in the adventure as you solve puzzles, avoid obstacles, and explore new paths, 
+            all while leading the capybara to victory. Get ready for a fun-filled journey that will test your skills and keep you entertained!</Text>
+        </View>
+
+        <TouchableOpacity style={{padding:16, backgroundColor:'#3DB2FF',margin: 16,borderRadius:20, alignItems:'center'}}
+        onPress={()=>setPlayGameVisible(true)}
+        >
+          <Text style={{fontSize:16, color:'white',fontWeight:'bold',}}>Play Now !</Text>
+        </TouchableOpacity>
+
+        {/* <Text style={{margin: 16}}>
         <Text style={{fontWeight: 'bold'}}>Game Introduction: </Text>
         <Text>Help the capybara find the treasure by crossing water puddles and avoiding blocking stones.</Text>
         </Text>
@@ -211,7 +298,69 @@ const TreasureHuntGame: React.FC = () => {
         {levels.map((level, index) => (
           <Button key={index} title={`Level ${level.level}`} onPress={() => selectLevel(index)} />
         ))}
-      </View>
+      </View> */}
+
+
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisibled}
+        onRequestClose={() => setModalVisibled(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={[styles.modalText,{fontWeight:'bold',fontSize:24,marginBottom: 20,}]}>How to Play</Text>
+            <Text style={[styles.modalText,{marginBottom:5}]}>In Capybara Treasure Hunt, your goal is to help the capybara find the treasure by navigating through a map full of obstacles.</Text>
+            <Text style={[styles.modalText,{marginBottom:5}]}>{'\u2022'} Use the arrow buttons (up, down, left, right) to move the capybara around.</Text>
+            <Text style={[styles.modalText,{marginBottom:5}]}>{'\u2022'} You cannot move through square tiles with obstacles like black stones.</Text>
+            <Text style={[styles.modalText,{marginBottom:5}]}>  {'\u2022'} To cross rivers, you must answer a question. If you answer correctly, the capybara will successfully cross the river. If you answer incorrectly, the river turns into a rock, blocking your path.</Text>
+            <Text style={[styles.modalText,{marginVertical:15,fontSize:16, fontWeight:'bold'}]}>Find the shortest route to reach the treasure and guide the capybara safely! </Text>
+
+            {/* Button to close the modal */}
+            <TouchableOpacity 
+              style={styles.closeButton} 
+              onPress={() => setModalVisibled(false)}
+            >
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={playGameVisible}
+        onRequestClose={() => setPlayGameVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            
+          <View>
+            <Text style={styles.header}>Select a Level:</Text>
+            {levels.map((level, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.levelButton}
+                onPress={() => selectLevel(index)}
+              >
+                <Text style={styles.levelText}>Level {level.level}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+
+            <TouchableOpacity 
+              style={styles.closeButton} 
+              onPress={() => setPlayGameVisible(false)}
+            >
+              <Text style={styles.closeButtonText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
       </View>
     );
   }
@@ -290,13 +439,25 @@ const TreasureHuntGame: React.FC = () => {
             <>
               <Text style={{ fontSize: 20 }}>Question: {currentQuestion.question}</Text>
               {currentQuestion.options.map((option, index) => (
-                <Button key={index} title={option} onPress={() => handleQuestionAnswer(option)} />
+                <TouchableOpacity
+                  key={index}
+                  style={styles.optionButton}
+                  onPress={() => handleQuestionAnswer(option)}
+                >
+                  <Text style={styles.optionText}>{option}</Text>
+                </TouchableOpacity>
               ))}
-              <Text>Time remaining: {timer}s</Text>
+
+              <Text style={{marginTop: 16,fontSize:20}}>Time remaining: <Text style={{color:'red'}}>{timer}s</Text></Text>
             </>
           )}
         </View>
       </Modal>
+      <CustomAlert
+        visible={customAlertVisible}
+        message={alertMessage}
+        onClose={() => setCustomAlertVisible(false)}
+      />
     </View>
   );
 };
@@ -331,6 +492,114 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    margin: 10,
+  },
+  infoItem: {
+    alignItems: 'center',
+  },
+  infoValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  infoLabel: {
+    fontSize: 14,
+    marginTop: 5,
+  },
+  verticalLine: {
+    width: 2,
+    height: 50,
+    backgroundColor: '#DADADA',
+    marginHorizontal: 15,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    width: 350,
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 16,
+  },
+  closeButton: {
+    backgroundColor: '#3DB2FF',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 16
+  },
+  closeButtonText: {
+    color: 'white',
+    fontSize: 16,
+  },
+  levelButton: {
+    padding: 10,
+    marginVertical: 5,
+    backgroundColor: '#3DB2FF', // Background color for the button
+    borderRadius: 5,
+    alignItems: 'center', // Center text horizontally
+  },
+  levelText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  optionButton: {
+    padding: 16,
+    marginVertical: 5,
+    backgroundColor: '#3DB2FF', // Background color for each option
+    borderRadius: 5,
+    alignItems: 'center',
+    width: '80%', // Option button width
+    marginTop: 16
+  },
+  optionText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  customAlertContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+  },
+  customAlertBox: {
+    width: 300,
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  customAlertText: {
+    fontSize: 18,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  customAlertButton: {
+    padding: 10,
+    backgroundColor: '#3DB2FF',
+    borderRadius: 5,
+  },
+  customAlertButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 
