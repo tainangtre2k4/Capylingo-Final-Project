@@ -70,7 +70,7 @@ const LearnVocab = () => {
   useEffect(() => {
     if (vocabsLength === 0 && !loading && !error) {
       completeLearningVocab(user.user?.id, topicID);
-      router.push(`/(tabs)/(learn)/resultScreen?correct=${0}&all=${0}`);
+      router.push(`/(tabs)/(learn)/resultScreen?correct=${0}&all=${0}&backPage=${'/level'}`);
     }
   }, [vocabsLength, loading, error]);
 
@@ -99,7 +99,7 @@ const LearnVocab = () => {
     }
     else {
       completeLearningVocab(user.user?.id, topicID);
-      router.push(`/(tabs)/(learn)/resultScreen?correct=${vocabs.length}&all=${vocabs.length}`);
+      router.push(`/(tabs)/(learn)/resultScreen?correct=${vocabs.length}&all=${vocabs.length}&backPage=${'/level'}`);
     }
   };
 

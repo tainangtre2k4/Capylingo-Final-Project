@@ -93,13 +93,13 @@ const styles = StyleSheet.create({
     headerContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        height: height * 0.072,
+        padding: 12,
         justifyContent: 'space-between',
         paddingHorizontal: 20,
         backgroundColor: '#3DB2FF',
       },
       headerTitle: {
-        fontSize: 27,
+        fontSize: 24,
         fontWeight: '600',
         color: '#fff',
       },

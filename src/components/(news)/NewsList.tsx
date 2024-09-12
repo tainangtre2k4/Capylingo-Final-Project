@@ -17,7 +17,7 @@ const NewsList = ({newsList}: Props) => {
             <Loading size = {"large"}/>
         ) : (
         newsList.map((item, index)=> (
-        <Link href={`/(news)/${item.article_id}?url=${encodeURIComponent(item.link)}`} asChild key = {index}> 
+        <Link href={`/news/${item.article_id}?url=${encodeURIComponent(item.link)}`} asChild key = {index}> 
         <TouchableOpacity>
             <NewsItem item = {item} />
         </TouchableOpacity>

@@ -58,7 +58,7 @@ const Saved = (props: Props) => {
                         keyExtractor={(_, index) => `list_item${index}`}
                         showsVerticalScrollIndicator={false}
                         renderItem={({ item }) => (
-                            <Link href={`/(news)/${item.article_id}?url=${encodeURIComponent(item.link)}`} asChild>
+                            <Link href={`/news/${item.article_id}?url=${encodeURIComponent(item.link)}`} asChild>
                                 <TouchableOpacity>
                                     <NewsItem item={item} />
                                 </TouchableOpacity>

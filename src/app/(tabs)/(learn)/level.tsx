@@ -219,13 +219,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: Platform.OS === 'android' ? RNStatusBar.currentHeight || 20 : 0,
     alignItems: 'center',
-    height: height * 0.1,
+    paddingVertical: 12,
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     backgroundColor: '#3DB2FF',
   },
   headerTitle: {
-    fontSize: 27,
+    fontSize: 24,
     fontWeight: '600',
     color: '#fff',
   },
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   buttonContainer: {
-    marginTop: height*0.01,
+    marginTop: height*0.03,
     alignItems: 'center',
   },
   button: {

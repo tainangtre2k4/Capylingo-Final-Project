@@ -77,7 +77,7 @@ const GrammarExercises = () => {
   useEffect(() => {
     if (exerciseLength === 0 && !loading && !error) {
       completedPracticingGrammar(user.user?.id, topicID);
-      router.push(`/(tabs)/(learn)/resultScreen?correct=${0}&all=${0}`);
+      router.push(`/(tabs)/(learn)/resultScreen?correct=${0}&all=${0}&backPage=${'/level'}`);
     }
   }, [exerciseLength, loading, error]);
 
@@ -109,7 +109,7 @@ const GrammarExercises = () => {
           completedPracticingGrammar(user.user?.id, topicID);
         }
 
-        router.push(`/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}`);
+        router.push(`/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}&backPage=${'/level'}`);
       } else {
         setModalVisible(true);
       }
@@ -118,7 +118,7 @@ const GrammarExercises = () => {
 
   const handleModalSubmit = () => {
     setModalVisible(false);
-    router.push(`/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}`);
+    router.push(`/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}&backPage=${'/level'}`);
   };
   const handleModalCancel = () => {
     setModalVisible(false);

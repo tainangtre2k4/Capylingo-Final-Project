@@ -71,7 +71,7 @@ const getNews = async() => {
         keyExtractor={(_, index) => `list_item${index}`}
         showsVerticalScrollIndicator={false}
         renderItem={({ index, item }) => {
-          return <Link href={`/(news)/${item.article_id}?url=${encodeURIComponent(item.link)}`} asChild key = {index}> 
+          return <Link href={`/news/${item.article_id}?url=${encodeURIComponent(item.link)}`} asChild key = {index}> 
           <TouchableOpacity>
               <NewsItem item = {item} />
           </TouchableOpacity>

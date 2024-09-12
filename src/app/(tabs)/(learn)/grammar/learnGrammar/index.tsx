@@ -22,7 +22,7 @@ const LearnGrammar = () => {
   useEffect(() => {
     if (lectureLink === 'null' || !lectureLink) {
       completeLearningGrammar(user.user?.id, topicID);
-      router.push(`/(tabs)/(learn)/resultScreen?correct=${1}&all=${1}`);
+      router.push(`/(tabs)/(learn)/resultScreen?correct=${1}&all=${1}&backPage=${'/level'}`);
     }
   }, [navigation]);
 
@@ -37,7 +37,7 @@ const LearnGrammar = () => {
             style={styles.doneButton} activeOpacity={0.6}
             onPress={()=> {
               completeLearningGrammar(user.user?.id, topicID);
-              router.push(`/(tabs)/(learn)/resultScreen?correct=${1}&all=${1}`);
+              router.push(`/(tabs)/(learn)/resultScreen?correct=${1}&all=${1}&backPage=${'/level'}`);
             }}
           >
             <Text style={styles.doneText}>Done</Text>
