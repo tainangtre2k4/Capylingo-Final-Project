@@ -1,10 +1,11 @@
-import { Dimensions, Platform, StatusBar as RNStatusBar, StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native'
+import { Image, Dimensions, Platform, StatusBar as RNStatusBar, StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native'
 import React, { useContext, useEffect } from 'react'
 import { router, useNavigation } from 'expo-router'
 import BackButton from "@/src/components/BackButton";
 import { SkillcheckContext } from './_layout';
 
-const { width, height } = Dimensions.get('window')
+const { width, height } = Dimensions.get('window');
+const cardColors = ['#9BD2FC', '#F1C40F', '#16A085', '#2980B9'];
 
 const SkillCheckLesson = () => {
     const {totalReadingTests, totalListeningTests, setListeningTestIndex, setReadingTestIndex} = useContext(SkillcheckContext);
@@ -14,10 +15,11 @@ const SkillCheckLesson = () => {
         navigation.setOptions({
             headerShown: true,
             header: () => (
-                <View style={styles.header}>
+                <View style={styles.headerContainer}>
                     <BackButton />
-                    <Text style={styles.title}>Skill Check</Text>
-                </View>
+                    <Text style={styles.headerTitle}>Skill Check</Text>
+                    <View style={styles.headerFillerContainer} />
+              </View>
             ),
             headerTitleStyle: {
                 color: 'white'
@@ -38,12 +40,15 @@ const SkillCheckLesson = () => {
             cards.push(
                 <TouchableOpacity 
                     key={`reading-${i}`} 
-                    style={styles.lessonCard} 
+                    style={[styles.lessonCard, { backgroundColor: cardColors[i % cardColors.length] }]}
                     onPress={() => {
                         setReadingTestIndex(i);
                         router.push('/skillcheck/reading');
                     }}
                 >
+                    <View style={styles.imageBox}>
+                        <Image source={require('@/assets/images/learn/reading.png')} style={styles.image}/>
+                    </View>
                     <Text style={styles.lessonTitle}>Reading Test {i + 1}</Text>
                 </TouchableOpacity>
             );
@@ -53,12 +58,15 @@ const SkillCheckLesson = () => {
             cards.push(
                 <TouchableOpacity 
                     key={`listening-${i}`} 
-                    style={styles.lessonCard} 
+                    style={[styles.lessonCard, { backgroundColor: cardColors[i % cardColors.length] }]}
                     onPress={() => {
                         setListeningTestIndex(i);
                         router.push('/skillcheck/listening');
                     }}
                 >
+                    <View style={styles.imageBox}>
+                        <Image source={require('@/assets/images/learn/listening.png')} style={styles.image}/>
+                    </View>
                     <Text style={styles.lessonTitle}>Listening Test {i + 1}</Text>
                 </TouchableOpacity>
             );
@@ -68,7 +76,7 @@ const SkillCheckLesson = () => {
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
             {renderLessonCards()}
         </ScrollView>
     )
@@ -82,32 +90,65 @@ const styles = StyleSheet.create({
         paddingVertical: 20,
         paddingHorizontal: 30,
     },
-    header: {
-        paddingHorizontal: 20,
-        paddingVertical: 8,
-        backgroundColor: '#3DB2FF',
+    headerContainer: {
+        flexDirection: 'row',
+        marginTop: Platform.OS === 'android' ? RNStatusBar.currentHeight || 20 : 0,
         alignItems: 'center',
-        flexDirection: 'row'
-    },
-    title: {
-        marginHorizontal: 10,
-        color: 'white',
-        fontSize: 22,
-        fontWeight: '500',
+        height: height * 0.072,
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        backgroundColor: '#3DB2FF',
+      },
+      headerTitle: {
+        fontSize: 27,
+        fontWeight: '600',
+        color: '#fff',
+      },
+      headerFillerContainer: {
+        height: 42,
+        width: 42,
+        backgroundColor: 'transparent',
+      },
+    imageBox: {
+        padding: 10,
+        backgroundColor: '#fff',
+        width: height * 0.088,
+        height: height * 0.088,
+        borderRadius: height * 0.044,
+        marginLeft: width*0.045,
+        borderWidth: 3.5,
+        borderColor: '#FF8504',
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+    image:{
+        width: height * 0.07,
+        height: height * 0.07,
+        borderRadius: height * 0.035,
+        resizeMode: 'contain',
     },
     lessonCard: {
         flexDirection: 'row',
-        justifyContent: 'center',
+        width: width * 0.85,
+        height: height * 0.1134,
+        marginTop: height * 0.0265,
+        borderRadius: 16,
         alignItems: 'center',
-        width: '100%',
-        paddingVertical: 20,
-        backgroundColor: '#F1C40F',
-        borderRadius: 8,
-        marginBottom: 15,
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 3,
+          height: 5,
+        },
+        shadowOpacity: 0.35,
+        shadowRadius: 3,
+        elevation: 5,
+        borderWidth: 1,
+        borderColor: '#EBEBEB',
     },
     lessonTitle: {
         color: 'white',
         fontSize: 24,
-        fontWeight: '500'
+        fontWeight: '500',
+        marginLeft: 16,
     }
 })

@@ -3,7 +3,6 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView, StyleSheet, View, ActivityIndicator } from 'react-native';
 import { CircularCarousel } from '@/src/components/onboarding/index';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
 import { router } from 'expo-router';
 
 const data = [
@@ -16,7 +15,6 @@ const data = [
 
 export default function App() {
   const [firstLaunch, setFirstLaunch] = useState<boolean | null>(null);
-  const navigation = useNavigation();
 
   // Check if it's the first time the app is launched
   useEffect(() => {
@@ -28,8 +26,8 @@ export default function App() {
           await AsyncStorage.setItem('hasLaunched', 'true');
           setFirstLaunch(true);
         } else {
-          // Not first time, redirect to auth
-          setFirstLaunch(false);
+          // Not first time, redirect to auth immediately
+          router.replace('/(auth)');
         }
       } catch (error) {
         console.error('Error checking first launch:', error);
@@ -38,13 +36,6 @@ export default function App() {
 
     checkFirstLaunch();
   }, []);
-
-  // Redirect to the authentication screen if not the first launch
-  useEffect(() => {
-    if (firstLaunch === false) {
-      router.push('/(auth)');
-    }
-  }, [firstLaunch, navigation]);
 
   // Show loading indicator while checking first launch
   if (firstLaunch === null) {
