@@ -10,7 +10,7 @@ import {
     NativeSyntheticEvent,
     NativeScrollEvent,
   } from "react-native";
-  import React, { useState, useContext, useRef } from "react";
+  import React, { useState, useContext, useRef, useEffect } from "react";
   import { useNavigation } from "expo-router";
   import { RenderHTML } from "react-native-render-html";
   import {Ionicons} from "@expo/vector-icons";
@@ -19,12 +19,10 @@ import {
   const { width, height } = Dimensions.get("window");
   
   const Passage = () => {
-    const navigation = useNavigation();
     const MIN_FONT_SIZE = 14;
     const MAX_FONT_SIZE = 28;
     const DEFAULT_FONT_SIZE = 14;
     const [fontSize, setFontSize] = useState(DEFAULT_FONT_SIZE);
-    const [isQuestionSheet, setIsQuestionSheet] = useState(false);
     const {
       curIndex,
       maxIndex,
@@ -33,6 +31,15 @@ import {
     } = useContext(ReadingContext);
   
     const scrollViewRef = useRef<ScrollView | null>(null);
+
+    useEffect(() => {
+      if (scrollViewRef.current) {
+        scrollViewRef.current.scrollTo({
+          x: curIndex * width, // Assuming width is the width of each page
+          animated: false, // Set to true for a smooth animation
+        });
+      }
+    }, [curIndex, width]);
   
     const increaseFontSize = () => {
       if (fontSize < MAX_FONT_SIZE) {
@@ -50,6 +57,7 @@ import {
       const contentOffsetX = event.nativeEvent.contentOffset.x;
       const newIndex = Math.round(contentOffsetX / width);
       setCurrentIndex(newIndex);
+      console.log("newIndex: ", newIndex);
     };
     
     const scrollToPassage = (index: number) => {

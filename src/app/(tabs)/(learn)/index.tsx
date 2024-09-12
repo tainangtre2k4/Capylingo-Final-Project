@@ -140,12 +140,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 10,
     },
-    // indicator: {
-    //     width: width * .2,
-    //     borderWidth: 2,
-    //     borderColor: '#A2A7A9',
-    //     alignSelf: 'center'
-    // },
     bodyTitle: {
         fontSize: 22,
         fontWeight: '600',
@@ -158,7 +152,7 @@ const styles = StyleSheet.create({
     },
     SubjectCardsContainer: {
         flex: 1,
-        marginVertical: 30, // not finish yet
+        marginVertical: 30,
         justifyContent: 'space-between',
     }
 })
