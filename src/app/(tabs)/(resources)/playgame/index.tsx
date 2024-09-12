@@ -54,7 +54,13 @@ const TreasureHuntGame: React.FC = () => {
   : null;
 
 
-  const CustomAlert = ({ visible, message, onClose }) => {
+  type CustomAlertProps = {
+    visible: boolean;
+    message: string;
+    onClose: () => void;
+  };
+  
+  const CustomAlert: React.FC<CustomAlertProps> = ({ visible, message, onClose }) => {
     return (
       <Modal
         transparent={true}
@@ -73,13 +79,17 @@ const TreasureHuntGame: React.FC = () => {
       </Modal>
     );
   };
+  
+
   const [customAlertVisible, setCustomAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
 
-  const showCustomAlert = (message) => {
+  const showCustomAlert = (message: string) => {
     setAlertMessage(message);
     setCustomAlertVisible(true);
   };
+  
+
 
   
   // Function to handle when a level is selected
@@ -141,9 +151,14 @@ const TreasureHuntGame: React.FC = () => {
 
     if (map[newRow][newCol] === 3) {
       showCustomAlert("Victory! You completed the level!");
-      goToLevelSelection();
+
+      // Delay going back to level selection to allow the alert to be shown
+      setTimeout(() => {
+        goToLevelSelection();
+      }, 2000); // Adjust the delay as necessary (2000ms = 2 seconds)
       return;
     }
+
 
     setPlayerPosition({ row: newRow, col: newCol });
   };
