@@ -8,15 +8,14 @@ const ResourcesStack = () => {
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <StatusBar style="dark" backgroundColor="white" />
       <Stack
-        initialRouteName="resources"
         screenOptions={{
-          headerShown: false,
           ...Platform.select({
             android: {
               statusBarColor: "white",
               statusBarStyle: "dark",
             },
           }),
+          headerShown: false,
         }}
       />
     </SafeAreaView>

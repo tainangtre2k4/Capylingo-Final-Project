@@ -21,7 +21,7 @@ export default function TabsLayout(){
         return false;
       };
     return(
-        <Tabs initialRouteName="(learn)" screenOptions={{tabBarHideOnKeyboard: true}}>
+        <Tabs initialRouteName="(learn)" screenOptions={{tabBarHideOnKeyboard: true, headerShown: false}}>
             <Tabs.Screen
                 name="(learn)"
                 options={{
@@ -29,7 +29,6 @@ export default function TabsLayout(){
                     headerTitle: '',
                     tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="book-open-page-variant-outline" size={size} color="3DB2FF" />,
                     tabBarLabel: 'Learn',
-                    headerShown: false,
                     tabBarStyle: { display: checkPageToHideTabBar() ? 'none' : 'flex' }
                 }}
             />
@@ -38,7 +37,6 @@ export default function TabsLayout(){
                 options={{
                     tabBarIcon: ({ color, size }) => <Ionicons name="file-tray-full" size={size} color="3DB2FF" />,
                     tabBarLabel: 'Dictionary',
-                    headerShown: false,
                 }}
             />
             <Tabs.Screen
@@ -54,7 +52,6 @@ export default function TabsLayout(){
             <Tabs.Screen
                 name="(profile)"
                 options={{
-                    headerShown: false,
                     tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color="3DB2FF" />,
                     tabBarLabel: 'My Profile',
                 }}
