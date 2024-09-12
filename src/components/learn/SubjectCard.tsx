@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, ImageSourcePropType, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import Vocabulary from "@/src/app/(tabs)/learn/vocabulary";
+import ProgressLine from '../ProgressLine';
 
 // Define the allowed types
 type SubjectType = 'vocabulary' | 'grammar' | 'skillcheck';
@@ -21,9 +21,10 @@ const link = {
 interface SubjectCardProps {
   type: SubjectType;
   level?: number;
+  percent?: number;
 }
 
-const SubjectCard: React.FC<SubjectCardProps> = ({ type, level }) => {
+const SubjectCard: React.FC<SubjectCardProps> = ({ type, level, percent }) => {
   const label = (type === 'vocabulary') ? 'Vocabulary' : (type === 'grammar') ? 'Grammar' : 'Skill Check';
   const router = useRouter();
 
@@ -46,6 +47,9 @@ const SubjectCard: React.FC<SubjectCardProps> = ({ type, level }) => {
         <Image source={illustrationMap[type]} style={styles.subjectIllustration} />
         <View style={styles.progressContainer}>
           <Text style={styles.label}>{label}</Text>
+          { type!=='skillcheck' &&
+            <ProgressLine percentage={percent ?? 0}/>
+          }
         </View>
       </View>
     </TouchableOpacity>
