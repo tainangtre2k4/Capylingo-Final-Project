@@ -147,7 +147,7 @@ const Level: React.FC = () => {
             animationType="fade"
           >
             <View style={styles.congratulationsContainer}>
-              <MedalCelebration imageMedal={levels[level-1].image} completedLevel={level}/>
+              <MedalCelebration imageMedal={levels[level].image} completedLevel={level}/>
               {showCloseButton && (
                 <TouchableOpacity
                   style={styles.closeButton}

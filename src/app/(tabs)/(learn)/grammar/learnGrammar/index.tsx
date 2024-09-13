@@ -40,7 +40,7 @@ const LearnGrammar = () => {
             style={styles.doneButton} activeOpacity={0.6}
             onPress={()=> {
               completeLearningGrammar(user.user?.id, topicID);
-              router.replace(`/(tabs)/(learn)/resultScreen?correct=${1}&all=${1}&backPage=${'/level'}`);
+              router.navigate(`/(tabs)/(learn)/resultScreen?correct=${1}&all=${1}&backPage=${'/level'}`);
             }}
           >
             <Text style={styles.doneText}>Done</Text>

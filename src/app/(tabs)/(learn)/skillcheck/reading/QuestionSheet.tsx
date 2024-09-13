@@ -83,7 +83,7 @@ const QuestionSheet = () => {
       }
     }
 
-    router.replace({
+    router.navigate({
       pathname: "resultScreen",
       params: {
         correct: matchCount,

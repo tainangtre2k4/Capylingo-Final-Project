@@ -72,7 +72,7 @@ const VocabExercises = () => {
   useEffect(() => {
     if (exerciseLength === 0 && !loading && !error) {
       completedPracticingVocab(user.user?.id, topicID);
-      router.push(`/(tabs)/(learn)/resultScreen?correct=${0}&all=${0}&backPage=${'/level'}`);
+      router.navigate(`/(tabs)/(learn)/resultScreen?correct=${0}&all=${0}&backPage=${'/level'}`);
     }
   }, [exerciseLength, loading, error]);
 
@@ -104,7 +104,7 @@ const VocabExercises = () => {
           completedPracticingVocab(user.user?.id, topicID);
         }
 
-        router.push(`/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}&backPage=${'/level'}`);
+        router.navigate(`/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}&backPage=${'/level'}`);
       } else {
         setModalVisible(true);
       }
@@ -113,7 +113,7 @@ const VocabExercises = () => {
 
   const handleModalSubmit = () => {
     setModalVisible(false);
-    router.push(`/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}&backPage=${'/level'}`);
+    router.navigate(`/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}&backPage=${'/level'}`);
   };
   const handleModalCancel = () => {
     setModalVisible(false);

@@ -137,7 +137,7 @@ const ListeningArticle = () => {
       }
     }
 
-    router.push({
+    router.navigate({
       pathname: "resultScreen",
       params: {
         correct: matchCount,

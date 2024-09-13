@@ -82,7 +82,7 @@ const ResultScreen = () => {
         <TouchableOpacity
           style={styles.backButton}
           activeOpacity={0.6}
-          onPress={() => router.replace(backPage)}
+          onPress={() => router.navigate(backPage)}
         >
           <Text style={styles.backButtonText}>Back to Home</Text>
         </TouchableOpacity>
