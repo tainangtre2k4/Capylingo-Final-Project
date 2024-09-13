@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons, Feather, AntDesign } from '@expo/vector-icons';
 import { AdvancedImage } from 'cloudinary-react-native';
 import { cld } from '@/src/lib/cloudinary';
-import { thumbnail } from "@cloudinary/url-gen/actions/resize";
 import { focusOn } from "@cloudinary/url-gen/qualifiers/gravity";
 import { FocusOn } from "@cloudinary/url-gen/qualifiers/focusOn";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -11,6 +10,8 @@ import { supabase } from '@/src/lib/supabase';
 import PostContent from './PostContent';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '@/src/providers/AuthProvider';
+import { fit } from "@cloudinary/url-gen/actions/resize";
+
 
 // Define types for Post, User, and the handler functions
 type User = {
@@ -122,7 +123,7 @@ export default function PostListItem({ post, commentHandler, show = true, onRemo
       ? avatarUrl
       : 'user_ynfjc7'
   );
-  avatar.resize(thumbnail().width(48).height(48).gravity(focusOn(FocusOn.face())));
+  avatar.resize(fit().width(48).height(48));
 
   return (
     <View className='bg-white'>

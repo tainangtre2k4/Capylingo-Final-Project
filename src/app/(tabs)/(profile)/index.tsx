@@ -5,7 +5,7 @@ import { AdvancedImage } from 'cloudinary-react-native';
 import { router } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Image, Dimensions, TouchableOpacity } from 'react-native';
-import { thumbnail } from "@cloudinary/url-gen/actions/resize";
+import { fit } from "@cloudinary/url-gen/actions/resize";
 
 const { width } = Dimensions.get('window');
 
@@ -159,7 +159,7 @@ export default function Index() {
   };
 
   const avatarCldImage = avatar
-    ? cld.image(avatar).resize(thumbnail().width(width).height(width))
+    ? cld.image(avatar).resize(fit().width(width).height(width))
     : null;
 
   const goToComingSoon = () => {

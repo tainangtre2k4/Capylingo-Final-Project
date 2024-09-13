@@ -5,7 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { AdvancedImage } from 'cloudinary-react-native';
 import colors from '@/constants/Colors';
 import { cld, uploadImage } from '@/src/lib/cloudinary';
-import { thumbnail } from "@cloudinary/url-gen/actions/resize";
+import { fit } from "@cloudinary/url-gen/actions/resize";
 import { useNavigation, useRouter } from 'expo-router';
 import { useAuth } from '@/src/providers/AuthProvider';
 import BackButton from '@/src/components/BackButton';
@@ -128,7 +128,7 @@ const Profile = () => {
 
   // Generate the Cloudinary image URL (without using hooks inside conditional statements)
   const remoteCldImage = remoteImage
-    ? cld.image(remoteImage).resize(thumbnail().width(width).height(width))
+    ? cld.image(remoteImage).resize(fit().width(width).height(width))
     : null;
 
   return (

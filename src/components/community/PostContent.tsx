@@ -6,6 +6,8 @@ import { FocusOn } from "@cloudinary/url-gen/qualifiers/focusOn";
 import { AdvancedImage } from "cloudinary-react-native";
 import { Video, ResizeMode } from 'expo-av';
 import { fit } from "@cloudinary/url-gen/actions/resize";
+import React from "react";
+
 
 type User = {
   id: string;
