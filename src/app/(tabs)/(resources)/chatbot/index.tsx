@@ -167,14 +167,9 @@ export default function ChatScreen() {
       </View>
     </Send>
   );
-  const router = useRouter();
-
-  const backHandler = () => {
-    router.back();
-  };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+    <View style={{ flex: 1, backgroundColor: "#fff",marginBottom: 40 }}>
       <GiftedChat
         messages={messages}
         isTyping={loading}
