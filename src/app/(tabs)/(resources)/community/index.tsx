@@ -5,6 +5,8 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
+  StatusBar as RNStatusBar,
+  Platform,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import PostListItem from "@/src/components/community/PostListItem";
@@ -17,7 +19,6 @@ import {
 } from "@expo/vector-icons"; // Import icon for Saved posts
 import { useAuth } from "@/src/providers/AuthProvider";
 import BackButton from "@/src/components/BackButton";
-
 
 type User = {
   id: string;
@@ -92,7 +93,7 @@ const FeedScreen = () => {
     let { data, error } = await supabase
       .from("posts")
       .select(
-        "*,user:profiles(*),my_likes:likesPost(*),likesPost(count),comments(count)"
+        "*,user:profiles(*),my_likes:likesPost(*),likesPost(count),comments(count)",
       )
       .eq("my_likes.user_id", user?.id);
 
@@ -165,7 +166,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: 8,
     backgroundColor: "white",
     paddingHorizontal: 20,
     elevation: 4,
@@ -173,6 +173,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     shadowColor: "black",
+    paddingTop:
+      Platform.OS === "android" ? (RNStatusBar.currentHeight ?? 0) + 8 : 8,
+    paddingBottom: 8,
   },
   headerTitle: {
     fontSize: 22,

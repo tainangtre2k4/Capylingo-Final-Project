@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
   Platform,
-  StatusBar as RNStatusBar
+  StatusBar as RNStatusBar,
 } from "react-native";
 import { Audio } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
@@ -46,7 +46,7 @@ const History = () => {
           },
           style: "destructive",
         },
-      ]
+      ],
     );
   };
 
@@ -227,7 +227,7 @@ const History = () => {
   return (
     <View style={styles.container}>
       <FlatList
-        data={history}
+        data={[...history].reverse()}
         renderItem={renderHistoryItem}
         keyExtractor={(item, index) => index.toString()}
         overScrollMode="never"
@@ -246,7 +246,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingTop: Platform.OS === "android" ? (RNStatusBar.currentHeight ?? 0) + 8 : 8,
+    paddingTop:
+      Platform.OS === "android" ? (RNStatusBar.currentHeight ?? 0) + 8 : 8,
     paddingBottom: 8,
   },
   headerTitle: {

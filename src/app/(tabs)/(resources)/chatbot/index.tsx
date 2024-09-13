@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
+import {
+  TouchableOpacity,
+  View,
+  Text,
+  StyleSheet,
+  StatusBar as RNStatusBar,
+} from "react-native";
 import {
   Bubble,
   GiftedChat,
@@ -55,7 +61,7 @@ export default function ChatScreen() {
       setMessages([
         {
           _id: 1,
-          text: `Hello, I am Raichu, How Can I help you? 
+          text: `Hello, I am Raichu, How Can I help you?
           \nThe first message can be longer, please wait a minute.
           \nIf any error occurs, please reopen the chat bot, and I'll be back to assist you.`,
           createdAt: new Date(),
@@ -73,7 +79,7 @@ export default function ChatScreen() {
 
   const onSend = useCallback((messages: IMessage[] = []) => {
     setMessages((previousMessages) =>
-      GiftedChat.append(previousMessages, messages as ChatMessage[])
+      GiftedChat.append(previousMessages, messages as ChatMessage[]),
     );
     if (messages[0]?.text) {
       getBardResp(messages[0].text);
@@ -100,7 +106,7 @@ export default function ChatScreen() {
           },
         ];
         setMessages((previousMessages) =>
-          GiftedChat.append(previousMessages, chatAIResp)
+          GiftedChat.append(previousMessages, chatAIResp),
         );
         break; // Exit loop if successful
       } catch (error) {
@@ -129,7 +135,7 @@ export default function ChatScreen() {
             },
           ];
           setMessages((previousMessages) =>
-            GiftedChat.append(previousMessages, errorResponse)
+            GiftedChat.append(previousMessages, errorResponse),
           );
         }
       }
@@ -169,7 +175,7 @@ export default function ChatScreen() {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff",marginBottom: 40 }}>
+    <View style={{ flex: 1, backgroundColor: "#fff", paddingBottom: 10 }}>
       <GiftedChat
         messages={messages}
         isTyping={loading}
@@ -190,11 +196,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     backgroundColor: "white",
     paddingHorizontal: 20,
-    elevation: 4,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    shadowColor: "black",
   },
   headerTitle: {
     fontSize: 22,

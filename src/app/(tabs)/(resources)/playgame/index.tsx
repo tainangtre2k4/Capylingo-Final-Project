@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
+  StatusBar as RNStatusBar,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { levels } from "@/constants/gameData"; // Import levels data from gameData.ts
@@ -47,7 +48,7 @@ const TreasureHuntGame: React.FC = () => {
   const [currentLevel, setCurrentLevel] = useState<number | null>(null); // No level selected initially
   const [map, setMap] = useState<number[][] | null>(null);
   const [playerPosition, setPlayerPosition] = useState<PlayerPosition | null>(
-    null
+    null,
   );
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null); // Store the current question object
@@ -56,21 +57,15 @@ const TreasureHuntGame: React.FC = () => {
   const [gridSize, setGridSize] = useState<number | null>(null); // Dynamically set grid size
 
   const characterCldImage = characterImageUri
-    ? cld
-        .image(characterImageUri)
-        .resize(thumbnail().width(500).height(500))
+    ? cld.image(characterImageUri).resize(thumbnail().width(500).height(500))
     : null;
 
   const stoneCldImage = blackStoneImageUri
-    ? cld
-        .image(blackStoneImageUri)
-        .resize(thumbnail().width(500).height(500))
+    ? cld.image(blackStoneImageUri).resize(thumbnail().width(500).height(500))
     : null;
 
   const treasureCldImage = treasureImageUri
-    ? cld
-        .image(treasureImageUri)
-        .resize(thumbnail().width(500).height(500))
+    ? cld.image(treasureImageUri).resize(thumbnail().width(500).height(500))
     : null;
 
   type CustomAlertProps = {
@@ -357,7 +352,7 @@ const TreasureHuntGame: React.FC = () => {
         <Text style={{fontWeight: 'bold'}}>Game Introduction: </Text>
         <Text>Help the capybara find the treasure by crossing water puddles and avoiding blocking stones.</Text>
         </Text>
-   
+
         <Text style={{margin: 16}}>
         <Text style={{fontWeight: 'bold'}}>How to Play: </Text>
         <Text>Use the arrow keys to move the capybara. Answer questions correctly to pass through stones, but be careful—wrong answers will add more obstacles!</Text>
@@ -464,6 +459,7 @@ const TreasureHuntGame: React.FC = () => {
           position: "absolute",
           zIndex: 2,
           left: 20,
+          top: 20,
         }}
       >
         <BackButton iconColor="black" />
@@ -534,20 +530,32 @@ const TreasureHuntGame: React.FC = () => {
 
       {/* Arrow Controls */}
       <View style={styles.controls}>
-        <TouchableOpacity onPress={() => movePlayer("up")} style={styles.controller}>
+        <TouchableOpacity
+          onPress={() => movePlayer("up")}
+          style={styles.controller}
+        >
           <Ionicons name="arrow-up" size={30} color="white" />
         </TouchableOpacity>
         <View style={styles.horizontalControls}>
-          <TouchableOpacity onPress={() => movePlayer("left")} style={styles.controller}>
+          <TouchableOpacity
+            onPress={() => movePlayer("left")}
+            style={styles.controller}
+          >
             <Ionicons name="arrow-back" size={30} color="white" />
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => movePlayer("right")} style={styles.controller}>
+          <TouchableOpacity
+            onPress={() => movePlayer("right")}
+            style={styles.controller}
+          >
             <Ionicons name="arrow-forward" size={30} color="white" />
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity onPress={() => movePlayer("down")} style={styles.controller}>
+        <TouchableOpacity
+          onPress={() => movePlayer("down")}
+          style={styles.controller}
+        >
           <Ionicons name="arrow-down" size={30} color="white" />
         </TouchableOpacity>
       </View>
@@ -762,7 +770,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     shadowColor: "black",
-  }
+  },
 });
 
 export default TreasureHuntGame;

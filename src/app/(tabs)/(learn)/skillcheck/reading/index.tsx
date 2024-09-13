@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   View,
   Platform,
+  StatusBar as RNStatusBar,
 } from "react-native";
 import React, { useEffect, useState, useContext } from "react";
 import { useNavigation } from "expo-router";
@@ -28,7 +29,10 @@ const ReadingTest = () => {
           <BackButton />
           <HeaderProgressTracker current={curIndex + 1} all={maxIndex + 1} />
           <TouchableOpacity
-            style={[styles.headerRightIconContainer, {backgroundColor: isQuestionSheet ? '#0693F1' : 'white'}]}
+            style={[
+              styles.headerRightIconContainer,
+              { backgroundColor: isQuestionSheet ? "#0693F1" : "white" },
+            ]}
             onPress={() => {
               console.log(isQuestionSheet);
               setIsQuestionSheet(!isQuestionSheet);
@@ -54,12 +58,9 @@ const ReadingTest = () => {
       headerTitleStyle: {
         color: "white",
       },
-      ...Platform.select({
-        android: {
-          statusBarColor: "white",
-          statusBarStyle: "dark",
-        },
-      }),
+      statusBarColor: "transparent",
+      statusBarTranslucent: true,
+      statusBarStyle: "dark",
     });
   }, [isQuestionSheet, navigation, curIndex, maxIndex]);
 
@@ -74,8 +75,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 20,
-    paddingVertical: 12,
     backgroundColor: "white",
+    paddingTop:
+      Platform.OS === "android" ? (RNStatusBar.currentHeight ?? 0) + 8 : 8,
+    paddingBottom: 8,
   },
   horizontalScrollView: {
     flex: 1,

@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
   Platform,
+  StatusBar as RNStatusBar,
 } from "react-native";
 import React, {
   useCallback,
@@ -250,7 +251,7 @@ const ListeningArticle = () => {
                       text: "Submit",
                       onPress: showGrade,
                     },
-                  ]
+                  ],
                 );
               }}
             >
@@ -271,13 +272,16 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 20,
-    paddingVertical: 12,
     backgroundColor: "white",
+    paddingTop:
+      Platform.OS === "android" ? (RNStatusBar.currentHeight ?? 0) + 8 : 8,
+    paddingBottom: 8,
   },
   container: {
     flex: 1,
     backgroundColor: "white",
     paddingHorizontal: 20,
+    paddingTop: 10,
   },
   scrollViewContainer: {
     marginTop: 10,

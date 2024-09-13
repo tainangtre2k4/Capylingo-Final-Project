@@ -57,7 +57,7 @@ const Flashcard: React.FC<FlashcardProps> = ({
       try {
         await AsyncStorage.setItem(
           STORAGE_KEYS.favorite,
-          JSON.stringify(favorite)
+          JSON.stringify(favorite),
         );
       } catch (error) {
         console.error("Failed to save data to storage", error);
@@ -71,7 +71,8 @@ const Flashcard: React.FC<FlashcardProps> = ({
     return favorite.includes(word);
   };
 
-  const addFavorite = (word: string) => {
+  const addFavorite = async (word: string) => {
+    await loadPersistedData();
     setFavorite((prev) => [...prev, word]);
   };
 
@@ -79,11 +80,19 @@ const Flashcard: React.FC<FlashcardProps> = ({
     setFavorite((prev) => prev.filter((fav) => fav !== word));
   };
 
-  const toggleFavorite = () => {
+  const toggleFavorite = async () => {
     if (isFavorite(word)) {
       removeFavorite(word);
     } else {
-      addFavorite(word);
+      await addFavorite(word);
+    }
+  };
+  const loadPersistedData = async () => {
+    try {
+      const savedFavorite = await AsyncStorage.getItem(STORAGE_KEYS.favorite);
+      if (savedFavorite) setFavorite(JSON.parse(savedFavorite));
+    } catch (error) {
+      console.error("Failed to load data from storage", error);
     }
   };
 
@@ -135,7 +144,7 @@ const Flashcard: React.FC<FlashcardProps> = ({
     try {
       // Fetch word data from the API
       const response = await fetch(
-        `https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`
+        `https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`,
       );
       const data: WordData[] = await response.json();
 
@@ -148,7 +157,7 @@ const Flashcard: React.FC<FlashcardProps> = ({
 
       // Find the first available audio URL
       const audioUrl = wordData.phonetics.find(
-        (phonetic) => phonetic.audio
+        (phonetic) => phonetic.audio,
       )?.audio;
 
       if (!audioUrl) {

@@ -59,11 +59,11 @@ const QuickSearch = () => {
       try {
         await AsyncStorage.setItem(
           STORAGE_KEYS.favorite,
-          JSON.stringify(favorite)
+          JSON.stringify(favorite),
         );
         await AsyncStorage.setItem(
           STORAGE_KEYS.history,
-          JSON.stringify(history)
+          JSON.stringify(history),
         );
       } catch (error) {
         console.error("Failed to save data to storage", error);
@@ -84,7 +84,7 @@ const QuickSearch = () => {
       if (JSON.stringify(parsedFavorite) !== JSON.stringify(favorite)) {
         await AsyncStorage.setItem(
           STORAGE_KEYS.favorite,
-          JSON.stringify(favorite)
+          JSON.stringify(favorite),
         );
         setFavorite(parsedFavorite);
       }
@@ -92,7 +92,7 @@ const QuickSearch = () => {
       if (JSON.stringify(parsedHistory) !== JSON.stringify(history)) {
         await AsyncStorage.setItem(
           STORAGE_KEYS.history,
-          JSON.stringify(history)
+          JSON.stringify(history),
         );
         setHistory(parsedHistory);
       }
@@ -156,9 +156,18 @@ const QuickSearch = () => {
   const handleSearch = useCallback(async () => {
     setModalVisible(true);
     await checkAndUpdateStorage(); // Check and update history and favorites
-    fetchWordData();
-    if (!history.includes(searchTerm) && error === null) updateHistory();
-  }, [fetchWordData, updateHistory, checkAndUpdateStorage]);
+    await fetchWordData();
+    if (!history.includes(searchTerm) && error === null) {
+      updateHistory();
+    }
+  }, [
+    searchTerm,
+    fetchWordData,
+    updateHistory,
+    checkAndUpdateStorage,
+    history,
+    error,
+  ]);
 
   const handleCloseModal = useCallback(() => {
     setModalVisible(false);
@@ -180,7 +189,9 @@ const QuickSearch = () => {
         <TouchableOpacity
           style={styles.searchButton}
           onPress={() => {
-            if (searchTerm !== "") handleSearch;
+            if (searchTerm.trim() !== "") {
+              handleSearch();
+            }
           }}
         >
           <Ionicons name="search-outline" size={18} color="white" />
