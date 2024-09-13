@@ -58,19 +58,19 @@ const TreasureHuntGame: React.FC = () => {
   const characterCldImage = characterImageUri
     ? cld
         .image(characterImageUri)
-        .resize(thumbnail().width(screenWidth).height(screenWidth))
+        .resize(thumbnail().width(500).height(500))
     : null;
 
   const stoneCldImage = blackStoneImageUri
     ? cld
         .image(blackStoneImageUri)
-        .resize(thumbnail().width(screenWidth).height(screenWidth))
+        .resize(thumbnail().width(500).height(500))
     : null;
 
   const treasureCldImage = treasureImageUri
     ? cld
         .image(treasureImageUri)
-        .resize(thumbnail().width(screenWidth).height(screenWidth))
+        .resize(thumbnail().width(500).height(500))
     : null;
 
   type CustomAlertProps = {

@@ -125,7 +125,7 @@ const Profile = () => {
 
   // Generate the Cloudinary image URL (without using hooks inside conditional statements)
   const remoteCldImage = remoteImage
-    ? cld.image(remoteImage).resize(fit().width(width).height(width))
+    ? cld.image(remoteImage).resize(fit().width(500).height(500))
     : null;
 
   return (

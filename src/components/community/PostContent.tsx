@@ -26,11 +26,10 @@ type Post = {
 };
 
 export default function PostContent({ post }: { post: Post }) {
-  const { width } = useWindowDimensions();
 
   if (post.media_type === 'image') {
     const image = cld.image(post.image);
-    image.resize(fit().height(width + 10).aspectRatio("1.0"));
+    image.resize(fit().width(500).height(500));
     return <AdvancedImage cldImg={image} className="w-full aspect-[6/3]" />;
   }
 

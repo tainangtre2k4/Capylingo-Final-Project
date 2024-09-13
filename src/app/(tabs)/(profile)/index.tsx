@@ -37,33 +37,6 @@ export default function Index() {
       }
       setAvatar(data.avatar_url);
       setUserName(data.username);
-
-      const learnTimeInMinutes = Number(data.total_learn_time) * 60;
-      if (!isNaN(learnTimeInMinutes)) {
-        const formattedLearnTime = formatTime(learnTimeInMinutes);
-        setTotalLearnTime(formattedLearnTime);
-      } else {
-        setTotalLearnTime('Loading...'); // or handle error
-      }
-
-    } catch (error: any) {
-      console.log('Error fetching user data:', error.message);
-    }
-  };
-
-  const getLevel = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('level')
-        .eq('id', user?.id)
-        .single();
-  
-      if (error) {
-        throw error;
-      }
-  
-      // Set the level only if data is available
       setLevel(data?.level + 1 ?? 0); // Default to 0 if level is null or undefined
 
       let levelText = '';
@@ -82,13 +55,20 @@ export default function Index() {
           levelText = 'Newbie'; // Default to empty if level is not defined
       }
       setUserLevel(levelText);
-  
+
+      const learnTimeInMinutes = Number(data.total_learn_time) * 60;
+      if (!isNaN(learnTimeInMinutes)) {
+        const formattedLearnTime = formatTime(learnTimeInMinutes);
+        setTotalLearnTime(formattedLearnTime);
+      } else {
+        setTotalLearnTime('Loading...'); // or handle error
+      }
+
     } catch (error: any) {
-      console.log('Error fetching level:', error.message);
+      console.log('Error fetching user data:', error.message);
     }
-
-
   };
+
   
   const updateLearnTime = async () => {
     try {
@@ -133,7 +113,6 @@ export default function Index() {
 
   useEffect(() => {
     fetchUserData();
-    getLevel();
 
     // Set up an interval to update the database every minute
     intervalRef.current = setInterval(() => {
@@ -159,7 +138,7 @@ export default function Index() {
   };
 
   const avatarCldImage = avatar
-    ? cld.image(avatar).resize(fit().width(width).height(width))
+    ? cld.image(avatar).resize(fit().width(500).height(500))
     : null;
 
   const goToComingSoon = () => {
