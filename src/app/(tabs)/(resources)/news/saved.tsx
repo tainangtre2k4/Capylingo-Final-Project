@@ -70,6 +70,9 @@ const Saved = (props: Props) => {
           <Text style={styles.headerTitle}>Saved</Text>
         </View>
       ),
+      statusBarColor: "transparent",
+      statusBarTranslucent: false,
+      statusBarStyle: "dark",
     });
   }, [navigation]);
 

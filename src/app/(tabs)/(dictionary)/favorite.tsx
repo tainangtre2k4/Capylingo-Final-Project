@@ -8,6 +8,8 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Platform,
+  StatusBar as RNStatusBar
 } from "react-native";
 import { Audio } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
@@ -265,6 +267,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    paddingTop: Platform.OS === "android" ? (RNStatusBar.currentHeight ?? 0) + 8 : 8,
+    paddingBottom: 8,
   },
   headerTitle: {
     fontSize: 22,

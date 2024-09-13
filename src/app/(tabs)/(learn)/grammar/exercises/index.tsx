@@ -1,18 +1,34 @@
-import { ActivityIndicator, Platform, Image, Modal, TouchableOpacity, Text, StyleSheet, Dimensions, ScrollView, View, StatusBar as RNStatusBar } from 'react-native';
-import React, { useEffect, useState, useRef } from 'react';
+import {
+  ActivityIndicator,
+  Platform,
+  Image,
+  Modal,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  Dimensions,
+  ScrollView,
+  View,
+  StatusBar as RNStatusBar,
+} from "react-native";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigation, useLocalSearchParams } from "expo-router";
-import ProgressTracker from '@/src/components/ProgressTracker';
+import ProgressTracker from "@/src/components/ProgressTracker";
 import { StatusBar } from "expo-status-bar";
-import { useRouter } from 'expo-router';
-import { getGrammarExType1List, getGrammarExType2List, getGrammarExType3List } from '@/src/fetchData/fetchLearn'
+import { useRouter } from "expo-router";
+import {
+  getGrammarExType1List,
+  getGrammarExType2List,
+  getGrammarExType3List,
+} from "@/src/fetchData/fetchLearn";
 import BackButton from "@/src/components/BackButton";
-import ExGrammarType1 from '@/src/components/exercise/GrammarType1/GrammarType1';
-import ExGrammarType2 from '@/src/components/exercise/GrammarType2/GrammarType2';
-import ExGrammarType3 from '@/src/components/exercise/VocabType2/VocabType2';
-import { completedPracticingGrammar } from '@/src/updateData/updateLearningProgress';
-import { useAuth } from '@/src/providers/AuthProvider';
+import ExGrammarType1 from "@/src/components/exercise/GrammarType1/GrammarType1";
+import ExGrammarType2 from "@/src/components/exercise/GrammarType2/GrammarType2";
+import ExGrammarType3 from "@/src/components/exercise/VocabType2/VocabType2";
+import { completedPracticingGrammar } from "@/src/updateData/updateLearningProgress";
+import { useAuth } from "@/src/providers/AuthProvider";
 
-const { width, height } = Dimensions.get('screen');
+const { width, height } = Dimensions.get("screen");
 
 const GrammarExercises = () => {
   const navigation = useNavigation();
@@ -53,7 +69,10 @@ const GrammarExercises = () => {
     fetchData();
   }, []);
 
-  const exerciseLength = grammarType1Exercises.length + grammarType2Exercises.length + grammarType3Exercises.length;
+  const exerciseLength =
+    grammarType1Exercises.length +
+    grammarType2Exercises.length +
+    grammarType3Exercises.length;
 
   useEffect(() => {
     navigation.setOptions({
@@ -61,32 +80,43 @@ const GrammarExercises = () => {
       header: () => (
         <View style={styles.headerContainer}>
           <BackButton />
-          <ProgressTracker current={currentIndex} all={Math.max(exerciseLength, 1)} />
+          <ProgressTracker
+            current={currentIndex}
+            all={Math.max(exerciseLength, 1)}
+          />
           <View style={styles.headerFillerContainer} />
         </View>
       ),
-      ...Platform.select({
-        android: {
-          statusBarColor: 'white',
-          statusBarStyle: 'dark',
-        }
-      })
+      statusBarColor: "transparent",
+      statusBarTranslucent: true,
+      statusBarStyle: "dark",
     });
   }, [navigation, currentIndex, exerciseLength]);
 
   useEffect(() => {
     if (exerciseLength === 0 && !loading && !error) {
       completedPracticingGrammar(user.user?.id, topicID);
-      router.push(`/(tabs)/(learn)/resultScreen?correct=${0}&all=${0}&backPage=${'/level'}`);
+      router.push(
+        `/(tabs)/(learn)/resultScreen?correct=${0}&all=${0}&backPage=${"/level"}`
+      );
     }
   }, [exerciseLength, loading, error]);
 
   if (loading) {
     return (
-        <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}>
-            <ActivityIndicator size="large" color="#2980B9" />
-            <Text style={{ marginTop: 10,fontSize: 20, fontWeight: '500', color: '#0693F1',}}>Loading...</Text>
-        </View>
+      <View style={{ justifyContent: "center", alignItems: "center", flex: 1 }}>
+        <ActivityIndicator size="large" color="#2980B9" />
+        <Text
+          style={{
+            marginTop: 10,
+            fontSize: 20,
+            fontWeight: "500",
+            color: "#0693F1",
+          }}
+        >
+          Loading...
+        </Text>
+      </View>
     );
   }
 
@@ -104,12 +134,13 @@ const GrammarExercises = () => {
     } else {
       const totalAnswered = numberCorrectAnswers + numberIncorrectAnswers;
       if (totalAnswered === exerciseLength) {
-
-        if (numberCorrectAnswers/exerciseLength >= 0.8){
+        if (numberCorrectAnswers / exerciseLength >= 0.8) {
           completedPracticingGrammar(user.user?.id, topicID);
         }
 
-        router.push(`/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}&backPage=${'/level'}`);
+        router.push(
+          `/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}&backPage=${"/level"}`
+        );
       } else {
         setModalVisible(true);
       }
@@ -118,162 +149,192 @@ const GrammarExercises = () => {
 
   const handleModalSubmit = () => {
     setModalVisible(false);
-    router.push(`/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}&backPage=${'/level'}`);
+    router.push(
+      `/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}&backPage=${"/level"}`
+    );
   };
   const handleModalCancel = () => {
     setModalVisible(false);
   };
 
   return (
-      <View style={styles.container}>
-        <ScrollView
-          ref={scrollViewRef}
-          horizontal
-          pagingEnabled
-          onScroll={(event) => {
-            const newIndex = Math.round(event.nativeEvent.contentOffset.x / width);
-            if (newIndex !== currentIndex) {
-              setCurrentIndex(newIndex);
-            }
-          }}
-          scrollEventThrottle={32}
-          showsHorizontalScrollIndicator={false}
-        >
-          {grammarType1Exercises.map((exercise, index) => (
-            <View style={{ width }} key={`type1-${index}`}>
-              <ExGrammarType1
-                key={index}
-                onNext={goToNextExercise}
-                question={exercise.question}
-                answer={exercise.answer}
-                onCorrectAnswer={() => setNumberCorrectAnswers(prev => prev + 1)}
-                onIncorrectAnswer={() => setNumberIncorrectAnswers(prev => prev + 1)}
-              />
-            </View>
-          ))}
+    <View style={styles.container}>
+      <ScrollView
+        ref={scrollViewRef}
+        horizontal
+        pagingEnabled
+        onScroll={(event) => {
+          const newIndex = Math.round(
+            event.nativeEvent.contentOffset.x / width
+          );
+          if (newIndex !== currentIndex) {
+            setCurrentIndex(newIndex);
+          }
+        }}
+        scrollEventThrottle={32}
+        showsHorizontalScrollIndicator={false}
+      >
+        {grammarType1Exercises.map((exercise, index) => (
+          <View style={{ width }} key={`type1-${index}`}>
+            <ExGrammarType1
+              key={index}
+              onNext={goToNextExercise}
+              question={exercise.question}
+              answer={exercise.answer}
+              onCorrectAnswer={() =>
+                setNumberCorrectAnswers((prev) => prev + 1)
+              }
+              onIncorrectAnswer={() =>
+                setNumberIncorrectAnswers((prev) => prev + 1)
+              }
+            />
+          </View>
+        ))}
 
-          {grammarType2Exercises.map((exercise, index) => (
-            <View style={{ width }} key={`type2-${index}`}>
-              <ExGrammarType2
-                key={index}
-                onNext={goToNextExercise}
-                words={exercise.words}
-                correctAnswer={exercise.correctAnswer}
-                onCorrectAnswer={() => setNumberCorrectAnswers(prev => prev + 1)}
-                onIncorrectAnswer={() => setNumberIncorrectAnswers(prev => prev + 1)}
-              />
-            </View>
-          ))}
-          {grammarType3Exercises.map((exercise, index) => (
-            <View style={{ width }} key={`type3-${index}`}>
-              <ExGrammarType3
-                key={index}
-                onNext={goToNextExercise}
-                question={exercise.question}
-                correctAnswerIndex={exercise.correctAnswerIndex - 1}
-                answers={exercise.answers}
-                onCorrectAnswer={() => setNumberCorrectAnswers(prev => prev + 1)}
-                onIncorrectAnswer={() => setNumberIncorrectAnswers(prev => prev + 1)}
-              />
-            </View>
-          ))}
-        </ScrollView>
+        {grammarType2Exercises.map((exercise, index) => (
+          <View style={{ width }} key={`type2-${index}`}>
+            <ExGrammarType2
+              key={index}
+              onNext={goToNextExercise}
+              words={exercise.words}
+              correctAnswer={exercise.correctAnswer}
+              onCorrectAnswer={() =>
+                setNumberCorrectAnswers((prev) => prev + 1)
+              }
+              onIncorrectAnswer={() =>
+                setNumberIncorrectAnswers((prev) => prev + 1)
+              }
+            />
+          </View>
+        ))}
+        {grammarType3Exercises.map((exercise, index) => (
+          <View style={{ width }} key={`type3-${index}`}>
+            <ExGrammarType3
+              key={index}
+              onNext={goToNextExercise}
+              question={exercise.question}
+              correctAnswerIndex={exercise.correctAnswerIndex - 1}
+              answers={exercise.answers}
+              onCorrectAnswer={() =>
+                setNumberCorrectAnswers((prev) => prev + 1)
+              }
+              onIncorrectAnswer={() =>
+                setNumberIncorrectAnswers((prev) => prev + 1)
+              }
+            />
+          </View>
+        ))}
+      </ScrollView>
 
-        <Modal
-          visible={isModalVisible}
-          transparent
-          animationType="slide"
-          onRequestClose={handleModalCancel}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Image source={require('@/assets/images/capyDecoreBox.png')} style={styles.capyModal} />
-              <Text style={styles.modalText}>You haven't completed all the questions. Are you sure you want to submit?</Text>
-              <View style={styles.modalButtons}>
-                <TouchableOpacity onPress={handleModalCancel} style={styles.modalButtonCancel}>
-                  <Text style={styles.modalButtonText}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={handleModalSubmit} style={styles.modalButtonSubmit}>
-                  <Text style={styles.modalButtonText}>Submit</Text>
-                </TouchableOpacity>
-              </View>
+      <Modal
+        visible={isModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={handleModalCancel}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Image
+              source={require("@/assets/images/capyDecoreBox.png")}
+              style={styles.capyModal}
+            />
+            <Text style={styles.modalText}>
+              You haven't completed all the questions. Are you sure you want to
+              submit?
+            </Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                onPress={handleModalCancel}
+                style={styles.modalButtonCancel}
+              >
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleModalSubmit}
+                style={styles.modalButtonSubmit}
+              >
+                <Text style={styles.modalButtonText}>Submit</Text>
+              </TouchableOpacity>
             </View>
           </View>
-        </Modal>
-      </View>
+        </View>
+      </Modal>
+    </View>
   );
 };
 
-
 const styles = StyleSheet.create({
   headerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    backgroundColor: 'white',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingBottom: 10,
+    backgroundColor: "white",
     paddingHorizontal: 20,
+    paddingTop:
+      Platform.OS === "android" ? (RNStatusBar.currentHeight ?? 0) + 10 : 10,
   },
   headerFillerContainer: {
     height: 42,
     width: 42,
-    backgroundColor: 'white',
+    backgroundColor: "white",
   },
   container: {
     flex: 1,
-    alignItems: 'center',
-    backgroundColor: 'white',
+    alignItems: "center",
+    backgroundColor: "white",
+    paddingTop: 20,
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   capyModal: {
     width: width * 0.14,
     height: width * 0.14,
-    resizeMode: 'contain',
-    position: 'absolute',
+    resizeMode: "contain",
+    position: "absolute",
     top: -0.08 * width,
     right: -2,
   },
   modalContent: {
-    width: '82%',
+    width: "82%",
     padding: 0.066 * width,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 0.04 * width,
-    alignItems: 'center',
+    alignItems: "center",
   },
   modalText: {
     fontSize: 20,
     marginBottom: height * 0.025,
-    textAlign: 'center',
+    textAlign: "center",
   },
   modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
   },
   modalButtonCancel: {
-    backgroundColor: '#A9A9A9',
+    backgroundColor: "#A9A9A9",
     padding: 0.026 * width,
     borderRadius: 0.026 * width,
     flex: 1,
     marginRight: 0.026 * width,
-    alignItems: 'center',
+    alignItems: "center",
   },
   modalButtonSubmit: {
-    backgroundColor: '#4095F1',
+    backgroundColor: "#4095F1",
     padding: 0.026 * width,
     borderRadius: 0.026 * width,
     flex: 1,
     marginLeft: 0.026 * width,
-    alignItems: 'center',
+    alignItems: "center",
   },
   modalButtonText: {
-    color: 'white',
-    fontWeight: '700',
+    color: "white",
+    fontWeight: "700",
     fontSize: 17,
   },
 });

@@ -58,12 +58,7 @@ const LearnVocab = () => {
           <View style={styles.headerFillerContainer} />
         </View>
       ),
-      ...Platform.select({
-        android: {
-          statusBarColor: "#f5f5f5",
-          statusBarStyle: "dark",
-        },
-      }),
+      statusBarStyle: "dark",
     });
   }, [navigation, currentIndex, incorrectVocabs.length]);
 
@@ -170,9 +165,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: height * 0.01477,
-    backgroundColor: "#f5f5f5",
     paddingHorizontal: width * 0.0533,
+    backgroundColor: "white",
+    paddingTop: Platform.OS === "android" ? (RNStatusBar.currentHeight ?? 0) + 10 : 10,
+    paddingBottom: 8,
   },
   headerFillerContainer: {
     height: height * 0.05,

@@ -7,7 +7,8 @@ const ResourcesStack = () => {
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <Stack
         screenOptions={{
-          statusBarColor: "white",
+          statusBarColor: "transparent",
+          statusBarTranslucent: true,
           statusBarStyle: "dark",
           headerShown: false,
         }}

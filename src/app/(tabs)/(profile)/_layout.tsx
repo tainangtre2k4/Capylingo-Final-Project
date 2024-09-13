@@ -11,8 +11,10 @@ export default function ProfileLayout() {
           headerShown: false,
           ...Platform.select({
             android: {
-              statusBarColor: "#3DB2FF",
+              statusBarColor: "transparent",
+              statusBarTranslucent: true,
               statusBarStyle: "light",
+              headerShown: false,
             },
           }),
         }}

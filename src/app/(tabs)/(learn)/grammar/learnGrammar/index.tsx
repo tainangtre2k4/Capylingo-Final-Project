@@ -22,7 +22,7 @@ const LearnGrammar = () => {
   useEffect(() => {
     if (lectureLink === 'null' || !lectureLink) {
       completeLearningGrammar(user.user?.id, topicID);
-      router.push(`/(tabs)/(learn)/resultScreen?correct=${1}&all=${1}&backPage=${'/level'}`);
+      router.replace(`/(tabs)/(learn)/resultScreen?correct=${1}&all=${1}&backPage=${'/level'}`);
     }
   }, [navigation]);
 
@@ -31,13 +31,16 @@ const LearnGrammar = () => {
       headerShown: true,
       header: () => (
         <View style={styles.headerContainer}>
-          <BackButton />
-          <Text style={styles.headerTitle}>Grammar</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <BackButton iconColor="black" />
+            <View style={{ marginHorizontal: 8 }} />
+            <Text style={styles.headerTitle}>Grammar</Text>
+          </View>
           <TouchableOpacity 
             style={styles.doneButton} activeOpacity={0.6}
             onPress={()=> {
               completeLearningGrammar(user.user?.id, topicID);
-              router.push(`/(tabs)/(learn)/resultScreen?correct=${1}&all=${1}&backPage=${'/level'}`);
+              router.replace(`/(tabs)/(learn)/resultScreen?correct=${1}&all=${1}&backPage=${'/level'}`);
             }}
           >
             <Text style={styles.doneText}>Done</Text>
@@ -67,7 +70,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: height * 0.013,
+    paddingBottom: 8,
+    paddingTop: Platform.OS === 'android' ? (RNStatusBar.currentHeight ?? 0) + 8 : 8, 
     backgroundColor: '#3DB2FF',
     paddingHorizontal: width * 0.0533,
   },

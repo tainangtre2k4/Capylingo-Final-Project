@@ -4,7 +4,7 @@ import { useAuth } from '@/src/providers/AuthProvider';
 import { AdvancedImage } from 'cloudinary-react-native';
 import { router } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, Image, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, Image, Dimensions, TouchableOpacity, Platform, StatusBar as RNStatusBar } from 'react-native';
 import { fit } from "@cloudinary/url-gen/actions/resize";
 
 const { width } = Dimensions.get('window');
@@ -190,7 +190,7 @@ export default function Index() {
               style={styles.avatar}
             />
           )}
-          <View style={{ padding: 15.6 }}>
+          <View style={{ padding: 16 }}>
             <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 8 }}>{userName}</Text>
             <Text style={{ fontSize: 16, color: '#898989' }}>{userLevel}</Text>
           </View>
@@ -294,11 +294,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'white',
     fontWeight: 'bold',
+    marginTop: Platform.OS === 'android' ? (RNStatusBar.currentHeight ?? 0) + 4 : 4,
   },
   backgroundImage: {
     position: 'absolute',
     width: width,
-    height: 250,
+    height: 270,
     zIndex: -1,
   },
   avatar: {

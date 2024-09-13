@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import colors from '@/constants/Colors';
 import { supabase } from '@/src/lib/supabase';
 import {useNavigation, router} from 'expo-router'
+import React from 'react';
 
 const Register = () => {
   const navigation = useNavigation();
@@ -39,8 +40,6 @@ const Register = () => {
     <View style={styles.container}>
       <Spinner visible={loading} />
 
-      
-        <>
           <View>
             <Text style={styles.title}>Enter Your Email</Text>
             <TextInput autoCapitalize="none" placeholder="yourgmail@gmail.com" value={emailAddress} onChangeText={setEmailAddress} style={styles.inputField} />
@@ -53,8 +52,6 @@ const Register = () => {
           <View style={styles.button}>         
              <Button onPress={signUpWithEmail} title="Sign up" color={colors.base.black0}></Button>
           </View>
-        </>
-
     </View>
   );
 };

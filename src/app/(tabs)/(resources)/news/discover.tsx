@@ -44,12 +44,9 @@ const Discover = (props: Props) => {
           </TouchableOpacity>
         </View>
       ),
-      ...Platform.select({
-        android: {
-          statusBarColor: "white",
-          statusBarStyle: "dark",
-        },
-      }),
+      statusBarColor: "transparent",
+      statusBarTranslucent: false,
+      statusBarStyle: "dark",
     });
   }, [navigation]);
 

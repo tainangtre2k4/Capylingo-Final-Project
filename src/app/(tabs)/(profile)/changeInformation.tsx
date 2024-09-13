@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, Image, ActivityIndicator, TouchableOpacity, useWindowDimensions, Platform, Dimensions } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Image, ActivityIndicator, TouchableOpacity, useWindowDimensions, Platform, Dimensions, StatusBar as RNStatusBar } from 'react-native';
 import { supabase } from '../../../lib/supabase';
 import * as ImagePicker from 'expo-image-picker';
 import { AdvancedImage } from 'cloudinary-react-native';
@@ -93,19 +93,16 @@ const Profile = () => {
         header: () => (
             <View style={styles.headerContainer}>
                 <BackButton />
+                <View style={{ marginHorizontal: 6 }} />
                 <Text style={styles.headerTitle}>Change Information</Text>
-                <View style={styles.headerFillerContainer} />
           </View>
         ),
         headerTitleStyle: {
             color: 'white'
         },
-        ...Platform.select({
-            android: {
-                statusBarColor: '#3DB2FF',
-                statusBarStyle: 'light',
-            }
-        })
+        statusBarColor: "transparent",
+        statusBarTranslucent: true,
+        statusBarStyle: "light",
     });
   }, [navigation]);
 
@@ -193,10 +190,10 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   headerContainer: {
+    paddingTop: Platform.OS === "android" ? (RNStatusBar.currentHeight ?? 0) + 8 : 8,
     flexDirection: 'row',
     alignItems: 'center',
-    height: height * 0.072,
-    justifyContent: 'space-between',
+    paddingBottom: 8,
     paddingHorizontal: 20,
     backgroundColor: '#3DB2FF',
   },

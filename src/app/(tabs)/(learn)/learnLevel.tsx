@@ -83,6 +83,8 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingHorizontal: 20,
         backgroundColor: '#3DB2FF',
+        paddingTop: Platform.OS === "android" ? (RNStatusBar.currentHeight ?? 0) + 8 : 8,
+        paddingBottom: 8
     },
     headerTitle: {
         fontSize: 27,

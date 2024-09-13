@@ -119,12 +119,9 @@ const DictionaryStack = () => {
         <Stack
           screenOptions={{
             animation: "none",
-            ...Platform.select({
-              android: {
-                statusBarColor: "#3DB2FF",
-                statusBarStyle: "light",
-              },
-            }),
+            statusBarColor: "transparent",
+            statusBarTranslucent: true,
+            statusBarStyle: "light",
           }}
           initialRouteName="dictionary"
         />

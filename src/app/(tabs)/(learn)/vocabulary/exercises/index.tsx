@@ -65,12 +65,7 @@ const VocabExercises = () => {
           <View style={styles.headerFillerContainer} />
         </View>
       ),
-      ...Platform.select({
-        android: {
-          statusBarColor: 'white',
-          statusBarStyle: 'dark',
-        }
-      })
+      statusBarStyle: "dark",
     });
   }, [navigation, currentIndex, exerciseLength]);
 
@@ -211,9 +206,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
-    backgroundColor: 'white',
     paddingHorizontal: 20,
+    paddingTop: Platform.OS === "android" ? (RNStatusBar.currentHeight ?? 0) + 10 : 10,
+    paddingBottom: 10,
+    backgroundColor: "white",
   },
   headerFillerContainer: {
     height: 42,

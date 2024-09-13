@@ -142,6 +142,8 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     flexDirection: 'row',
+    backgroundColor: "#3DB2FF",
+    paddingTop: Platform.OS === "android" ? (RNStatusBar.currentHeight ?? 0) : 0,
   },
   card: {
     flexDirection: 'row',

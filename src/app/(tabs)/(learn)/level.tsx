@@ -217,9 +217,9 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     flexDirection: 'row',
-    marginTop: Platform.OS === 'android' ? RNStatusBar.currentHeight || 20 : 0,
+    paddingTop: Platform.OS === 'android' ? (RNStatusBar.currentHeight ?? 0) + 8 : 8,
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingBottom: 8,
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     backgroundColor: '#3DB2FF',
