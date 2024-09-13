@@ -1,4 +1,4 @@
-import { Button, TextInput, View, StyleSheet,Text, Alert } from 'react-native';
+import { Button, TextInput, View, StyleSheet,Text, Alert,TouchableOpacity } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { useEffect, useState } from 'react';
 import colors from '@/constants/Colors';
@@ -49,9 +49,9 @@ const Register = () => {
             <TextInput placeholder="password" value={password} onChangeText={setPassword} secureTextEntry style={styles.inputField} />
           </View>
 
-          <View style={styles.button}>         
-             <Button onPress={signUpWithEmail} title="Sign up" color={colors.base.black0}></Button>
-          </View>
+          <TouchableOpacity style={styles.button} onPress={signUpWithEmail}>   
+             <Text style={{color:colors.base.black0}}>Sign up</Text>      
+          </TouchableOpacity>
     </View>
   );
 };
