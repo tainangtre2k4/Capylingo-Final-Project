@@ -219,36 +219,44 @@ const ListeningArticle = () => {
         <BottomSheetScrollView
           contentContainerStyle={styles.bottomSheetContainer}
         >
-          {visibleAnswers.map((answer, index) => {
-            const globalIndex = curIndex * 10 + index;
-            return (
-              <View key={globalIndex} style={styles.inputContainer}>
-                <Text style={styles.answerNumberText}>{globalIndex + 1}</Text>
-                <TextInput
-                  style={styles.answerInput}
-                  value={answer}
-                  onChangeText={(text) => handleInputChange(text, globalIndex)}
-                />
-              </View>
-            );
-          })}
-          <TouchableOpacity
-            style={styles.submitButton}
-            onPress={() => {
-              Alert.alert("Submit All", "Are you sure you want to continue?", [
-                {
-                  text: "Cancel",
-                  style: "destructive",
-                },
-                {
-                  text: "Submit",
-                  onPress: showGrade,
-                },
-              ]);
-            }}
-          >
-            <Text style={styles.submitText}>Submit All</Text>
-          </TouchableOpacity>
+          <ScrollView contentContainerStyle={{ alignItems: "center" }}>
+            {visibleAnswers.map((answer, index) => {
+              const globalIndex = curIndex * 10 + index;
+              return (
+                <View key={globalIndex} style={styles.inputContainer}>
+                  <Text style={styles.answerNumberText}>{globalIndex + 1}</Text>
+                  <TextInput
+                    style={styles.answerInput}
+                    value={answer}
+                    onChangeText={(text) =>
+                      handleInputChange(text, globalIndex)
+                    }
+                  />
+                </View>
+              );
+            })}
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={() => {
+                Alert.alert(
+                  "Submit All",
+                  "Are you sure you want to continue?",
+                  [
+                    {
+                      text: "Cancel",
+                      style: "destructive",
+                    },
+                    {
+                      text: "Submit",
+                      onPress: showGrade,
+                    },
+                  ]
+                );
+              }}
+            >
+              <Text style={styles.submitText}>Submit All</Text>
+            </TouchableOpacity>
+          </ScrollView>
         </BottomSheetScrollView>
       </BottomSheet>
     </GestureHandlerRootView>

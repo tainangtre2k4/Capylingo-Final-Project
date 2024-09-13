@@ -6,7 +6,9 @@ import { SafeAreaView, Platform } from "react-native";
 const LearnStack: React.FC = () => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#3DB2FF" }}>
-      <StatusBar style="light" backgroundColor="#3DB2FF" />
+      {Platform.OS === "ios" && (
+        <StatusBar style="light" backgroundColor="#3DB2FF" />
+      )}
       <Stack
         screenOptions={{
           headerShown: false,

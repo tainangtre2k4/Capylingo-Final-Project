@@ -7,8 +7,7 @@ import React, {
   useEffect,
 } from "react";
 import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import { SafeAreaView, Platform } from "react-native";
+import { SafeAreaView } from "react-native";
 import { SkillcheckContext, SkillcheckContextType } from "../_layout";
 import readingTests from "@/assets/data/skillcheck-reading.json";
 
@@ -53,7 +52,6 @@ const defaultContextValue: ReadingContextType = {
   setAnswers: () => {},
   setTimeRemaining: () => {},
 };
-
 
 export const ReadingContext =
   createContext<ReadingContextType>(defaultContextValue);
@@ -106,10 +104,13 @@ const SkillCheckReadingStack = () => {
           setTimeRemaining,
         }}
       >
-        {Platform.OS === "ios" && (
-          <StatusBar style="dark" backgroundColor="white" />
-        )}
-        <Stack screenOptions={{ animation: "none" }} />
+        <Stack
+          screenOptions={{
+            animation: "none",
+            statusBarColor: "white",
+            statusBarStyle: "dark",
+          }}
+        />
       </ReadingContext.Provider>
     </SafeAreaView>
   );

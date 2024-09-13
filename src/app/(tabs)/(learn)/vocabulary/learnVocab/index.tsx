@@ -108,8 +108,6 @@ const LearnVocab = () => {
   };
 
   return (
-    <>
-      <StatusBar style="dark" backgroundColor="#f5f5f5" />
       <View style={styles.container}>
         <ScrollView
           ref={scrollViewRef}
@@ -164,7 +162,6 @@ const LearnVocab = () => {
           ))}
         </ScrollView>
       </View>
-    </>
   );
 };
 

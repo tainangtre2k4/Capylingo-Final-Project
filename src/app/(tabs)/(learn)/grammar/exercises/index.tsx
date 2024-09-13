@@ -125,9 +125,6 @@ const GrammarExercises = () => {
   };
 
   return (
-
-    <>
-      <StatusBar style="dark" backgroundColor="white" />
       <View style={styles.container}>
         <ScrollView
           ref={scrollViewRef}
@@ -204,7 +201,6 @@ const GrammarExercises = () => {
           </View>
         </Modal>
       </View>
-    </>
   );
 };
 

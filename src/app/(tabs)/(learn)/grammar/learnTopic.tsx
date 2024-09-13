@@ -134,7 +134,6 @@ const styles = StyleSheet.create({
     },
     headerContainer: {
         flexDirection: 'row',
-        marginTop: Platform.OS === 'android' ? RNStatusBar.currentHeight || 20 : 0,
     },
     image: {
         width: height * 0.11,

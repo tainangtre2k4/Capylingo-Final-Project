@@ -52,8 +52,6 @@ const LearnGrammar = () => {
   }
 
   return (
-    <>
-      <StatusBar style="dark" backgroundColor='#f5f5f5' />
       <View style={styles.container}>
         <WebView
           originWhitelist={['*']}
@@ -61,7 +59,6 @@ const LearnGrammar = () => {
           source={{ uri: lectureLink }}
         />
     </View>
-    </>
   );
 };
 
@@ -70,7 +67,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: Platform.OS === 'android' ? RNStatusBar.currentHeight || 20 : 0,
     paddingVertical: height * 0.013,
     backgroundColor: '#3DB2FF',
     paddingHorizontal: width * 0.0533,
