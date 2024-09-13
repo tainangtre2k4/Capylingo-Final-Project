@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useContext } from "react";
 import {
   View,
   TextInput,
@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { playPronunciation } from "@/utils/audioUtils";
 import STORAGE_KEYS from "@/assets/data/storage-keys.json";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { DictionaryContext } from "@/src/app/(tabs)/_layout";
 
 const { width, height } = Dimensions.get("window");
 
@@ -36,97 +37,100 @@ const QuickSearch = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const [favorite, setFavorite] = useState<string[]>([]);
-  const [history, setHistory] = useState<string[]>([]);
+  const { favorite, history, updateHistory, handleFavorite } =
+    useContext(DictionaryContext);
 
-  useEffect(() => {
-    const loadPersistedData = async () => {
-      try {
-        const savedFavorite = await AsyncStorage.getItem(STORAGE_KEYS.favorite);
-        if (savedFavorite) setFavorite(JSON.parse(savedFavorite));
-        const savedHistory = await AsyncStorage.getItem(STORAGE_KEYS.history);
-        if (savedHistory) setHistory(JSON.parse(savedHistory));
-      } catch (error) {
-        console.error("Failed to load data from storage", error);
-      }
-    };
+  // const [favorite, setFavorite] = useState<string[]>([]);
+  // const [history, setHistory] = useState<string[]>([]);
 
-    loadPersistedData();
-  }, []);
+  // useEffect(() => {
+  //   const loadPersistedData = async () => {
+  //     try {
+  //       const savedFavorite = await AsyncStorage.getItem(STORAGE_KEYS.favorite);
+  //       if (savedFavorite) setFavorite(JSON.parse(savedFavorite));
+  //       const savedHistory = await AsyncStorage.getItem(STORAGE_KEYS.history);
+  //       if (savedHistory) setHistory(JSON.parse(savedHistory));
+  //     } catch (error) {
+  //       console.error("Failed to load data from storage", error);
+  //     }
+  //   };
 
-  useEffect(() => {
-    const saveToStorage = async () => {
-      try {
-        await AsyncStorage.setItem(
-          STORAGE_KEYS.favorite,
-          JSON.stringify(favorite),
-        );
-        await AsyncStorage.setItem(
-          STORAGE_KEYS.history,
-          JSON.stringify(history),
-        );
-      } catch (error) {
-        console.error("Failed to save data to storage", error);
-      }
-    };
+  //   loadPersistedData();
+  // }, []);
 
-    saveToStorage();
-  }, [favorite, history]);
+  // useEffect(() => {
+  //   const saveToStorage = async () => {
+  //     try {
+  //       await AsyncStorage.setItem(
+  //         STORAGE_KEYS.favorite,
+  //         JSON.stringify(favorite),
+  //       );
+  //       await AsyncStorage.setItem(
+  //         STORAGE_KEYS.history,
+  //         JSON.stringify(history),
+  //       );
+  //     } catch (error) {
+  //       console.error("Failed to save data to storage", error);
+  //     }
+  //   };
 
-  const checkAndUpdateStorage = useCallback(async () => {
-    try {
-      const savedFavorite = await AsyncStorage.getItem(STORAGE_KEYS.favorite);
-      const savedHistory = await AsyncStorage.getItem(STORAGE_KEYS.history);
+  //   saveToStorage();
+  // }, [favorite, history]);
 
-      const parsedFavorite = savedFavorite ? JSON.parse(savedFavorite) : [];
-      const parsedHistory = savedHistory ? JSON.parse(savedHistory) : [];
+  // const checkAndUpdateStorage = useCallback(async () => {
+  //   try {
+  //     const savedFavorite = await AsyncStorage.getItem(STORAGE_KEYS.favorite);
+  //     const savedHistory = await AsyncStorage.getItem(STORAGE_KEYS.history);
 
-      if (JSON.stringify(parsedFavorite) !== JSON.stringify(favorite)) {
-        await AsyncStorage.setItem(
-          STORAGE_KEYS.favorite,
-          JSON.stringify(favorite),
-        );
-        setFavorite(parsedFavorite);
-      }
+  //     const parsedFavorite = savedFavorite ? JSON.parse(savedFavorite) : [];
+  //     const parsedHistory = savedHistory ? JSON.parse(savedHistory) : [];
 
-      if (JSON.stringify(parsedHistory) !== JSON.stringify(history)) {
-        await AsyncStorage.setItem(
-          STORAGE_KEYS.history,
-          JSON.stringify(history),
-        );
-        setHistory(parsedHistory);
-      }
-    } catch (error) {
-      console.error("Failed to check and update storage", error);
-    }
-  }, [favorite, history]);
+  //     if (JSON.stringify(parsedFavorite) !== JSON.stringify(favorite)) {
+  //       await AsyncStorage.setItem(
+  //         STORAGE_KEYS.favorite,
+  //         JSON.stringify(favorite),
+  //       );
+  //       setFavorite(parsedFavorite);
+  //     }
 
-  const isFavorite = () => {
-    return favorite.includes(searchTerm);
-  };
+  //     if (JSON.stringify(parsedHistory) !== JSON.stringify(history)) {
+  //       await AsyncStorage.setItem(
+  //         STORAGE_KEYS.history,
+  //         JSON.stringify(history),
+  //       );
+  //       setHistory(parsedHistory);
+  //     }
+  //   } catch (error) {
+  //     console.error("Failed to check and update storage", error);
+  //   }
+  // }, [favorite, history]);
 
-  const addFavorite = () => {
-    setFavorite((prev) => [...prev, searchTerm]);
-  };
+  // const isFavorite = () => {
+  //   return favorite.includes(searchTerm);
+  // };
 
-  const updateHistory = () => {
-    setHistory((prevHistory) => {
-      const filteredHistory = prevHistory.filter((w) => w !== searchTerm);
-      return [searchTerm, ...filteredHistory];
-    });
-  };
+  // const addFavorite = () => {
+  //   setFavorite((prev) => [...prev, searchTerm]);
+  // };
 
-  const removeFavorite = () => {
-    setFavorite((prev) => prev.filter((fav) => fav !== searchTerm));
-  };
+  // const updateHistory = () => {
+  //   setHistory((prevHistory) => {
+  //     const filteredHistory = prevHistory.filter((w) => w !== searchTerm);
+  //     return [searchTerm, ...filteredHistory];
+  //   });
+  // };
 
-  const toggleFavorite = () => {
-    if (isFavorite()) {
-      removeFavorite();
-    } else {
-      addFavorite();
-    }
-  };
+  // const removeFavorite = () => {
+  //   setFavorite((prev) => prev.filter((fav) => fav !== searchTerm));
+  // };
+
+  // const toggleFavorite = () => {
+  //   if (isFavorite()) {
+  //     removeFavorite();
+  //   } else {
+  //     addFavorite();
+  //   }
+  // };
 
   const fetchWordData = useCallback(async () => {
     if (!searchTerm.trim()) return;
@@ -141,7 +145,7 @@ const QuickSearch = () => {
 
       if (response.status === 200) {
         setData(fetchedData[0]);
-        updateHistory();
+        updateHistory(searchTerm);
       } else {
         setError("Word not found. Please try another word.");
       }
@@ -155,19 +159,11 @@ const QuickSearch = () => {
 
   const handleSearch = useCallback(async () => {
     setModalVisible(true);
-    await checkAndUpdateStorage(); // Check and update history and favorites
     await fetchWordData();
     if (!history.includes(searchTerm) && error === null) {
-      updateHistory();
+      updateHistory(searchTerm);
     }
-  }, [
-    searchTerm,
-    fetchWordData,
-    updateHistory,
-    checkAndUpdateStorage,
-    history,
-    error,
-  ]);
+  }, [searchTerm, fetchWordData, updateHistory, history, error]);
 
   const handleCloseModal = useCallback(() => {
     setModalVisible(false);
@@ -225,10 +221,12 @@ const QuickSearch = () => {
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.cardButton}
-                    onPress={toggleFavorite}
+                    onPress={() => handleFavorite(data.word)}
                   >
                     <Ionicons
-                      name={isFavorite() ? "star" : "star-outline"}
+                      name={
+                        favorite.includes(data.word) ? "star" : "star-outline"
+                      }
                       size={24}
                       color="#0693F1"
                     />

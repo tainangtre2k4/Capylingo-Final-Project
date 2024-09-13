@@ -1,9 +1,4 @@
-import React, {
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -16,8 +11,9 @@ import {
 } from "react-native";
 import { Audio } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation, useRouter } from "expo-router";
-import { DictionaryContext } from "./_layout";
+import { DictionaryContext } from "@/src/app/(tabs)/_layout";
+import History from "./history";
+import Favorite from "./favorite";
 
 type Meaning = {
   partOfSpeech: string;
@@ -30,9 +26,13 @@ type WordData = {
   meanings: Meaning[];
 };
 
-const Dictionary = () => {
-  const router = useRouter();
-  const navigation = useNavigation();
+const Dictionary = ({
+  page,
+  setPage,
+}: {
+  page: string;
+  setPage: () => void;
+}) => {
   const [newWord, setNewWord] = useState<string>("");
   const [checkedWord, setCheckedWord] = useState<string>("");
   const [lastSearchedWord, setLastSearchedWord] = useState<string>("");
@@ -42,41 +42,6 @@ const Dictionary = () => {
   const inputRef = useRef<TextInput | null>(null);
   const { favorite, cache, setHistory, setFavorite, setCache } =
     useContext(DictionaryContext);
-
-  useEffect(() => {
-    navigation.setOptions({
-      headerShown: true,
-      header: () => (
-        <View style={styles.headerContainer}>
-          <Text style={styles.headerTitle}>Dictionary</Text>
-          <View style={styles.headerIconsContainer}>
-            <TouchableOpacity
-              style={styles.headerIcon}
-              activeOpacity={0.6}
-              onPress={() => {
-                router.push("/history");
-              }}
-            >
-              <Ionicons name="timer-outline" size={20} color="#0693F1" />
-            </TouchableOpacity>
-            <View style={{ marginHorizontal: 8 }} />
-            <TouchableOpacity
-              style={styles.headerIcon}
-              activeOpacity={0.6}
-              onPress={() => {
-                router.push("/favorite");
-              }}
-            >
-              <Ionicons name="star-outline" size={20} color="#0693F1" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      ),
-      headerTitleStyle: {
-        color: "white",
-      },
-    });
-  }, [navigation]);
 
   const getInfo = async () => {
     if (!newWord.trim() || newWord === lastSearchedWord) {
@@ -189,75 +154,79 @@ const Dictionary = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.inputContainer}>
-        <TextInput
-          ref={inputRef}
-          style={styles.input}
-          placeholder="Search..."
-          value={newWord}
-          onChangeText={setNewWord}
-        />
-        <TouchableOpacity
-          style={styles.button}
-          onPress={getInfo}
-          activeOpacity={0.6}
-        >
-          <Ionicons name="search" size={20} color="white" />
-        </TouchableOpacity>
-      </View>
-      {error && <Text style={styles.errorText}>{error}</Text>}
-      {checkedWord && !error && (
-        <View style={styles.resultsContainer}>
-          <View style={styles.resultHeaderContainer}>
-            <View style={styles.headerIconsContainer}>
-              <Text style={styles.word}>{checkedWord}</Text>
-              <TouchableOpacity style={styles.cardButton} onPress={playAudio}>
-                <Ionicons name="volume-high" size={24} color="#0693F1" />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.cardButton}
-                onPress={handleFavorite}
-              >
-                <Ionicons
-                  name={
-                    favorite.includes(checkedWord) ? "star" : "star-outline"
-                  }
-                  size={24}
-                  color="#0693F1"
-                />
-              </TouchableOpacity>
-            </View>
-            {newWord ? (
-              <TouchableOpacity
-                style={styles.clearButton}
-                onPress={clear}
-                activeOpacity={0.6}
-              >
-                <Text style={styles.clearButtonText}>Clear</Text>
-              </TouchableOpacity>
-            ) : null}
-          </View>
-          <ScrollView overScrollMode="never" style={{ flexGrow: 0 }}>
-            {data?.meanings.map((meaning, index) => (
-              <View key={index}>
-                <Text style={styles.partOfSpeech}>{meaning.partOfSpeech}</Text>
-                {meaning.definitions.map((definition, defIndex) => (
-                  <View key={defIndex}>
-                    <Text style={styles.resultText}>
-                      Definition: {definition.definition}
-                    </Text>
-                    {definition.example && (
-                      <Text style={styles.resultText}>
-                        Example: {definition.example}
-                      </Text>
-                    )}
-                  </View>
-                ))}
-              </View>
-            ))}
-          </ScrollView>
+      <View>
+        <View style={styles.inputContainer}>
+          <TextInput
+            ref={inputRef}
+            style={styles.input}
+            placeholder="Search..."
+            value={newWord}
+            onChangeText={setNewWord}
+          />
+          <TouchableOpacity
+            style={styles.button}
+            onPress={getInfo}
+            activeOpacity={0.6}
+          >
+            <Ionicons name="search" size={20} color="white" />
+          </TouchableOpacity>
         </View>
-      )}
+        {error && <Text style={styles.errorText}>{error}</Text>}
+        {checkedWord && !error && (
+          <View style={styles.resultsContainer}>
+            <View style={styles.resultHeaderContainer}>
+              <View style={styles.headerIconsContainer}>
+                <Text style={styles.word}>{checkedWord}</Text>
+                <TouchableOpacity style={styles.cardButton} onPress={playAudio}>
+                  <Ionicons name="volume-high" size={24} color="#0693F1" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.cardButton}
+                  onPress={handleFavorite}
+                >
+                  <Ionicons
+                    name={
+                      favorite.includes(checkedWord) ? "star" : "star-outline"
+                    }
+                    size={24}
+                    color="#0693F1"
+                  />
+                </TouchableOpacity>
+              </View>
+              {newWord ? (
+                <TouchableOpacity
+                  style={styles.clearButton}
+                  onPress={clear}
+                  activeOpacity={0.6}
+                >
+                  <Text style={styles.clearButtonText}>Clear</Text>
+                </TouchableOpacity>
+              ) : null}
+            </View>
+            <ScrollView overScrollMode="never" style={{ flexGrow: 0 }}>
+              {data?.meanings.map((meaning, index) => (
+                <View key={index}>
+                  <Text style={styles.partOfSpeech}>
+                    {meaning.partOfSpeech}
+                  </Text>
+                  {meaning.definitions.map((definition, defIndex) => (
+                    <View key={defIndex}>
+                      <Text style={styles.resultText}>
+                        Definition: {definition.definition}
+                      </Text>
+                      {definition.example && (
+                        <Text style={styles.resultText}>
+                          Example: {definition.example}
+                        </Text>
+                      )}
+                    </View>
+                  ))}
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+      </View>
     </View>
   );
 };
@@ -266,7 +235,8 @@ export default Dictionary;
 
 const styles = StyleSheet.create({
   headerContainer: {
-    paddingTop: Platform.OS === "android" ? (RNStatusBar.currentHeight ?? 0) + 8 : 8,
+    paddingTop:
+      Platform.OS === "android" ? (RNStatusBar.currentHeight ?? 0) + 8 : 8,
     paddingBottom: 8,
     paddingHorizontal: 20,
     backgroundColor: "#3DB2FF",
@@ -295,10 +265,9 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    alignItems: "center",
+    // alignItems: "center",
     backgroundColor: "#F3F3F3",
     padding: 10,
-    paddingBottom: 70,
   },
   errorText: {
     color: "red",
