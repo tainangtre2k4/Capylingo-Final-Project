@@ -7,6 +7,7 @@ import {
   StyleSheet,
   StatusBar as RNStatusBar,
   Platform,
+  Modal,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import PostListItem from "@/src/components/community/PostListItem";
@@ -42,6 +43,8 @@ const FeedScreen = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const navigation = useNavigation();
+  const [postToDelete, setPostToDelete] = useState<number | null>(null); // Track the post to delete
+  const [isAlertVisible, setIsAlertVisible] = useState(false); // Alert visibility
 
   useEffect(() => {
     fetchPosts();
@@ -88,6 +91,10 @@ const FeedScreen = () => {
     });
   }, [navigation]);
 
+  const onRemovePost = (postId: number) => {
+    setPosts(posts.filter((post) => post.id !== postId));
+  };
+
   const fetchPosts = async () => {
     setLoading(true);
     let { data, error } = await supabase
@@ -115,16 +122,45 @@ const FeedScreen = () => {
     setLoading(false);
   };
 
-  const commentHandler = (post: Post) => {
-    router.push(`/(resources)/community/comment?postId=${post.id}`);
+  const deletePost = async (postId: number) => {
+    const { error } = await supabase
+      .from("posts")
+      .delete()
+      .eq("id", postId);
+
+    if (error) {
+      Alert.alert("Error deleting post");
+    } else {
+      onRemovePost(postId); // Call onRemovePost to update UI
+    }
+    setIsAlertVisible(false); // Hide the custom alert
   };
 
+  const confirmDelete = () => {
+    if (postToDelete !== null) {
+      deletePost(postToDelete); // Delete the post
+    }
+  };
+
+  const handleDeletePress = (postId: number) => {
+    setPostToDelete(postId); // Set the post ID to be deleted
+    setIsAlertVisible(true); // Show custom alert modal
+  };
+  const commentHandler = (post: Post) => {
+    // Logic for handling comments goes here
+    router.push(`/(resources)/community/comment?postId=${post.id}`);
+  };
+  
   return (
     <View style={{ flex: 1 }}>
       <FlatList
         data={posts}
         renderItem={({ item }) => (
-          <PostListItem post={item} commentHandler={commentHandler} />
+          <PostListItem
+            post={item}
+            commentHandler={commentHandler}
+            onRemove={() => handleDeletePress(item.id)} // Show custom alert
+          />
         )}
         contentContainerStyle={{
           gap: 10,
@@ -136,6 +172,36 @@ const FeedScreen = () => {
         onRefresh={fetchPosts}
         refreshing={loading}
       />
+
+      {/* Custom Alert Modal */}
+      <Modal
+        transparent={true}
+        visible={isAlertVisible}
+        animationType="fade"
+        onRequestClose={() => setIsAlertVisible(false)}
+      >
+        <View style={styles.customAlertContainer}>
+          <View style={styles.customAlertBox}>
+            <Text style={styles.customAlertText}>
+              Are you sure you want to delete this post?
+            </Text>
+            <View style={styles.customAlertButtonContainer}>
+              <TouchableOpacity
+                style={styles.customAlertButton}
+                onPress={confirmDelete}
+              >
+                <Text style={styles.customAlertButtonText}>Yes</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.customAlertButton}
+                onPress={() => setIsAlertVisible(false)}
+              >
+                <Text style={styles.customAlertButtonText}>No</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -194,6 +260,41 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     shadowColor: "black",
+  },
+  customAlertContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
+  },
+  customAlertBox: {
+    width: 300,
+    padding: 20,
+    backgroundColor: "white",
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  customAlertText: {
+    fontSize: 18,
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  customAlertButtonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  customAlertButton: {
+    padding: 10,
+    backgroundColor: "#3DB2FF",
+    borderRadius: 5,
+    width: "45%",
+    alignItems: "center",
+  },
+  customAlertButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
 
