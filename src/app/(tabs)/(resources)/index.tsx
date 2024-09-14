@@ -124,7 +124,7 @@ const Square: React.FC<SquareProps> = ({ scrollX }) => {
                 backgroundColor: '#fff',
                 borderRadius: 86,
                 position: 'absolute',
-                top: -height * 0.71,
+                top: -height * 0.70,
                 left: -height * 0.33,
                 transform: [{ rotate }, { translateX }]
             }}
@@ -168,8 +168,8 @@ const ResourcesStack: React.FC = () => {
                             <Image
                                 source={item.image}
                                 style={{
-                                    width: width / 2,
-                                    height: height / 2,
+                                    width: width*0.48,
+                                    height: height*0.48,
                                     resizeMode: 'contain'
                                 }}
                             />
@@ -179,8 +179,7 @@ const ResourcesStack: React.FC = () => {
                                 color: '#fff',
                                 fontWeight: '800',
                                 fontSize: 30,
-                                marginBottom: 40,
-                                marginTop: 16
+                                marginBottom: 24,
                             }}>
                                 {item.title}
                             </Text>
