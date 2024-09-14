@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useContext } from "react";
 import {
   View,
   Text,
@@ -12,8 +12,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 const { width, height } = Dimensions.get("screen");
 import NextButton from "@/src/components/learnVocab/nextButton";
 import { playPronunciation } from "@/utils/audioUtils";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import STORAGE_KEYS from "@/assets/data/storage-keys.json";
+import { DictionaryContext } from "@/src/app/(tabs)/_layout";
 
 interface FlashcardProps {
   word: string;
@@ -35,66 +34,7 @@ const Flashcard: React.FC<FlashcardProps> = ({
   const [flipped, setFlipped] = useState(false);
   const flipAnim = useRef(new Animated.Value(0)).current;
 
-  // resolve add and remove favorite
-  const [favorite, setFavorite] = useState<string[]>([]);
-
-  useEffect(() => {
-    const loadPersistedData = async () => {
-      try {
-        const savedFavorite = await AsyncStorage.getItem(STORAGE_KEYS.favorite);
-        if (savedFavorite) setFavorite(JSON.parse(savedFavorite));
-      } catch (error) {
-        console.error("Failed to load data from storage", error);
-      }
-    };
-
-    loadPersistedData();
-  }, []);
-
-  // Save favorite to AsyncStorage whenever they change
-  useEffect(() => {
-    const saveToStorage = async () => {
-      try {
-        await AsyncStorage.setItem(
-          STORAGE_KEYS.favorite,
-          JSON.stringify(favorite),
-        );
-      } catch (error) {
-        console.error("Failed to save data to storage", error);
-      }
-    };
-
-    saveToStorage();
-  }, [favorite]);
-
-  const isFavorite = (word: string) => {
-    return favorite.includes(word);
-  };
-
-  const addFavorite = async (word: string) => {
-    await loadPersistedData();
-    setFavorite((prev) => [...prev, word]);
-  };
-
-  const removeFavorite = (word: string) => {
-    setFavorite((prev) => prev.filter((fav) => fav !== word));
-  };
-
-  const toggleFavorite = async () => {
-    if (isFavorite(word)) {
-      removeFavorite(word);
-    } else {
-      await addFavorite(word);
-    }
-  };
-  const loadPersistedData = async () => {
-    try {
-      const savedFavorite = await AsyncStorage.getItem(STORAGE_KEYS.favorite);
-      if (savedFavorite) setFavorite(JSON.parse(savedFavorite));
-    } catch (error) {
-      console.error("Failed to load data from storage", error);
-    }
-  };
+  const { favorite, handleFavorite } = useContext(DictionaryContext);
 
   const flipCard = () => {
     if (flipped) {
@@ -140,45 +80,7 @@ const Flashcard: React.FC<FlashcardProps> = ({
     phonetics: Phonetic[];
   };
 
-  async function playAudio(word: string) {
-    try {
-      // Fetch word data from the API
-      const response = await fetch(
-        `https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`,
-      );
-      const data: WordData[] = await response.json();
 
-      if (!response.ok) {
-        throw new Error("Word not found");
-      }
-
-      const wordData = data[0];
-      console.log("Word data:", wordData);
-
-      // Find the first available audio URL
-      const audioUrl = wordData.phonetics.find(
-        (phonetic) => phonetic.audio,
-      )?.audio;
-
-      if (!audioUrl) {
-        console.log("No audio available for this word");
-        return;
-      }
-
-      // Play the audio
-      const audio = new Audio(audioUrl);
-      audio.play();
-
-      console.log("Audio played successfully");
-    } catch (error) {
-      // Ensure error is of type Error before accessing its message
-      if (error instanceof Error) {
-        console.error("Error:", error.message);
-      } else {
-        console.error("Unexpected error:", error);
-      }
-    }
-  }
 
   return (
     <View style={styles.container}>
@@ -200,12 +102,12 @@ const Flashcard: React.FC<FlashcardProps> = ({
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.iconCell}
-                onPress={toggleFavorite}
+                onPress={() => handleFavorite(word)}
               >
                 <Ionicons
-                  name={isFavorite(word) ? "star" : "star-outline"}
+                  name={favorite.includes(word) ? "star" : "star-outline"}
                   size={32}
-                  color={isFavorite(word) ? "#FFD700" : "#fff"}
+                  color={favorite.includes(word) ? "#FFD700" : "#fff"}
                 />
               </TouchableOpacity>
             </View>
@@ -233,12 +135,12 @@ const Flashcard: React.FC<FlashcardProps> = ({
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.iconCell}
-                onPress={toggleFavorite}
+                onPress={() => handleFavorite(word)}
               >
                 <Ionicons
-                  name={isFavorite(word) ? "star" : "star-outline"}
+                  name={favorite.includes(word) ? "star" : "star-outline"}
                   size={32}
-                  color={isFavorite(word) ? "#FFD700" : "#fff"}
+                  color={favorite.includes(word) ? "#FFD700" : "#fff"}
                 />
               </TouchableOpacity>
             </View>
@@ -276,7 +178,6 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.3,
     shadowRadius: 6,
-    //elevation: 6,
   },
   cardBack: {
     position: "absolute",

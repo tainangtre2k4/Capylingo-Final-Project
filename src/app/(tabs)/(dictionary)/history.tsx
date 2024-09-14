@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
 import {
   Alert,
   Dimensions,
@@ -14,11 +14,11 @@ import {
 import { Audio } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRouter } from "expo-router";
-import { DictionaryContext, WordData } from "./_layout";
+import { DictionaryContext, WordData } from "@/src/app/(tabs)/_layout";
 
 const { width, height } = Dimensions.get("window");
 
-const History = () => {
+const History = ({setPage}: {setPage: () => void}) => {
   const navigation = useNavigation();
   const router = useRouter();
   const [checkedWord, setCheckedWord] = useState<string>("");
@@ -26,7 +26,7 @@ const History = () => {
   const [data, setData] = useState<WordData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
-  const { history, favorite, cache, setHistory, setFavorite, setCache } =
+  const { history, favorite, cache, setHistory, handleFavorite, setCache } =
     useContext(DictionaryContext);
 
   const handleHistorydeleteAll = () => {
@@ -49,39 +49,6 @@ const History = () => {
       ],
     );
   };
-
-  useEffect(() => {
-    navigation.setOptions({
-      headerShown: true,
-      header: () => (
-        <View style={styles.headerContainer}>
-          <Text style={styles.headerTitle}>History</Text>
-          <View style={styles.headerIconsContainer}>
-            <TouchableOpacity
-              style={styles.headerIcon}
-              activeOpacity={0.6}
-              onPress={() => {
-                router.back();
-              }}
-            >
-              <Ionicons name="timer" size={20} color="#0693F1" />
-            </TouchableOpacity>
-            <View style={{ marginHorizontal: 8 }} />
-            <TouchableOpacity
-              style={styles.headerIcon}
-              activeOpacity={0.6}
-              onPress={handleHistorydeleteAll}
-            >
-              <Ionicons name="trash" size={20} color="#0693F1" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      ),
-      headerTitleStyle: {
-        color: "white",
-      },
-    });
-  }, [navigation]);
 
   const getInfo = async (item: string) => {
     if (!item.trim()) {
@@ -140,18 +107,6 @@ const History = () => {
     }
   };
 
-  const handleFavorite = () => {
-    if (checkedWord) {
-      setFavorite((prevFavorites) => {
-        if (prevFavorites.includes(checkedWord)) {
-          return prevFavorites.filter((word) => word !== checkedWord);
-        } else {
-          return [...prevFavorites, checkedWord];
-        }
-      });
-    }
-  };
-
   const renderHistoryItem = ({ item }: { item: string }) => {
     const isExpanded = expandedItem === item;
 
@@ -186,7 +141,7 @@ const History = () => {
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.cardButton}
-                onPress={handleFavorite}
+                onPress={() => handleFavorite(checkedWord)}
               >
                 <Ionicons
                   name={
@@ -225,14 +180,12 @@ const History = () => {
   };
 
   return (
-    <View style={styles.container}>
       <FlatList
         data={[...history].reverse()}
         renderItem={renderHistoryItem}
         keyExtractor={(item, index) => index.toString()}
         overScrollMode="never"
       />
-    </View>
   );
 };
 
@@ -269,9 +222,7 @@ const styles = StyleSheet.create({
     shadowColor: "black",
   },
   container: {
-    flex: 1,
     backgroundColor: "#F3F3F3",
-    paddingBottom: 70,
     paddingTop: 10,
   },
   errorText: {

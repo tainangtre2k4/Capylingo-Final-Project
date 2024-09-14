@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -15,6 +15,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { playPronunciation } from "@/utils/audioUtils";
 import { generate } from "random-words";
 import STORAGE_KEYS from "@/assets/data/storage-keys.json";
+import { DictionaryContext } from "@/src/app/(tabs)/_layout";
 
 const { width, height } = Dimensions.get("window");
 
@@ -38,57 +39,7 @@ const WOTDCard = () => {
   const [loading, setLoading] = useState(false);
   const [wordOfTheDay, setWordOfTheDay] = useState("");
   const [cachedWords, setCachedWords] = useState<Record<string, WordData>>({});
-
-  const [favorite, setFavorite] = useState<string[]>([]);
-
-  useEffect(() => {
-    const loadPersistedData = async () => {
-      try {
-        const savedFavorite = await AsyncStorage.getItem(STORAGE_KEYS.favorite);
-        if (savedFavorite) setFavorite(JSON.parse(savedFavorite));
-      } catch (error) {
-        console.error("Failed to load data from storage", error);
-      }
-    };
-
-    loadPersistedData();
-  }, []);
-
-  // Save favorite to AsyncStorage whenever they change
-  useEffect(() => {
-    const saveToStorage = async () => {
-      try {
-        await AsyncStorage.setItem(
-          STORAGE_KEYS.favorite,
-          JSON.stringify(favorite)
-        );
-      } catch (error) {
-        console.error("Failed to save data to storage", error);
-      }
-    };
-
-    saveToStorage();
-  }, [favorite]);
-
-  const isFavorite = () => {
-    return favorite.includes(wordOfTheDay);
-  };
-
-  const addFavorite = () => {
-    setFavorite((prev) => [...prev, wordOfTheDay]);
-  };
-
-  const removeFavorite = () => {
-    setFavorite((prev) => prev.filter((fav) => fav !== wordOfTheDay));
-  };
-
-  const toggleFavorite = () => {
-    if (isFavorite()) {
-      removeFavorite();
-    } else {
-      addFavorite();
-    }
-  };
+  const { favorite, handleFavorite } = useContext(DictionaryContext);
 
   const generateValidWord = () => {
     let newWord;
@@ -236,11 +187,11 @@ const WOTDCard = () => {
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.cardButton}
-                    onPress={toggleFavorite}
+                    onPress={() => handleFavorite(wordOfTheDay)}
                   >
                     <Ionicons
                       name={
-                        isFavorite() ? "star" : "star-outline"
+                        favorite.includes(wordOfTheDay) ? "star" : "star-outline"
                       }
                       size={24}
                       color="#0693F1"

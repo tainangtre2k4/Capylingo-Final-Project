@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
 import {
   Alert,
   Dimensions,
@@ -14,7 +14,7 @@ import {
 import { Audio } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRouter } from "expo-router";
-import { DictionaryContext } from "./_layout";
+import { DictionaryContext } from "@/src/app/(tabs)/_layout";
 
 const { width, height } = Dimensions.get("window");
 
@@ -29,7 +29,7 @@ type WordData = {
   meanings: Meaning[];
 };
 
-const Favorite = () => {
+const Favorite = ({setPage}: {setPage: () => void}) => {
   const navigation = useNavigation();
   const router = useRouter();
   const [checkedWord, setCheckedWord] = useState<string>("");
@@ -39,60 +39,6 @@ const Favorite = () => {
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
   const { favorite, cache, setHistory, setFavorite, setCache } =
     useContext(DictionaryContext);
-
-  const handleFavoriteDeleteAll = () => {
-    Alert.alert(
-      "Delete All Favorites",
-      "All Favorite entries will be deleted! Still proceed?",
-      [
-        {
-          text: "Cancel",
-          onPress: () => {},
-          style: "cancel",
-        },
-        {
-          text: "Confirm",
-          onPress: () => {
-            setFavorite([]);
-          },
-          style: "destructive",
-        },
-      ],
-    );
-  };
-
-  useEffect(() => {
-    navigation.setOptions({
-      headerShown: true,
-      header: () => (
-        <View style={styles.headerContainer}>
-          <Text style={styles.headerTitle}>Favorite</Text>
-          <View style={styles.headerIconsContainer}>
-            <TouchableOpacity
-              style={styles.headerIcon}
-              activeOpacity={0.6}
-              onPress={() => {
-                router.back();
-              }}
-            >
-              <Ionicons name="star" size={20} color="#0693F1" />
-            </TouchableOpacity>
-            <View style={{ marginHorizontal: 8 }} />
-            <TouchableOpacity
-              style={styles.headerIcon}
-              activeOpacity={0.6}
-              onPress={handleFavoriteDeleteAll}
-            >
-              <Ionicons name="trash" size={20} color="#0693F1" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      ),
-      headerTitleStyle: {
-        color: "white",
-      },
-    });
-  }, [navigation]);
 
   const getInfo = async (item: string) => {
     if (!item.trim()) {
@@ -246,14 +192,12 @@ const Favorite = () => {
   };
 
   return (
-    <View style={styles.container}>
       <FlatList
         data={[...favorite].reverse()}
         renderItem={renderFavoriteItem}
         keyExtractor={(item, index) => index.toString()}
         overScrollMode="never"
       />
-    </View>
   );
 };
 
@@ -290,9 +234,7 @@ const styles = StyleSheet.create({
     shadowColor: "black",
   },
   container: {
-    flex: 1,
     backgroundColor: "#F3F3F3",
-    paddingBottom: 70,
     paddingTop: 10,
   },
   errorText: {

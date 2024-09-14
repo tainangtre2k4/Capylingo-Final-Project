@@ -41,10 +41,13 @@ type PostListItemProps = {
 };
 
 export default function PostListItem({ post, commentHandler, show = true, onRemove = () => {}, savePost = false }: PostListItemProps) {
-  const { user } = useAuth();
+  const { user } = useAuth(); // Current authenticated user
   const [isLiked, setIsLiked] = useState(false);
   const [likeRecord, setLikeRecord] = useState<{ id: string } | null>(null);
   const [isSaved, setIsSaved] = useState(false);
+
+  // Only show delete button for the user's own post and if the post is not saved
+  const canDelete = post.user.id === user?.id && !isSaved;
 
   useEffect(() => {
     if (post.my_likes.length > 0) {
@@ -169,6 +172,13 @@ export default function PostListItem({ post, commentHandler, show = true, onRemo
               className="ml-auto"
             />
           </TouchableOpacity>
+
+          {/* Show delete button only if the user owns the post and the post is not saved */}
+          {canDelete && (
+            <TouchableOpacity onPress={onRemove}>
+              <AntDesign name="delete" size={20} color="red" className="ml-auto" />
+            </TouchableOpacity>
+          )}
         </View>
       )}
 
