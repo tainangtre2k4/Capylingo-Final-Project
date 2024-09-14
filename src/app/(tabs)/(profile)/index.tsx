@@ -37,10 +37,10 @@ export default function Index() {
       }
       setAvatar(data.avatar_url);
       setUserName(data.username);
-      setLevel(data?.level ?? 0); // Default to 0 if level is null or undefined
+      setLevel(data?.level?? 0); // Default to 0 if level is null or undefined
 
       let levelText = '';
-      switch (data.level + 1) {
+      switch (data.level) {
         case 1:
           levelText = 'Beginner';
           break;
@@ -51,8 +51,6 @@ export default function Index() {
         case 4:
           levelText = 'Advanced';
           break;
-        default:
-          levelText = 'Newbie'; // Default to empty if level is not defined
       }
       setUserLevel(levelText);
 
