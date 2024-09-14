@@ -133,7 +133,7 @@ const SliderItem = ({slideItem, index, scrollX}: Props) => {
         style = {[styles.itemWrapper]} 
         key ={slideItem.article_id}>
       <Image source = {{uri: slideItem.image_url}} style = {styles.image} />
-      <LinearGradient colors ={["transparent", 'rgba(0,0,0,0.8']} style = {styles.background}>
+      <LinearGradient colors ={["transparent", "transparent"]} style = {styles.background}>
         <View style = {styles.sourceInfo}>
                 {slideItem.source_icon && (
                     <Image 
