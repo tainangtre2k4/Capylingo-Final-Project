@@ -104,7 +104,7 @@ const GrammarExercises = () => {
       updateTopicGrammar(topicID, undefined, true);
       completedPracticingGrammar(user.user?.id, topicID);
       router.navigate(
-        `/(tabs)/(learn)/resultScreen?correct=${0}&all=${0}&backPage=${"/level"}`
+        `/(tabs)/(learn)/resultScreen?correct=${0}&all=${0}&backPage=${'/(learn)'}`
       );
     }
   }, [exerciseLength, loading, error]);
@@ -147,7 +147,7 @@ const GrammarExercises = () => {
         }
 
         router.navigate(
-          `/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}&backPage=${"/level"}`
+          `/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}&backPage=${'/(learn)'}`
         );
       } else {
         setModalVisible(true);
@@ -162,7 +162,7 @@ const GrammarExercises = () => {
       completedPracticingGrammar(user.user?.id, topicID);
     }
     router.navigate(
-      `/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}&backPage=${"/level"}`
+      `/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}&backPage=${'/(learn)'}`
     );
   };
   const handleModalCancel = () => {

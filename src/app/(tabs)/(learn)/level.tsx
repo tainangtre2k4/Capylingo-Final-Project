@@ -6,6 +6,7 @@ import BackButton from "@/src/components/BackButton";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { fetchUserLevel, getGrammarTopicList, getVocabTopicList } from "@/src/fetchData/fetchLearn";
 import { useUserLearn } from "@/src/app/(tabs)/(learn)/ UserLearnContext";
+import { updateUserLevel } from '@/src/updateData/updateLearningProgress';
 import CircularProgress from '@/src/components/learn/CircularProgress';
 import MedalCelebration from '@/src/components/MedalCelebration';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -78,7 +79,7 @@ const Level: React.FC = () => {
       setShowCongratulations(true);
       setTimeout(() => {
         setShowCloseButton(true);
-      }, newlevel>=5? 3500 : 8200);
+      }, newlevel>=5? 3500 : 7500);
       setLoading(true);
       const loadData = async () => {
         try {
@@ -86,6 +87,7 @@ const Level: React.FC = () => {
           if (!userId) throw new Error("User ID not found");
           
           updateLevel(newlevel);
+          updateUserLevel(user.user?.id, newlevel)
   
           const vocabTopics = await getVocabTopicList(userId, newlevel);
           const grammarTopics = await getGrammarTopicList(userId, newlevel);

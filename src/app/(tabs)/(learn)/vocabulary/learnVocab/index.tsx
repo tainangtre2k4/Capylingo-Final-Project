@@ -72,7 +72,7 @@ const LearnVocab = () => {
     if (vocabsLength === 0 && !loading && !error) {
       completeLearningVocab(user.user?.id, topicID);
       updateTopicVocab(topicID, true, undefined);
-      router.navigate(`/(tabs)/(learn)/resultScreen?correct=${0}&all=${0}&backPage=${'/level'}`);
+      router.navigate(`/(tabs)/(learn)/resultScreen?correct=${0}&all=${0}&backPage=${'/(learn)'}`);
     }
   }, [vocabsLength, loading, error]);
 
@@ -102,7 +102,7 @@ const LearnVocab = () => {
     else {
       completeLearningVocab(user.user?.id, topicID);
       updateTopicVocab(topicID, true, undefined);
-      router.navigate(`/(tabs)/(learn)/resultScreen?correct=${vocabs.length}&all=${vocabs.length}&backPage=${'/level'}`);
+      router.navigate(`/(tabs)/(learn)/resultScreen?correct=${vocabs.length}&all=${vocabs.length}&backPage=${'/(learn)'}`);
     }
   };
 

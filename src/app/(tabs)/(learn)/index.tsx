@@ -126,10 +126,12 @@ const Learn = () => {
         <View style={styles.SubjectCardsContainer}>
           <SubjectCard
             type="vocabulary"
+            level={level}
             percent={percentVocab}
           />
           <SubjectCard
             type="grammar"
+            level={level}
             percent={percentGrammar}
           />
           <SubjectCard type="skillcheck" />

@@ -20,20 +20,21 @@ const link = {
 
 interface SubjectCardProps {
   type: SubjectType;
+  level?: number;
   percent?: number;
 }
 
-const SubjectCard: React.FC<SubjectCardProps> = ({ type, percent }) => {
+const SubjectCard: React.FC<SubjectCardProps> = ({ type, level, percent }) => {
   const label = (type === 'vocabulary') ? 'Vocabulary' : (type === 'grammar') ? 'Grammar' : 'Skill Check';
   const router = useRouter();
 
   const pressHandler = () => {
     switch (type) {
       case 'vocabulary':
-        router.push('/(tabs)/(learn)/vocabulary');
+        router.push(`/(tabs)/(learn)/vocabulary?level=${level}`);
         break;
       case 'grammar':
-        router.push('/(tabs)/(learn)/grammar');
+        router.push(`/(tabs)/(learn)/grammar?level=${level}`);
         break;
       case 'skillcheck':
         router.push('/(tabs)/(learn)/skillcheck');

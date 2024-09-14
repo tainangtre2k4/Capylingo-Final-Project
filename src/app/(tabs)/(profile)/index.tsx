@@ -191,7 +191,7 @@ export default function Index() {
           </View>
           <View style={styles.verticalLine} />
           <View style={styles.infoItem}>
-            <Text style={styles.infoValue}>20</Text>
+            <Text style={styles.infoValue}>0</Text>
             <Text style={styles.infoLabel}>Achievements</Text>
           </View>
           <View style={styles.verticalLine} />

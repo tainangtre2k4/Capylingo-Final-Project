@@ -16,7 +16,7 @@ const MedalCelebration: React.FC<MedalProps> = ({ imageMedal, completedLevel }) 
 
     const timer = setTimeout(() => {
       setShowNextLevel(true);
-    }, 3000);
+    }, 2500);
 
 
     return () => clearTimeout(timer);
