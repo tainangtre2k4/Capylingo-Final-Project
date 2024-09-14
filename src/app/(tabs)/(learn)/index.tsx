@@ -11,13 +11,10 @@ import {
 } from "react-native";
 import WOTDCard from "@/src/components/learn/WOTDCard";
 import SubjectCard from "@/src/components/learn/SubjectCard";
+import { useUserLearn } from "@/src/app/(tabs)/(learn)/ UserLearnContext";
 import { useNavigation, useRouter } from "expo-router";
 import { useAuth } from "@/src/providers/AuthProvider";
-import { fetchUserLevel } from "@/src/fetchData/fetchLearn";
-import {
-  fetchVocabLevelPercent,
-  fetchGrammarLevelPercent,
-} from "@/src/fetchData/fetchProgress";
+import { fetchUserLevel, getGrammarTopicList, getVocabTopicList } from "@/src/fetchData/fetchLearn";
 import ProgressCard from "@/src/components/learn/ProgressCard";
 import React, { useState, useEffect } from "react";
 import QuickSearch from "@/src/components/learn/QuickSearch";
@@ -27,62 +24,81 @@ const { width, height } = Dimensions.get("window");
 const Learn = () => {
   const router = useRouter();
   const user = useAuth();
-  const [level, setLevel] = useState<any>(null);
-  const [percent, setPercent] = useState<number | 0>(0);
-  const [percentVocab, setPercentVocab] = useState<number | 0>(0);
-  const [percentGrammar, setPercentGrammar] = useState<number | 0>(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigation = useNavigation();
 
+  const {
+    level,
+    totalPercent: percent,
+    vocabPercent: percentVocab,
+    grammarPercent: percentGrammar,
+    updateLevel,
+    setTopicsVocab,
+    setTopicsGrammar,
+  } = useUserLearn();
+
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
+    const loadData = async () => {
       try {
-        const userLevel = await fetchUserLevel(user.user?.id);
-        const percentV = await fetchVocabLevelPercent(
-          user.user?.id,
-          userLevel.level + 1
-        );
-        const percentG = await fetchGrammarLevelPercent(
-          user.user?.id,
-          userLevel.level + 1
-        );
-        const totalPercent = Math.round((percentV + percentG) / 2);
-        setLevel(userLevel.level);
-        setPercentVocab(Math.round(percentV));
-        setPercentGrammar(Math.round(percentG));
-        setPercent(totalPercent);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+        const userId = user.user?.id;
+        if (!userId) throw new Error("User ID not found");
+
+        const userLevel = await fetchUserLevel(userId);
+        updateLevel(userLevel.level);
+
+        const vocabTopics = await getVocabTopicList(userId, userLevel.level);
+        const grammarTopics = await getGrammarTopicList(userId, userLevel.level);
+  
+        // Chuyển đổi dữ liệu thành định dạng Topic[]
+        const newVocabTopics = vocabTopics.map((topic: any) => ({
+          id: topic.id,
+          title: topic.title, // Thêm thuộc tính title nếu cần
+          ImageUrl: topic.ImageUrl, // Thêm thuộc tính ImageUrl nếu cần
+          isLearned: topic.CompletedTopicVocab.length > 0 ? topic.CompletedTopicVocab[0].completedLearning : false,
+          isPracticed: topic.CompletedTopicVocab.length > 0 ? topic.CompletedTopicVocab[0].completedPracticing : false
+        }));
+  
+        const newGrammarTopics = grammarTopics.map((topic: any) => ({
+          id: topic.id,
+          title: topic.title, // Thêm thuộc tính title nếu cần
+          ImageUrl: topic.ImageUrl, // Thêm thuộc tính ImageUrl nếu cần
+          lectureLink: topic.lectureLink,
+          isLearned: topic.CompletedTopicGrammar.length > 0 ? topic.CompletedTopicGrammar[0].completedLearning : false,
+          isPracticed: topic.CompletedTopicGrammar.length > 0 ? topic.CompletedTopicGrammar[0].completedPracticing : false
+        }));
+        
+        // Gọi hàm set để thay thế toàn bộ dữ liệu
+        setTopicsVocab(newVocabTopics);
+        setTopicsGrammar(newGrammarTopics);
+        
+
+        setLoading(false); // Kết thúc quá trình loading
+      } catch (error) {
+        console.error("Failed to load data", error);
+        setError("Failed to load data");
+        setLoading(false); // Kết thúc loading nếu có lỗi
       }
     };
-    fetchData();
+
+    loadData();
   }, []);
 
   if (loading) {
+    // Hiển thị hình ảnh loading full màn hình khi đang fetch
     return (
-      <View style={{ justifyContent: "center", alignItems: "center", flex: 1 }}>
-        <ActivityIndicator size="large" color="#2980B9" />
-        <Text
-          style={{
-            marginTop: 10,
-            fontSize: 20,
-            fontWeight: "500",
-            color: "#0693F1",
-          }}
-        >
-          Loading...
-        </Text>
+      <View style={styles.container}>
+        <Image source={require("@/assets/splash.png")} style={{width: width, height: height, resizeMode: 'contain'}} />
       </View>
     );
   }
 
   if (error) {
-    return <Text>Failed to load user's level {error}</Text>;
+    return (
+      <View style={styles.container}>
+        <Text style={{ fontSize: 16, color: "red"}}>Sorry, there is an error. Please try again later.</Text>
+      </View>
+    );
   }
 
   return (
@@ -110,12 +126,10 @@ const Learn = () => {
         <View style={styles.SubjectCardsContainer}>
           <SubjectCard
             type="vocabulary"
-            level={level + 1}
             percent={percentVocab}
           />
           <SubjectCard
             type="grammar"
-            level={level + 1}
             percent={percentGrammar}
           />
           <SubjectCard type="skillcheck" />

@@ -8,6 +8,8 @@ import { fit } from "@cloudinary/url-gen/actions/resize";
 import CloudHeader from '@/src/components/CloudHeader';
 import { useAuth } from '@/src/providers/AuthProvider';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { useUserLearn } from "@/src/app/(tabs)/(learn)/ UserLearnContext";
+
 
 type CompletedTopic = {
   completedLearning: number;
@@ -25,21 +27,37 @@ const TopicList = () => {
   const level = Number(params.level);
   const user = useAuth();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const topicList = await getVocabTopicList(user.user?.id, level);
-        setTopics(topicList);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const {
+    level: userLevel,
+    TopicsVocab,
+  } = useUserLearn();
 
-    fetchData();
+  useEffect(() => {
+    if (userLevel != level){
+      const fetchData = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          const topicList = await getVocabTopicList(user.user?.id, level);
+          const newVocabTopics = topicList.map((topic: any) => ({
+            id: topic.id,
+            title: topic.title,
+            ImageUrl: topic.ImageUrl,
+            isLearned: topic.CompletedTopicVocab.length > 0 ? topic.CompletedTopicVocab[0].completedLearning : false,
+            isPracticed: topic.CompletedTopicVocab.length > 0 ? topic.CompletedTopicVocab[0].completedPracticing : false
+          }));
+          setTopics(newVocabTopics);
+        } catch (err: any) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchData();
+    } else {
+      setTopics(TopicsVocab);
+      setLoading(false);
+    }
   }, []);
   
 
@@ -94,17 +112,12 @@ const TopicList = () => {
             );
           }
         
-          const isCompleted = item.CompletedTopicVocab?.some((completed: CompletedTopic) =>
-            completed.completedLearning && completed.completedPracticing
-          );
+          const isCompleted = item.isLearned && item.isPracticed
           return (
             <TouchableOpacity
               style={[styles.card, { backgroundColor: cardColors[index % cardColors.length] }]}
-              onPress={() => {
-                const isCompletedLearning = item.CompletedTopicVocab?.some((completed: CompletedTopic) => completed.completedLearning) ?? false;
-                const isCompletedPracticing = item.CompletedTopicVocab?.some((completed: CompletedTopic) => completed.completedPracticing) ?? false;
-            
-                router.push(`/(learn)/vocabulary/learnTopic?title=${item.title}&topicID=${item.id}&imageUrl=${item.ImageUrl}&completedLearning=${isCompletedLearning}&completedPracticing=${isCompletedPracticing}`);
+              onPress={() => {         
+                router.push(`/(learn)/vocabulary/learnTopic?title=${item.title}&topicID=${item.id}&imageUrl=${item.ImageUrl}&completedLearning=${item.isLearned ? 'true' : 'false'}&completedPracticing=${item.isPracticed ? 'true' : 'false'}`);
               }}
             >
               <View style={styles.textBox}>

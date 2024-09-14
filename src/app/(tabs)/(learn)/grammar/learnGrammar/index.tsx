@@ -4,6 +4,7 @@ import { WebView } from 'react-native-webview';
 import BackButton from "@/src/components/BackButton";
 import { StatusBar } from "expo-status-bar";
 import { ScrollView, Platform, View, Text, StyleSheet, Dimensions, StatusBar as RNStatusBar } from 'react-native';
+import { useUserLearn } from "@/src/app/(tabs)/(learn)/ UserLearnContext";
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/src/providers/AuthProvider';
 import { completeLearningGrammar } from '@/src/updateData/updateLearningProgress';
@@ -18,6 +19,10 @@ const LearnGrammar = () => {
   const params = useLocalSearchParams();
   const topicID = Number(params.topicID);
   const lectureLink = params.lectureLink as string;
+
+  const {
+    updateTopicGrammar,
+  } = useUserLearn();
 
   useEffect(() => {
     if (lectureLink === 'null' || !lectureLink) {
@@ -40,6 +45,7 @@ const LearnGrammar = () => {
             style={styles.doneButton} activeOpacity={0.6}
             onPress={()=> {
               completeLearningGrammar(user.user?.id, topicID);
+              updateTopicGrammar(topicID, true, undefined);
               router.navigate(`/(tabs)/(learn)/resultScreen?correct=${1}&all=${1}&backPage=${'/level'}`);
             }}
           >

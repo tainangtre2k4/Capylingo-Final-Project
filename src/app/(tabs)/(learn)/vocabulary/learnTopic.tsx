@@ -24,7 +24,6 @@ const LearnTopic: React.FC = () => {
   const navigation = useNavigation();
   const params = useLocalSearchParams();
   const router = useRouter();
-
   const title = params.title as string;
   const topicID = Number(params.topicID);
   const imageUrl = params.imageUrl as string;

@@ -84,7 +84,7 @@ const ResultScreen = () => {
           activeOpacity={0.6}
           onPress={() => router.navigate(backPage)}
         >
-          <Text style={styles.backButtonText}>Back to Home</Text>
+          <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
       </View>
       <AnimatedCircularProgress

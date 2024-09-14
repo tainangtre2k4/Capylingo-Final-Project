@@ -9,6 +9,7 @@ import { getVocabList } from '@/src/fetchData/fetchLearn';
 import ProgressTracker from '@/src/components/ProgressTracker';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/src/providers/AuthProvider';
+import { useUserLearn } from "@/src/app/(tabs)/(learn)/ UserLearnContext";
 import { completeLearningVocab } from '@/src/updateData/updateLearningProgress';
 
 const { width, height } = Dimensions.get('screen');
@@ -24,7 +25,12 @@ const LearnVocab = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [incorrectVocabs, setIncorrectVocabs] = useState<any[]>([]);
 
-  const { topicID } = useLocalSearchParams();
+  const {
+    updateTopicVocab,
+  } = useUserLearn();
+
+  const params = useLocalSearchParams();
+  const topicID = Number(params.topicID);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -65,6 +71,7 @@ const LearnVocab = () => {
   useEffect(() => {
     if (vocabsLength === 0 && !loading && !error) {
       completeLearningVocab(user.user?.id, topicID);
+      updateTopicVocab(topicID, true, undefined);
       router.navigate(`/(tabs)/(learn)/resultScreen?correct=${0}&all=${0}&backPage=${'/level'}`);
     }
   }, [vocabsLength, loading, error]);
@@ -94,6 +101,7 @@ const LearnVocab = () => {
     }
     else {
       completeLearningVocab(user.user?.id, topicID);
+      updateTopicVocab(topicID, true, undefined);
       router.navigate(`/(tabs)/(learn)/resultScreen?correct=${vocabs.length}&all=${vocabs.length}&backPage=${'/level'}`);
     }
   };

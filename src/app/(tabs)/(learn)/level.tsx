@@ -2,11 +2,10 @@ import { Modal, ActivityIndicator, StatusBar as RNStatusBar, StyleSheet, Text, V
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useNavigation } from 'expo-router';
-import { useAuth } from '@/src/providers/AuthProvider';
 import BackButton from "@/src/components/BackButton";
-import { fetchUserLevel } from '@/src/fetchData/fetchLearn';
-import { fetchVocabLevelPercent, fetchGrammarLevelPercent } from '@/src/fetchData/fetchProgress';
-import { updateUserLevel } from '@/src/updateData/updateLearningProgress';
+import { useAuth } from "@/src/providers/AuthProvider";
+import { fetchUserLevel, getGrammarTopicList, getVocabTopicList } from "@/src/fetchData/fetchLearn";
+import { useUserLearn } from "@/src/app/(tabs)/(learn)/ UserLearnContext";
 import CircularProgress from '@/src/components/learn/CircularProgress';
 import MedalCelebration from '@/src/components/MedalCelebration';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -44,68 +43,20 @@ const Level: React.FC = () => {
   const navigation = useNavigation();
   const router = useRouter();
   const user = useAuth();
-  const [level, setLevel] = useState<any>(null);
-  const [percentVocab, setPercentVocab] = useState<number | 0>(0);
-  const [percentGrammar, setPercentGrammar] = useState<number | 0>(0);
-  const [percent, setPercent] = useState<number | 0>(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [showCongratulations, setShowCongratulations] = useState(false);
   const [showCloseButton, setShowCloseButton] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        // Lấy level hiện tại của người dùng
-        const userLevel = await fetchUserLevel(user.user?.id);
-        setLevel(userLevel.level);
-  
-        // Lấy phần trăm từ các nguồn
-        const percentV = await fetchVocabLevelPercent(user.user?.id, userLevel.level + 1);
-        const percentG = await fetchGrammarLevelPercent(user.user?.id, userLevel.level + 1);
-        const totalPercent = Math.round((percentV + percentG) / 2);
-  
-        setPercentVocab(Math.round(percentV));
-        setPercentGrammar(Math.round(percentG));
-        setPercent(totalPercent);
-
-        if (totalPercent === 100) {
-          setShowCongratulations(true);
-          const updateResult = await updateUserLevel(user.user?.id, userLevel.level);
-  
-          if (updateResult.success) {
-           
-            const newLevel = userLevel.level + 1;
-
-            const newPercentV = await fetchVocabLevelPercent(user.user?.id, newLevel+1);
-            const newPercentG = await fetchGrammarLevelPercent(user.user?.id, newLevel+1);
-            const newTotalPercent = Math.round((newPercentV + newPercentG) / 2);
-
-            setLevel(newLevel);
-  
-            setPercentVocab(Math.round(newPercentV));
-            setPercentGrammar(Math.round(newPercentG));
-            setPercent(newTotalPercent);
-  
-          
-            setTimeout(() => {
-              setShowCloseButton(true);
-            }, newLevel>=4? 3500 : 8200);
-          } else {
-            console.error('Failed to update user level');
-          }
-        }
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-  
-    fetchData();
-  }, []);
+  const {
+    level,
+    totalPercent: percent,
+    vocabPercent: percentVocab,
+    grammarPercent: percentGrammar,
+    setTopicsVocab,
+    setTopicsGrammar,
+    updateLevel,
+  } = useUserLearn();
   
   useEffect(() => {
     navigation.setOptions({
@@ -120,19 +71,72 @@ const Level: React.FC = () => {
     });
   }, [navigation]);
 
+  useEffect(() => {
+    if (percent >= 100) {
+      const newlevel =  Math.min(level + 1, 5);
+
+      setShowCongratulations(true);
+      setTimeout(() => {
+        setShowCloseButton(true);
+      }, newlevel>=5? 3500 : 8200);
+      setLoading(true);
+      const loadData = async () => {
+        try {
+          const userId = user.user?.id;
+          if (!userId) throw new Error("User ID not found");
+          
+          updateLevel(newlevel);
+  
+          const vocabTopics = await getVocabTopicList(userId, newlevel);
+          const grammarTopics = await getGrammarTopicList(userId, newlevel);
+    
+          const newVocabTopics = vocabTopics.map((topic: any) => ({
+            id: topic.id,
+            title: topic.title,
+            ImageUrl: topic.ImageUrl,
+            isLearned: topic.CompletedTopicVocab.length > 0 ? topic.CompletedTopicVocab[0].completedLearning : false,
+            isPracticed: topic.CompletedTopicVocab.length > 0 ? topic.CompletedTopicVocab[0].completedPracticing : false
+          }));
+    
+          const newGrammarTopics = grammarTopics.map((topic: any) => ({
+            id: topic.id,
+            title: topic.title,
+            ImageUrl: topic.ImageUrl,
+            lectureLink: topic.lectureLink,
+            isLearned: topic.CompletedTopicGrammar.length > 0 ? topic.CompletedTopicGrammar[0].completedLearning : false,
+            isPracticed: topic.CompletedTopicGrammar.length > 0 ? topic.CompletedTopicGrammar[0].completedPracticing : false
+          }));
+          
+          setTopicsVocab(newVocabTopics);
+          setTopicsGrammar(newGrammarTopics);
+        
+          setLoading(false);
+        } catch (error) {
+          console.error("Failed to load data", error);
+          setError("Failed to load data");
+          setLoading(false); // Kết thúc loading nếu có lỗi
+        }
+      };
+  
+      loadData();
+
+    }
+  }, [percent]);
+
+
   if (loading) {
     return (
-        <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}>
-            <ActivityIndicator size="large" color="#2980B9" />
-            <Text style={{ marginTop: 10,fontSize: 20, fontWeight: '500', color: '#0693F1',}}>Loading...</Text>
-        </View>
-    );
+      <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}>
+          <ActivityIndicator size="large" color="#2980B9" />
+          <Text style={{ marginTop: 10,fontSize: 20, fontWeight: '500', color: '#0693F1',}}>Loading...</Text>
+      </View>
+  );
   }
-
 
   if (error) {
-  return <Text>Failed to load user's level {error}</Text>;
-  }
+    return <Text>Failed to load user's level {error}</Text>;
+    }
+  
 
   const handleCloseModal = () => {
     setShowCongratulations(false);
@@ -147,7 +151,7 @@ const Level: React.FC = () => {
             animationType="fade"
           >
             <View style={styles.congratulationsContainer}>
-              <MedalCelebration imageMedal={levels[level].image} completedLevel={level}/>
+              <MedalCelebration imageMedal={levels[level-1].image} completedLevel={level-1}/>
               {showCloseButton && (
                 <TouchableOpacity
                   style={styles.closeButton}
@@ -163,32 +167,32 @@ const Level: React.FC = () => {
                 let vocabPercent = 0;
                 let grammarPercent = 0;
             
-                if (levelItem.levelNumber === level + 1) {
+                if (levelItem.levelNumber === level) {
                   vocabPercent = percentVocab;
                   grammarPercent = percentGrammar;
-                } else if (levelItem.levelNumber < level + 1) {
+                } else if (levelItem.levelNumber < level) {
                   vocabPercent = 100;
                   grammarPercent = 100;
                 } 
                 return (
                   <TouchableOpacity
                       key={index}
-                      style={[styles.button, { backgroundColor: (levelItem.levelNumber <= level+1) ?  levelItem.backgroundColor : '#A0A0A0' }]}
+                      style={[styles.button, { backgroundColor: (levelItem.levelNumber <= level) ?  levelItem.backgroundColor : '#A0A0A0' }]}
                       onPress={() => router.push(`/learnLevel?level=${levelItem.levelNumber}&vocabPercent=${vocabPercent}&grammarPercent=${grammarPercent}`)}
-                      disabled={levelItem.levelNumber > level + 1}
+                      disabled={levelItem.levelNumber > level}
                   >
                       {
-                        (levelItem.levelNumber < level+1) &&
+                        (levelItem.levelNumber < level) &&
                           <Image source={levelItem.image} style={styles.imageBox} />
                       }
                       {
-                        (levelItem.levelNumber === level+1) &&
+                        (levelItem.levelNumber === level) &&
                           <View style={styles.imageBox}>
                             <CircularProgress size={65} percentage={percent}/>
                           </View>
                       }
                      {
-                        (levelItem.levelNumber > level+1) &&
+                        (levelItem.levelNumber > level) &&
                           <View style={[styles.imageBox, {backgroundColor: 'transparent', borderWidth: 0}]}>
                             <Ionicons name="lock-closed" size={40} color="#F6D344" />
                           </View>
@@ -219,7 +223,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingTop: Platform.OS === 'android' ? (RNStatusBar.currentHeight ?? 0) + 8 : 8,
     alignItems: 'center',
-    paddingBottom: 8,
+    paddingBottom: 10,
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     backgroundColor: '#3DB2FF',

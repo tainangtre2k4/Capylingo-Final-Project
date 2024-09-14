@@ -13,15 +13,15 @@ const levelDescriptions = ["Beginner", "Intermediate", "Intermediate", "Advanced
 const { width, height } = Dimensions.get('window');
 
 const ProgressCard: React.FC<ProgressCardProps> = ({ level, percentage }) => {
-    const [currentLevel, setCurrentLevel] = useState<number>(level - 1);
+    const [currentLevel, setCurrentLevel] = useState<number>(level);
     const [currentPercentage, setCurrentPercentage] = useState<number>(percentage);
 
     useEffect(() => {
-        setCurrentLevel(level + 1);
+        setCurrentLevel(level);
         setCurrentPercentage(percentage);
     }, [level, percentage]);
 
-    const levelDescription: string = levelDescriptions[currentLevel];
+    const levelDescription: string = levelDescriptions[currentLevel-1];
 
     return (
         <View style={styles.container}>
