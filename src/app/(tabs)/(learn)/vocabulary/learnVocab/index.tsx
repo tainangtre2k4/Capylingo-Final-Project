@@ -72,7 +72,7 @@ const LearnVocab = () => {
     if (vocabsLength === 0 && !loading && !error) {
       completeLearningVocab(user.user?.id, topicID);
       updateTopicVocab(topicID, true, undefined);
-      router.navigate(`/(tabs)/(learn)/resultScreen?correct=${0}&all=${0}&backPage=${'/(learn)'}`);
+      router.navigate(`/(tabs)/(learn)/resultScreenVG?correct=${0}&all=${0}&backTo=${'vocabulary'}&part=${'learning'}`);
     }
   }, [vocabsLength, loading, error]);
 
@@ -93,7 +93,7 @@ const LearnVocab = () => {
   const goToNextVocab = () => {
     if (currentIndex < vocabs.length * 2 + incorrectVocabs.length - 1) {
       const nextIndex = currentIndex + 1;
-      //setCurrentIndex(nextIndex);
+      //setCurrentIndex(nextIndex);npm 
       scrollViewRef.current?.scrollTo({
         x: nextIndex * width,
         animated: true,
@@ -102,7 +102,7 @@ const LearnVocab = () => {
     else {
       completeLearningVocab(user.user?.id, topicID);
       updateTopicVocab(topicID, true, undefined);
-      router.navigate(`/(tabs)/(learn)/resultScreen?correct=${vocabs.length}&all=${vocabs.length}&backPage=${'/(learn)'}`);
+      router.navigate(`/(tabs)/(learn)/resultScreenVG?correct=${vocabs.length}&all=${vocabs.length}&backTo=${'vocabulary'}&part=${'learning'}`);
     }
   };
 

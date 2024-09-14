@@ -28,7 +28,7 @@ const LearnGrammar = () => {
     if (lectureLink === 'null' || !lectureLink) {
       updateTopicGrammar(topicID, true, undefined);
       completeLearningGrammar(user.user?.id, topicID);
-      router.replace(`/(tabs)/(learn)/resultScreen?correct=${1}&all=${1}&backPage=${'/(learn)'}`);
+      router.navigate(`/(tabs)/(learn)/resultScreenVG?correct=${1}&all=${1}&backTo=${'grammar'}&part=${'learning'}`);
     }
   }, [navigation]);
 
@@ -47,7 +47,7 @@ const LearnGrammar = () => {
             onPress={()=> {
               completeLearningGrammar(user.user?.id, topicID);
               updateTopicGrammar(topicID, true, undefined);
-              router.navigate(`/(tabs)/(learn)/resultScreen?correct=${1}&all=${1}&backPage=${'/(learn)'}`);
+              router.navigate(`/(tabs)/(learn)/resultScreenVG?correct=${1}&all=${1}&backTo=${'grammar'}&part=${'learning'}`);
             }}
           >
             <Text style={styles.doneText}>Done</Text>

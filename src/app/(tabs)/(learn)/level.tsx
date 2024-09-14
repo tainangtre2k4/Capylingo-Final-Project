@@ -39,8 +39,6 @@ const levels = [
 const Level: React.FC = () => {
   const navigation = useNavigation();
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const {
     level,
@@ -62,19 +60,6 @@ const Level: React.FC = () => {
     });
   }, [navigation]);
 
-  if (loading) {
-    return (
-      <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}>
-          <ActivityIndicator size="large" color="#2980B9" />
-          <Text style={{ marginTop: 10,fontSize: 20, fontWeight: '500', color: '#0693F1',}}>Loading...</Text>
-      </View>
-  );
-  }
-
-  if (error) {
-    return <Text>Failed to load user's level {error}</Text>;
-    }
-
   return (
       <View style={styles.container}>
           <View style={styles.buttonContainer}>
@@ -93,7 +78,7 @@ const Level: React.FC = () => {
                   <TouchableOpacity
                       key={index}
                       style={[styles.button, { backgroundColor: (levelItem.levelNumber <= level) ?  levelItem.backgroundColor : '#A0A0A0' }]}
-                      onPress={() => router.push(`/learnLevel?level=${levelItem.levelNumber}&vocabPercent=${vocabPercent}&grammarPercent=${grammarPercent}`)}
+                      onPress={() => router.push(`/learnLevel?level=${levelItem.levelNumber}`)}
                       disabled={levelItem.levelNumber > level}
                   >
                       {

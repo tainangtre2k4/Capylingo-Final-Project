@@ -104,7 +104,7 @@ const GrammarExercises = () => {
       updateTopicGrammar(topicID, undefined, true);
       completedPracticingGrammar(user.user?.id, topicID);
       router.navigate(
-        `/(tabs)/(learn)/resultScreen?correct=${0}&all=${0}&backPage=${'/(learn)'}`
+        `/(tabs)/(learn)/resultScreenVG?correct=${0}&all=${0}&backTo=${'grammar'}&part=${'practicing'}`
       );
     }
   }, [exerciseLength, loading, error]);
@@ -141,13 +141,13 @@ const GrammarExercises = () => {
     } else {
       const totalAnswered = numberCorrectAnswers + numberIncorrectAnswers;
       if (totalAnswered === exerciseLength) {
-        if (numberCorrectAnswers / exerciseLength >= 0.8) {
+        if (numberCorrectAnswers / exerciseLength >= 0.7) {
           updateTopicGrammar(topicID, undefined, true);
           completedPracticingGrammar(user.user?.id, topicID);
         }
 
         router.navigate(
-          `/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}&backPage=${'/(learn)'}`
+          `/(tabs)/(learn)/resultScreenVG?correct=${numberCorrectAnswers}&all=${exerciseLength}&backTo=${'grammar'}&part=${'practicing'}`
         );
       } else {
         setModalVisible(true);
@@ -157,12 +157,12 @@ const GrammarExercises = () => {
 
   const handleModalSubmit = () => {
     setModalVisible(false);
-    if (numberCorrectAnswers / exerciseLength >= 0.8) {
+    if (numberCorrectAnswers / exerciseLength >= 0.7) {
       updateTopicGrammar(topicID, undefined, true);
       completedPracticingGrammar(user.user?.id, topicID);
     }
     router.navigate(
-      `/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}&backPage=${'/(learn)'}`
+      `/(tabs)/(learn)/resultScreenVG?correct=${numberCorrectAnswers}&all=${exerciseLength}&backTo=${'grammar'}&part=${'practicing'}`
     );
   };
   const handleModalCancel = () => {

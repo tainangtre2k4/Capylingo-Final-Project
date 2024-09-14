@@ -59,7 +59,7 @@ const TopicList = () => {
       setTopics(TopicsGrammar);
       setLoading(false);
     }
-  }, []);
+  }, [userLevel, TopicsGrammar]);
   
   
 

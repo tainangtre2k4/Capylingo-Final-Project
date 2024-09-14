@@ -58,7 +58,7 @@ const TopicList = () => {
       setTopics(TopicsVocab);
       setLoading(false);
     }
-  }, []);
+  }, [userLevel, TopicsVocab]);
   
 
   useEffect(() => {

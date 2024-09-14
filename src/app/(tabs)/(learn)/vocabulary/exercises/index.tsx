@@ -79,7 +79,7 @@ const VocabExercises = () => {
     if (exerciseLength === 0 && !loading && !error) {
       completedPracticingVocab(user.user?.id, topicID);
       updateTopicVocab(topicID, undefined, true);
-      router.navigate(`/(tabs)/(learn)/resultScreen?correct=${0}&all=${0}&backPage=${'/(learn)'}`);
+      router.navigate(`/(tabs)/(learn)/resultScreenVG?correct=${0}&all=${0}&backTo=${'vocabulary'}&part=${'practicing'}`);
     }
   }, [exerciseLength, loading, error]);
 
@@ -107,12 +107,12 @@ const VocabExercises = () => {
       const totalAnswered = numberCorrectAnswers + numberIncorrectAnswers;
       if (totalAnswered === exerciseLength) {
 
-        if (numberCorrectAnswers/exerciseLength >= 0.8){
+        if (numberCorrectAnswers/exerciseLength >= 0.7){
           updateTopicVocab(topicID, undefined, true);
           completedPracticingVocab(user.user?.id, topicID);
         }
 
-        router.navigate(`/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}&backPage=${'/(learn)'}`);
+        router.navigate(`/(tabs)/(learn)/resultScreenVG?correct=${numberCorrectAnswers}&all=${exerciseLength}&backTo=${'vocabulary'}&part=${'practicing'}`);
       } else {
         setModalVisible(true);
       }
@@ -121,11 +121,11 @@ const VocabExercises = () => {
 
   const handleModalSubmit = () => {
     setModalVisible(false);
-    if (numberCorrectAnswers/exerciseLength >= 0.8){
+    if (numberCorrectAnswers/exerciseLength >= 0.7){
       updateTopicVocab(topicID, undefined, true);
       completedPracticingVocab(user.user?.id, topicID);
     }
-    router.navigate(`/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}&backPage=${'/(learn)'}`);
+    router.navigate(`/(tabs)/(learn)/resultScreenVG?correct=${numberCorrectAnswers}&all=${exerciseLength}&backTo=${'vocabulary'}&part=${'practicing'}`);
   };
   const handleModalCancel = () => {
     setModalVisible(false);

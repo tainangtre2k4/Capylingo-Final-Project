@@ -3,6 +3,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'expo-router';
 import { useNavigation, useLocalSearchParams } from 'expo-router';
 import BackButton from "@/src/components/BackButton";
+import { useUserLearn } from "@/src/app/(tabs)/(learn)/ UserLearnContext";
 import CircularProgress from '@/src/components/learn/CircularProgress';
 
 const { width, height } = Dimensions.get('screen');
@@ -11,10 +12,29 @@ const LearnTopic: React.FC = () => {
   const navigation = useNavigation();
   const params = useLocalSearchParams();
   const router = useRouter();
+  const [vocabPercent, setVocabPercent] = useState(100);
+  const [grammarPercent, setGrammarPercent] = useState(100);
+
 
   const level = Number(params.level);
-  const vocabPercent = Number(params.vocabPercent);
-  const grammarPercent = Number(params.grammarPercent);
+//   const vocabPercent = Number(params.vocabPercent);
+//   const grammarPercent = Number(params.grammarPercent);
+
+  const {
+    level: userLevel,
+    vocabPercent: percentV,
+    grammarPercent: percentG,
+  } = useUserLearn();
+
+  useEffect(() => {
+    if (userLevel != level){
+        setVocabPercent(100);
+        setGrammarPercent(100);
+    } else {
+        setVocabPercent(percentV);
+        setGrammarPercent(percentG);   
+    }
+  }, [userLevel, percentV, percentG]);
 
   useEffect(() => {
     navigation.setOptions({
