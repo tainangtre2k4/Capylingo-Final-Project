@@ -10,6 +10,7 @@ import ExVocabType1 from '@/src/components/exercise/VocabType1/VocabType1';
 import ExVocabType2 from '@/src/components/exercise/VocabType2/VocabType2';
 import ExVocabType3 from '@/src/components/exercise/VocabType3/VocabType3';
 import { completedPracticingVocab } from '@/src/updateData/updateLearningProgress';
+import { useUserLearn } from "@/src/app/(tabs)/(learn)/ UserLearnContext";
 import { useAuth } from '@/src/providers/AuthProvider';
 
 const { width, height } = Dimensions.get('screen');
@@ -29,7 +30,12 @@ const VocabExercises = () => {
   const scrollViewRef = useRef<ScrollView>(null);
   const router = useRouter();
 
-  const { topicID } = useLocalSearchParams();
+  const {
+    updateTopicVocab,
+  } = useUserLearn();
+
+  const params = useLocalSearchParams();
+  const topicID = Number(params.topicID);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -72,7 +78,8 @@ const VocabExercises = () => {
   useEffect(() => {
     if (exerciseLength === 0 && !loading && !error) {
       completedPracticingVocab(user.user?.id, topicID);
-      router.navigate(`/(tabs)/(learn)/resultScreen?correct=${0}&all=${0}&backPage=${'/level'}`);
+      updateTopicVocab(topicID, undefined, true);
+      router.navigate(`/(tabs)/(learn)/resultScreenVG?correct=${0}&all=${0}&backTo=${'vocabulary'}&part=${'practicing'}`);
     }
   }, [exerciseLength, loading, error]);
 
@@ -100,11 +107,12 @@ const VocabExercises = () => {
       const totalAnswered = numberCorrectAnswers + numberIncorrectAnswers;
       if (totalAnswered === exerciseLength) {
 
-        if (numberCorrectAnswers/exerciseLength >= 0.8){
+        if (numberCorrectAnswers/exerciseLength >= 0.7){
+          updateTopicVocab(topicID, undefined, true);
           completedPracticingVocab(user.user?.id, topicID);
         }
 
-        router.navigate(`/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}&backPage=${'/level'}`);
+        router.navigate(`/(tabs)/(learn)/resultScreenVG?correct=${numberCorrectAnswers}&all=${exerciseLength}&backTo=${'vocabulary'}&part=${'practicing'}`);
       } else {
         setModalVisible(true);
       }
@@ -113,7 +121,11 @@ const VocabExercises = () => {
 
   const handleModalSubmit = () => {
     setModalVisible(false);
-    router.navigate(`/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}&backPage=${'/level'}`);
+    if (numberCorrectAnswers/exerciseLength >= 0.7){
+      updateTopicVocab(topicID, undefined, true);
+      completedPracticingVocab(user.user?.id, topicID);
+    }
+    router.navigate(`/(tabs)/(learn)/resultScreenVG?correct=${numberCorrectAnswers}&all=${exerciseLength}&backTo=${'vocabulary'}&part=${'practicing'}`);
   };
   const handleModalCancel = () => {
     setModalVisible(false);

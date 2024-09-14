@@ -26,6 +26,7 @@ import ExGrammarType1 from "@/src/components/exercise/GrammarType1/GrammarType1"
 import ExGrammarType2 from "@/src/components/exercise/GrammarType2/GrammarType2";
 import ExGrammarType3 from "@/src/components/exercise/VocabType2/VocabType2";
 import { completedPracticingGrammar } from "@/src/updateData/updateLearningProgress";
+import { useUserLearn } from "@/src/app/(tabs)/(learn)/ UserLearnContext";
 import { useAuth } from "@/src/providers/AuthProvider";
 
 const { width, height } = Dimensions.get("screen");
@@ -45,7 +46,12 @@ const GrammarExercises = () => {
   const scrollViewRef = useRef<ScrollView>(null);
   const router = useRouter();
 
-  const { topicID } = useLocalSearchParams();
+  const {
+    updateTopicGrammar,
+  } = useUserLearn();
+
+  const params = useLocalSearchParams();
+  const topicID = Number(params.topicID);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -95,9 +101,10 @@ const GrammarExercises = () => {
 
   useEffect(() => {
     if (exerciseLength === 0 && !loading && !error) {
+      updateTopicGrammar(topicID, undefined, true);
       completedPracticingGrammar(user.user?.id, topicID);
       router.navigate(
-        `/(tabs)/(learn)/resultScreen?correct=${0}&all=${0}&backPage=${"/level"}`
+        `/(tabs)/(learn)/resultScreenVG?correct=${0}&all=${0}&backTo=${'grammar'}&part=${'practicing'}`
       );
     }
   }, [exerciseLength, loading, error]);
@@ -134,12 +141,13 @@ const GrammarExercises = () => {
     } else {
       const totalAnswered = numberCorrectAnswers + numberIncorrectAnswers;
       if (totalAnswered === exerciseLength) {
-        if (numberCorrectAnswers / exerciseLength >= 0.8) {
+        if (numberCorrectAnswers / exerciseLength >= 0.7) {
+          updateTopicGrammar(topicID, undefined, true);
           completedPracticingGrammar(user.user?.id, topicID);
         }
 
         router.navigate(
-          `/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}&backPage=${"/level"}`
+          `/(tabs)/(learn)/resultScreenVG?correct=${numberCorrectAnswers}&all=${exerciseLength}&backTo=${'grammar'}&part=${'practicing'}`
         );
       } else {
         setModalVisible(true);
@@ -149,8 +157,12 @@ const GrammarExercises = () => {
 
   const handleModalSubmit = () => {
     setModalVisible(false);
+    if (numberCorrectAnswers / exerciseLength >= 0.7) {
+      updateTopicGrammar(topicID, undefined, true);
+      completedPracticingGrammar(user.user?.id, topicID);
+    }
     router.navigate(
-      `/(tabs)/(learn)/resultScreen?correct=${numberCorrectAnswers}&all=${exerciseLength}&backPage=${"/level"}`
+      `/(tabs)/(learn)/resultScreenVG?correct=${numberCorrectAnswers}&all=${exerciseLength}&backTo=${'grammar'}&part=${'practicing'}`
     );
   };
   const handleModalCancel = () => {

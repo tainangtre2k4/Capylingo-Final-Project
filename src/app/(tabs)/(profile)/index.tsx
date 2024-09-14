@@ -37,7 +37,7 @@ export default function Index() {
       }
       setAvatar(data.avatar_url);
       setUserName(data.username);
-      setLevel(data?.level + 1 ?? 0); // Default to 0 if level is null or undefined
+      setLevel(data?.level ?? 0); // Default to 0 if level is null or undefined
 
       let levelText = '';
       switch (data.level + 1) {
@@ -191,7 +191,7 @@ export default function Index() {
           </View>
           <View style={styles.verticalLine} />
           <View style={styles.infoItem}>
-            <Text style={styles.infoValue}>20</Text>
+            <Text style={styles.infoValue}>0</Text>
             <Text style={styles.infoLabel}>Achievements</Text>
           </View>
           <View style={styles.verticalLine} />

@@ -4,6 +4,7 @@ import { WebView } from 'react-native-webview';
 import BackButton from "@/src/components/BackButton";
 import { StatusBar } from "expo-status-bar";
 import { ScrollView, Platform, View, Text, StyleSheet, Dimensions, StatusBar as RNStatusBar } from 'react-native';
+import { useUserLearn } from "@/src/app/(tabs)/(learn)/ UserLearnContext";
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/src/providers/AuthProvider';
 import { completeLearningGrammar } from '@/src/updateData/updateLearningProgress';
@@ -19,10 +20,15 @@ const LearnGrammar = () => {
   const topicID = Number(params.topicID);
   const lectureLink = params.lectureLink as string;
 
+  const {
+    updateTopicGrammar,
+  } = useUserLearn();
+
   useEffect(() => {
     if (lectureLink === 'null' || !lectureLink) {
+      updateTopicGrammar(topicID, true, undefined);
       completeLearningGrammar(user.user?.id, topicID);
-      router.replace(`/(tabs)/(learn)/resultScreen?correct=${1}&all=${1}&backPage=${'/level'}`);
+      router.navigate(`/(tabs)/(learn)/resultScreenVG?correct=${1}&all=${1}&backTo=${'grammar'}&part=${'learning'}`);
     }
   }, [navigation]);
 
@@ -40,7 +46,8 @@ const LearnGrammar = () => {
             style={styles.doneButton} activeOpacity={0.6}
             onPress={()=> {
               completeLearningGrammar(user.user?.id, topicID);
-              router.navigate(`/(tabs)/(learn)/resultScreen?correct=${1}&all=${1}&backPage=${'/level'}`);
+              updateTopicGrammar(topicID, true, undefined);
+              router.navigate(`/(tabs)/(learn)/resultScreenVG?correct=${1}&all=${1}&backTo=${'grammar'}&part=${'learning'}`);
             }}
           >
             <Text style={styles.doneText}>Done</Text>

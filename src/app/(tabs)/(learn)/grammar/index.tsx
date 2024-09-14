@@ -8,6 +8,8 @@ import { fit } from "@cloudinary/url-gen/actions/resize";
 import CloudHeader from '@/src/components/CloudHeader';
 import { useAuth } from '@/src/providers/AuthProvider';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { useUserLearn } from "@/src/app/(tabs)/(learn)/ UserLearnContext";
+
 
 type CompletedTopic = {
   completedLearning: number;
@@ -25,22 +27,40 @@ const TopicList = () => {
   const level = Number(params.level);
   const user = useAuth();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const topicList = await getGrammarTopicList(user.user?.id, level);
-        setTopics(topicList);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const {
+    level: userLevel,
+    TopicsGrammar,
+  } = useUserLearn();
 
-    fetchData();
-  }, []);
+  useEffect(() => {
+    if (userLevel != level){
+      const fetchData = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          const topicList = await getGrammarTopicList(user.user?.id, level);
+          const newGrammarTopics = topicList.map((topic: any) => ({
+            id: topic.id,
+            title: topic.title,
+            ImageUrl: topic.ImageUrl,
+            lectureLink: topic.lectureLink,
+            isLearned: topic.CompletedTopicGrammar.length > 0 ? topic.CompletedTopicGrammar[0].completedLearning : false,
+            isPracticed: topic.CompletedTopicGrammar.length > 0 ? topic.CompletedTopicGrammar[0].completedPracticing : false
+          }));
+          setTopics(newGrammarTopics);
+        } catch (err: any) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchData();
+    } else {
+      setTopics(TopicsGrammar);
+      setLoading(false);
+    }
+  }, [userLevel, TopicsGrammar]);
+  
   
 
   useEffect(() => {
@@ -94,18 +114,13 @@ const TopicList = () => {
             );
           }
         
-          const isCompleted = item.CompletedTopicGrammar?.some((completed: CompletedTopic) =>
-            completed.completedLearning && completed.completedPracticing
-          );
+          const isCompleted = item.isLearned && item.isPracticed
           return (
             <TouchableOpacity
               style={[styles.card, { backgroundColor: cardColors[index % cardColors.length] }]}
-              onPress={() => {
-                const isCompletedLearning = item.CompletedTopicGrammar?.some((completed: CompletedTopic) => completed.completedLearning) ?? false;
-                const isCompletedPracticing = item.CompletedTopicGrammar?.some((completed: CompletedTopic) => completed.completedPracticing) ?? false;
-            
+              onPress={() => {            
                 router.push(
-                  `(learn)/grammar/learnTopic?title=${encodeURIComponent(item.title)}&topicID=${item.id}&imageUrl=${encodeURIComponent(item.ImageUrl)}&lectureLink=${encodeURIComponent(item.lectureLink)}&completedLearning=${isCompletedLearning}&completedPracticing=${isCompletedPracticing}`
+                   `(learn)/grammar/learnTopic?title=${encodeURIComponent(item.title)}&topicID=${item.id}&imageUrl=${encodeURIComponent(item.ImageUrl)}&lectureLink=${encodeURIComponent(item.lectureLink)}&completedLearning=${item.isLearned ? 'true' : 'false'}&completedPracticing=${item.isPracticed ? 'true' : 'false'}`
                 );
               }}
             >

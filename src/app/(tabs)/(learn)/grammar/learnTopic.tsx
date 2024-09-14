@@ -29,8 +29,8 @@ const LearnTopic: React.FC = () => {
   const topicID = Number(params.topicID);
   const imageUrl = params.imageUrl as string;
   const lectureLink = params.lectureLink as string;
-  const completedLearning = params.completedLearning === "true";
-  const completedPracticing = params.completedPracticing === "true";
+  const completedLearning = params.completedLearning as string === "true";
+  const completedPracticing = params.completedPracticing as string === "true";
 
   const [loading, setLoading] = useState(true);
   useEffect(() => {

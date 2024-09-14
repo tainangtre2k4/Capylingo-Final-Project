@@ -10,6 +10,7 @@ import {
 import { useNavigation, useRouter, useLocalSearchParams, Href } from "expo-router";
 import React, { useEffect } from "react";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
+import { useUserLearn } from "@/src/app/(tabs)/(learn)/ UserLearnContext";
 
 const { width, height } = Dimensions.get("window");
 
@@ -23,26 +24,59 @@ const headings = [
 type SearchParams = {
   correct: string;
   all: string;
-  backPage: string;
+  backTo: string;
+  part: string;
 };
 
-const ResultScreen = () => {
+const ResultScreenVG = () => {
   const navigation = useNavigation();
   const router = useRouter();
-  const { correct, all, backPage } = useLocalSearchParams<SearchParams>();
+  const { correct, all, backTo, part } = useLocalSearchParams<SearchParams>();
+
+  const {
+    level,
+  } = useUserLearn();
 
   const correctNum = parseInt(correct, 10); 
   const allNum = parseInt(all, 10);
 
   const getHeading = (percent: number) => {
-    if (percent < 50) return headings[0];
-    if (percent >= 50 && percent < 70) return headings[1];
-    if (percent >= 70 && percent < 80) return headings[2];
+    if (percent < 70) return headings[0];
+    if (percent >= 70 && percent < 80) return headings[1];
+    if (percent >= 80 && percent < 90) return headings[2];
     return headings[3];
   };
 
   const percentage = Math.round((correctNum / allNum) * 100);
   const heading = getHeading(percentage);
+
+
+  const getResultText = () => {
+    if (percentage >= 70) {
+      if (backTo === 'vocabulary' && part === 'learning') {
+        return "Congratulations on completing the vocabulary section!";
+      }
+      if (backTo === 'vocabulary' && part === 'practicing') {
+        return "Well done! You've passed the vocabulary exercises for this topic!";
+      }
+      if (backTo === 'grammar' && part === 'learning') {
+        return "Congratulations on completing the grammar section!";
+      }
+      if (backTo === 'grammar' && part === 'practicing') {
+        return "Great job! You've passed the grammar exercises for this topic!";
+      }
+    } else {
+      if (backTo === 'vocabulary') {
+        return "Keep going! Review the vocabulary and try again!";
+      }
+      if (backTo === 'grammar') {
+        return "Don't give up! Practice the grammar exercises once more!";
+      }
+    }
+    return 'Capylingo';
+  };
+
+  const resultText = getResultText();
 
   useEffect(() => {
     navigation.setOptions({
@@ -68,21 +102,25 @@ const ResultScreen = () => {
         <Text style={styles.scoreText}>Your Score</Text>
       </View>
       <View style={styles.lowerBackground}>
-        <View style={{ flexDirection: "row" }}>
+        <View style={{ flexDirection: "row", marginTop: height*0.05 }}>
           <Image
             source={require("@/assets/images/resources/capyNews.png")}
             style={styles.image}
           />
           <View style={styles.chillingContainer}>
-            <Text style={styles.chillingText}>Keep on studying!</Text>
-            <View style={{ marginVertical: 4 }} />
-            <Text style={styles.chillingText}>I'm just chilling here tho'</Text>
+            <Text style={styles.chillingText}>{resultText}</Text>
           </View>
         </View>
         <TouchableOpacity
           style={styles.backButton}
           activeOpacity={0.6}
-          onPress={() => router.navigate(backPage)}
+          onPress={() => {
+            if (backTo === 'vocabulary') {
+              router.navigate(`/vocabulary?level=${level}`)
+            } else if (backTo === 'grammar') {
+              router.navigate(`/grammar?level=${level}`)
+            }
+          }}
         >
           <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
@@ -109,12 +147,13 @@ const ResultScreen = () => {
   );
 };
 
-export default ResultScreen;
+export default ResultScreenVG;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
+    marginTop: 24,
   },
   heading: {
     fontSize: 24,
@@ -135,7 +174,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: width * 0.16,
     backgroundColor: "#F3F3F3",
     paddingTop: height * 0.2,
-    alignItems: "center",
   },
   resultText: {
     fontSize: 32,
@@ -148,25 +186,33 @@ const styles = StyleSheet.create({
     top: width * 0.4,
   },
   image: {
-    width: 200,
-    height: 208,
+    width: width*0.35,
+    height: width*0.35,
+    marginLeft: width*0.05,
   },
   chillingContainer: {
-    marginVertical: 20,
-    marginLeft: -20,
+    width: width*0.5,
+    marginTop: 20,
+    marginLeft: width*0.05,
   },
   chillingText: {
-    fontSize: 16,
+    fontSize: 18,
+    fontWeight: '500',
   },
   backButton: {
     backgroundColor: "#0693F1",
-    paddingVertical: 30,
+    width: width*0.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
     paddingHorizontal: 40,
     borderRadius: 30,
-    marginTop: height * 0.06,
+    alignSelf: 'center',
+    position: 'absolute',
+    bottom: height*0.08,
   },
   backButtonText: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "500",
     color: "white",
   },

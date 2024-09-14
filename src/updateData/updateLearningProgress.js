@@ -3,7 +3,7 @@ import { supabase } from '@/src/lib/supabase';
 export const updateUserLevel = async (userID, level) => {
   const { data, error } = await supabase
     .from('profiles')
-    .update({ level: level + 1 })
+    .update({ level: level })
     .eq('id', userID);
 
   if (error) {
