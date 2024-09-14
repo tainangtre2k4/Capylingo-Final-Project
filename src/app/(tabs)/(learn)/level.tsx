@@ -188,7 +188,7 @@ const Level: React.FC = () => {
                       {
                         (levelItem.levelNumber === level) &&
                           <View style={styles.imageBox}>
-                            <CircularProgress size={65} percentage={percent}/>
+                            <CircularProgress size={60} percentage={percent}/>
                           </View>
                       }
                      {

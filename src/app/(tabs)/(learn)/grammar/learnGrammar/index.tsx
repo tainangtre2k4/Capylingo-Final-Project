@@ -26,6 +26,7 @@ const LearnGrammar = () => {
 
   useEffect(() => {
     if (lectureLink === 'null' || !lectureLink) {
+      updateTopicGrammar(topicID, true, undefined);
       completeLearningGrammar(user.user?.id, topicID);
       router.replace(`/(tabs)/(learn)/resultScreen?correct=${1}&all=${1}&backPage=${'/level'}`);
     }

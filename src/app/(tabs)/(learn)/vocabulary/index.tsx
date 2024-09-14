@@ -95,7 +95,7 @@ const TopicList = () => {
 
           if (item.ImageUrl) {
             const image = cld.image(item.ImageUrl);
-            image.resize(fit().width(100).height(100)); // Resize ảnh Cloudinary
+            image.resize(fit().width(100).height(100));
             imageContent = (
               <AdvancedImage
                 cldImg={image}
