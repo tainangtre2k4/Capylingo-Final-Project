@@ -8,6 +8,7 @@ import {
   View,
   Platform,
   StatusBar as RNStatusBar,
+  Modal,
 } from "react-native";
 import WOTDCard from "@/src/components/learn/WOTDCard";
 import SubjectCard from "@/src/components/learn/SubjectCard";
@@ -18,12 +19,23 @@ import { fetchUserLevel, getGrammarTopicList, getVocabTopicList } from "@/src/fe
 import ProgressCard from "@/src/components/learn/ProgressCard";
 import React, { useState, useEffect } from "react";
 import QuickSearch from "@/src/components/learn/QuickSearch";
+import { updateUserLevel } from '@/src/updateData/updateLearningProgress';
+import MedalCelebration from '@/src/components/MedalCelebration';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const { width, height } = Dimensions.get("window");
+const levels = [
+  require('@/assets/images/level/medal1.png'),
+  require('@/assets/images/level/medal2.png'),
+  require('@/assets/images/level/medal3.png'),
+  require('@/assets/images/level/medal4.png'),
+]
 
 const Learn = () => {
   const router = useRouter();
   const user = useAuth();
+  const [showCongratulations, setShowCongratulations] = useState(false);
+  const [showCloseButton, setShowCloseButton] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigation = useNavigation();
@@ -84,6 +96,64 @@ const Learn = () => {
     loadData();
   }, []);
 
+  const handleCloseModal = () => {
+    setShowCongratulations(false);
+    setShowCloseButton(false);
+  };
+
+  useEffect(() => {
+    if (percent >= 100) {
+      const newlevel =  Math.min(level + 1, 5);
+
+      setShowCongratulations(true);
+      setTimeout(() => {
+        setShowCloseButton(true);
+      }, newlevel>=5? 3500 : 7500);
+      setLoading(true);
+      const loadData = async () => {
+        try {
+          const userId = user.user?.id;
+          if (!userId) throw new Error("User ID not found");
+          
+          updateLevel(newlevel);
+          updateUserLevel(user.user?.id, newlevel)
+  
+          const vocabTopics = await getVocabTopicList(userId, newlevel);
+          const grammarTopics = await getGrammarTopicList(userId, newlevel);
+    
+          const newVocabTopics = vocabTopics.map((topic: any) => ({
+            id: topic.id,
+            title: topic.title,
+            ImageUrl: topic.ImageUrl,
+            isLearned: topic.CompletedTopicVocab.length > 0 ? topic.CompletedTopicVocab[0].completedLearning : false,
+            isPracticed: topic.CompletedTopicVocab.length > 0 ? topic.CompletedTopicVocab[0].completedPracticing : false
+          }));
+    
+          const newGrammarTopics = grammarTopics.map((topic: any) => ({
+            id: topic.id,
+            title: topic.title,
+            ImageUrl: topic.ImageUrl,
+            lectureLink: topic.lectureLink,
+            isLearned: topic.CompletedTopicGrammar.length > 0 ? topic.CompletedTopicGrammar[0].completedLearning : false,
+            isPracticed: topic.CompletedTopicGrammar.length > 0 ? topic.CompletedTopicGrammar[0].completedPracticing : false
+          }));
+          
+          setTopicsVocab(newVocabTopics);
+          setTopicsGrammar(newGrammarTopics);
+        
+          setLoading(false);
+        } catch (error) {
+          console.error("Failed to load data", error);
+          setError("Failed to load data");
+          setLoading(false); // Kết thúc loading nếu có lỗi
+        }
+      };
+  
+      loadData();
+
+    }
+  }, [percent]);
+
   if (loading) {
     // Hiển thị hình ảnh loading full màn hình khi đang fetch
     return (
@@ -101,8 +171,27 @@ const Learn = () => {
     );
   }
 
+
   return (
     <View style={styles.container}>
+      <Modal
+        transparent={true}
+        visible={showCongratulations}
+        animationType="fade"
+      >
+        <View style={styles.congratulationsContainer}>
+          <MedalCelebration imageMedal={levels[level-1]} completedLevel={level-1}/>
+          {showCloseButton && (
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={handleCloseModal}
+            >
+              <Ionicons name="close-circle" size={47} color="#FF4D4D" />
+            </TouchableOpacity>
+          )}
+        </View>
+      </Modal>
+
       <View style={styles.headBanner}>
         <View style={styles.GreetingContainer}>
           <Text style={styles.greeting}>Welcome, New User!</Text>
@@ -202,5 +291,17 @@ const styles = StyleSheet.create({
     flex: 1,
     marginVertical: 30,
     justifyContent: "space-between",
+  },
+  congratulationsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: height*0.057,
+    left: 22,
+    zIndex: 1,
   },
 });

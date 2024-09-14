@@ -3,12 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useNavigation } from 'expo-router';
 import BackButton from "@/src/components/BackButton";
-import { useAuth } from "@/src/providers/AuthProvider";
-import { fetchUserLevel, getGrammarTopicList, getVocabTopicList } from "@/src/fetchData/fetchLearn";
 import { useUserLearn } from "@/src/app/(tabs)/(learn)/ UserLearnContext";
-import { updateUserLevel } from '@/src/updateData/updateLearningProgress';
 import CircularProgress from '@/src/components/learn/CircularProgress';
-import MedalCelebration from '@/src/components/MedalCelebration';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 const { width, height } = Dimensions.get('screen');
@@ -43,9 +39,6 @@ const levels = [
 const Level: React.FC = () => {
   const navigation = useNavigation();
   const router = useRouter();
-  const user = useAuth();
-  const [showCongratulations, setShowCongratulations] = useState(false);
-  const [showCloseButton, setShowCloseButton] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -54,9 +47,6 @@ const Level: React.FC = () => {
     totalPercent: percent,
     vocabPercent: percentVocab,
     grammarPercent: percentGrammar,
-    setTopicsVocab,
-    setTopicsGrammar,
-    updateLevel,
   } = useUserLearn();
   
   useEffect(() => {
@@ -72,60 +62,6 @@ const Level: React.FC = () => {
     });
   }, [navigation]);
 
-  useEffect(() => {
-    if (percent >= 100) {
-      const newlevel =  Math.min(level + 1, 5);
-
-      setShowCongratulations(true);
-      setTimeout(() => {
-        setShowCloseButton(true);
-      }, newlevel>=5? 3500 : 7500);
-      setLoading(true);
-      const loadData = async () => {
-        try {
-          const userId = user.user?.id;
-          if (!userId) throw new Error("User ID not found");
-          
-          updateLevel(newlevel);
-          updateUserLevel(user.user?.id, newlevel)
-  
-          const vocabTopics = await getVocabTopicList(userId, newlevel);
-          const grammarTopics = await getGrammarTopicList(userId, newlevel);
-    
-          const newVocabTopics = vocabTopics.map((topic: any) => ({
-            id: topic.id,
-            title: topic.title,
-            ImageUrl: topic.ImageUrl,
-            isLearned: topic.CompletedTopicVocab.length > 0 ? topic.CompletedTopicVocab[0].completedLearning : false,
-            isPracticed: topic.CompletedTopicVocab.length > 0 ? topic.CompletedTopicVocab[0].completedPracticing : false
-          }));
-    
-          const newGrammarTopics = grammarTopics.map((topic: any) => ({
-            id: topic.id,
-            title: topic.title,
-            ImageUrl: topic.ImageUrl,
-            lectureLink: topic.lectureLink,
-            isLearned: topic.CompletedTopicGrammar.length > 0 ? topic.CompletedTopicGrammar[0].completedLearning : false,
-            isPracticed: topic.CompletedTopicGrammar.length > 0 ? topic.CompletedTopicGrammar[0].completedPracticing : false
-          }));
-          
-          setTopicsVocab(newVocabTopics);
-          setTopicsGrammar(newGrammarTopics);
-        
-          setLoading(false);
-        } catch (error) {
-          console.error("Failed to load data", error);
-          setError("Failed to load data");
-          setLoading(false); // Kết thúc loading nếu có lỗi
-        }
-      };
-  
-      loadData();
-
-    }
-  }, [percent]);
-
-
   if (loading) {
     return (
       <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}>
@@ -138,32 +74,9 @@ const Level: React.FC = () => {
   if (error) {
     return <Text>Failed to load user's level {error}</Text>;
     }
-  
-
-  const handleCloseModal = () => {
-    setShowCongratulations(false);
-    setShowCloseButton(false);
-  };
 
   return (
       <View style={styles.container}>
-          <Modal
-            transparent={true}
-            visible={showCongratulations}
-            animationType="fade"
-          >
-            <View style={styles.congratulationsContainer}>
-              <MedalCelebration imageMedal={levels[level-1].image} completedLevel={level-1}/>
-              {showCloseButton && (
-                <TouchableOpacity
-                  style={styles.closeButton}
-                  onPress={handleCloseModal}
-                >
-                  <Ionicons name="close-circle" size={47} color="#FF4D4D" />
-                </TouchableOpacity>
-              )}
-            </View>
-          </Modal>
           <View style={styles.buttonContainer}>
               {levels.map((levelItem, index) => {
                 let vocabPercent = 0;
@@ -287,23 +200,5 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -13,
     right: -13,
-  },
-  congratulationsContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-  },
-  congratulationsText: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    color: '#fff',
-    textAlign: 'center',
-  },
-  closeButton: {
-    position: 'absolute',
-    top: height*0.057,
-    left: 22,
-    zIndex: 1,
   },
 });
