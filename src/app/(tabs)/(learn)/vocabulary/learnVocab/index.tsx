@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigation, useLocalSearchParams } from "expo-router";
 import BackButton from "@/src/components/BackButton";
-import { StatusBar } from "expo-status-bar";
 import { ActivityIndicator, ScrollView, Platform, View, Text, StyleSheet, Dimensions, StatusBar as RNStatusBar } from 'react-native';
 import Flashcard from '@/src/components/learnVocab/flashcard';
 import RewriteVocab from '@/src/components/learnVocab/rewriteVocab';
